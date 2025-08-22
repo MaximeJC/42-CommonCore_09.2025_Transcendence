@@ -16,27 +16,15 @@
 					height: 100%;
 					touch-action: none;
 				}
-				/* Style pour l'affichage des FPS */
-				#fps {
-					position: absolute;
-					top: 10px;
-					left: 10px;
-					background-color: rgba(0, 0, 0, 0.5);
-					color: white;
-					padding: 5px 10px;
-					font-family: monospace;
-					font-size: 16px;
-					border-radius: 5px;
-					z-index: 100; /* S'assure qu'il est au-dessus du canvas */
-				}
 			</style>
-			<script src="https://cdn.babylonjs.com/babylon.js"></script> <!-- Importe la bibliothèque Babylon.js 
+			<!-- officiel : https://cdn.babylonjs.com/  enregistre dans includes/js/BabylonJS/-->
+			<script src="includes/js/BabylonJS/babylon.js"></script> <!-- Importe la bibliothèque Babylon.js 
 			directement depuis un CDN. -->
-			<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> <!-- Ceci est une extension 
+			<script src="includes/js/BabylonJS/loaders/babylonjs.loaders.min.js"></script> <!-- Ceci est une extension 
 			de Babylon.js qui permet de charger différents formats de modèles 3D comme GLB ou OBJ.-->
-			<script src="https://cdn.babylonjs.com/materialsLibrary/babylon.gridMaterial.min.js"></script>
+			<script src="includes/js/BabylonJS/materialsLibrary/babylon.gridMaterial.min.js"></script>
 			<!-- Le script pour l'interface graphique (GUI) -->
-			<script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+			<script src="includes/js/BabylonJS/gui/babylon.gui.min.js"></script>
 
 		</head>
 		<body>
@@ -44,6 +32,6 @@
 													Babylon.js va dessiner toute ta scène 3D à
 													l'intérieur de ce canvas. L'ID
 													renderCanvas est crucial pour que Babylon.js puisse le cibler. -->
-			<script src="app.js"></script> 		<!-- importe le script app.js où seras écrit tout le code Babylon.js.-->
+			<script type="module" src="includes/js/app.js"></script>		<!-- importe le script app.js où seras écrit tout le code Babylon.js.-->
 		</body>
 	</html>
