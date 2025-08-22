@@ -1,0 +1,49 @@
+<!DOCTYPE html> <!-- Déclaration du type de document. -->
+	<html>
+		<head>
+			<meta charset="UTF-8"> <!-- Spécifie l'encodage des caractères. -->
+			<title>🔥 Hell's Gate Pong 🔥</title> <!-- Le titre de ta page affiché dans l'onglet du navigateur. -->
+			<style>
+				html, body {
+					overflow: hidden;
+					width: 100%;
+					height: 100%;
+					margin: 0;
+					padding: 0;
+				}
+				#renderCanvas {
+					width: 100%;
+					height: 100%;
+					touch-action: none;
+				}
+				/* Style pour l'affichage des FPS */
+				#fps {
+					position: absolute;
+					top: 10px;
+					left: 10px;
+					background-color: rgba(0, 0, 0, 0.5);
+					color: white;
+					padding: 5px 10px;
+					font-family: monospace;
+					font-size: 16px;
+					border-radius: 5px;
+					z-index: 100; /* S'assure qu'il est au-dessus du canvas */
+				}
+			</style>
+			<script src="https://cdn.babylonjs.com/babylon.js"></script> <!-- Importe la bibliothèque Babylon.js 
+			directement depuis un CDN. -->
+			<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> <!-- Ceci est une extension 
+			de Babylon.js qui permet de charger différents formats de modèles 3D comme GLB ou OBJ.-->
+			<script src="https://cdn.babylonjs.com/materialsLibrary/babylon.gridMaterial.min.js"></script>
+			<!-- Le script pour l'interface graphique (GUI) -->
+			<script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+
+		</head>
+		<body>
+			<canvas id="renderCanvas"></canvas> <!-- C'est l'élément HTML essentiel.
+													Babylon.js va dessiner toute ta scène 3D à
+													l'intérieur de ce canvas. L'ID
+													renderCanvas est crucial pour que Babylon.js puisse le cibler. -->
+			<script src="app.js"></script> 		<!-- importe le script app.js où seras écrit tout le code Babylon.js.-->
+		</body>
+	</html>
