@@ -37,7 +37,7 @@ async function initializeApp() {
 	}
 
 	// Cree l'interface utilisateur (GUI)
-	createGUI(gameState);
+	createGUI(gameState, engine);
 
 	// Met en place la gestion des entrees clavier
 	setupInputManager(scene, gameState);
