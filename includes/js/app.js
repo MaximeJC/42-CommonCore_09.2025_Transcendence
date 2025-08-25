@@ -27,6 +27,8 @@ async function initializeApp() {
 	// Cree les objets 3D restants (balle, table, etc.)
 	// On stocke la reference de la balle dans l'etat du jeu
 	gameState.ball = await createBall(scene); 
+	gameState.ball.isVisible = false;
+
 	const table = createTable(scene);
 	const arcade = await loadArcade(scene);
 

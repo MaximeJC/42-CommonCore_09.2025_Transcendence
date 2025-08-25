@@ -22,7 +22,7 @@ export function setupInputManager(scene, gameState) {
 						gameState.isGamePaused = true;
 					}
 					
-					gameState.ui.pauseText.isVisible = gameState.isGamePaused; // On affiche ou cache le texte
+					gameState.ui.pauseText.mesh.isVisible = gameState.isGamePaused; // On affiche ou cache le texte
 					
 					// Gere la visibilite du compte a rebours pendant la pause
 					if (gameState.countdownInterval) {

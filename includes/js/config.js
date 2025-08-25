@@ -3,6 +3,8 @@
 //#region------------------------------------------config----------------------------------------
 export const debug = false;
 export const debugVisuals = false;
+export const debugFps = true;
+
 
 // MODIFIER ICI LE MODE DE JEU
 // Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
@@ -17,7 +19,7 @@ export const limitDown4v4 = -30;
 export const maxScore = 5;
 
 // Vitesses
-export const speedRacket = 50;
+export const speedRacket = 60;
 // C'est la vitesse de depart de la balle, elle augmentera pendant le jeu.
 export const initialSpeedBall = 60;
 

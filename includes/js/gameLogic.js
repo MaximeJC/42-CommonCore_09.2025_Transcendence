@@ -1,15 +1,15 @@
 // js/gameLogic.js
 
 import { inputMap } from './inputManager.js';
-import { initialSpeedBall, maxScore, speedRacket, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
+import { initialSpeedBall, maxScore, speedRacket, debugFps, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
 
 //region--------------------------------------fonctions-pong------------------------------------
 
 //Fonction pour demarrer le compte a rebours
 export function startCountdown(gameState) {
 	let count = 3;
-	gameState.ui.countdownText.text = count.toString();
-	gameState.ui.countdownText.isVisible = true;
+	gameState.ui.countdownText.textBlock.text = count.toString();
+	gameState.ui.countdownText.mesh.isVisible = true;
 
 	// On s'assure de nettoyer un eventuel intervalle precedent
 	if (gameState.countdownInterval) {
@@ -17,15 +17,17 @@ export function startCountdown(gameState) {
 	}
 
 	gameState.countdownInterval = setInterval(() => {
-		if (!gameState.isPaused) {
+		if (!gameState.isPaused && !gameState.isGamePaused) {
 			count--;
 			if (count > 0) {
-				gameState.ui.countdownText.text = count.toString();
+				gameState.ui.countdownText.textBlock.text = count.toString();
 			} else {
 				// Fin du compte a rebours
-				gameState.ui.countdownText.isVisible = false;
+				gameState.ui.countdownText.mesh.isVisible = false;
 				gameState.isBallPaused = false; // La balle peut maintenant bouger
 				clearInterval(gameState.countdownInterval); // On arrete l'intervalle
+				gameState.ball.isVisible = true;
+
 			}
 		}
 	}, 1000); // Se declenche toutes les secondes
@@ -36,7 +38,8 @@ export function resetBall(gameState, directionZ) {
 	gameState.isBallPaused = true; // On met la balle en pause
 	gameState.ball.position.set(0, 0, 0);
 	gameState.speedBall = initialSpeedBall;
-		
+	gameState.ball.isVisible = false;
+	
 	let zDir;
 	// Si une direction est fournie (apres un but), on l'utilise.
 	if (directionZ !== undefined) {
@@ -78,12 +81,12 @@ export function endGame(gameState, message) {
 	if (gameState.countdownInterval) {
 		clearInterval(gameState.countdownInterval);
 	}
-	gameState.ui.countdownText.isVisible = false;
-		
-	gameState.ui.winnerText.text = message;
-	gameState.ui.winnerText.isVisible = true;
+	gameState.ball.isVisible = false;
+	gameState.ui.countdownText.mesh.isVisible = false;
+	gameState.ui.winnerText.textBlock.text  = message;
+	gameState.ui.winnerText.mesh.isVisible = true;
 	gameState.ui.startButton.textBlock.text = "RESTART";
-	gameState.ui.startButton.isVisible = true;
+	gameState.ui.startButton.mesh.isVisible = true;
 }
 
 //endregion---------------------------------fin-fonctions-pong----------------------------------
@@ -148,9 +151,8 @@ export function startAIBrain(gameState) {
 export function startGameLoop(scene, engine, gameState) {
 	scene.onBeforeRenderObservable.add(() => {
 		const deltaTime = scene.getEngine().getDeltaTime() / 1000;
-		
-		gameState.ui.fpsText.text = engine.getFps().toFixed() + " fps";
-		
+
+		gameState.ui.fpsText.textBlock.text = engine.getFps().toFixed() + " fps";
 
 		// On arrete toute la logique de jeu si c'est en pause
 		if (gameState.isGamePaused) {
@@ -159,6 +161,11 @@ export function startGameLoop(scene, engine, gameState) {
 
 		// MOUVEMENT DES JOUEURS 
 		updatePlayers(deltaTime, gameState);
+
+		if (debugFps)
+			gameState.ui.fpsText.mesh.isVisible = true;
+		else
+			gameState.ui.fpsText.mesh.isVisible = false;
 
 		//LOGIQUE DE LA BALLE ET DES SCORES (si le jeu a commence)
 		if (gameState.isGameStarted) {
@@ -344,7 +351,7 @@ function updateBall(deltaTime, gameState) {
 	const goalLimit = 40;
 	if (ball.position.z > goalLimit) {
 		gameState.scoreLeft++;
-		gameState.ui.scoreLeftText.text = gameState.scoreLeft.toString();
+		gameState.ui.scoreLeft.textBlock.text = gameState.scoreLeft.toString();
 		
 		if (gameState.scoreLeft >= maxScore) {
 			const winnerPseudo = gameState.activePlayers[0].config.pseudo;
@@ -355,7 +362,7 @@ function updateBall(deltaTime, gameState) {
 
 	} else if (ball.position.z < -goalLimit) {
 		gameState.scoreRight++;
-		gameState.ui.scoreRightText.text = gameState.scoreRight.toString();
+		gameState.ui.scoreRight.textBlock.text = gameState.scoreRight.toString();
 		
 		if (gameState.scoreRight >= maxScore) {
 			const winnerPseudo = gameState.activePlayers[1].config.pseudo;

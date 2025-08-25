@@ -48,6 +48,7 @@ export async function createBall(scene) {
 			axes.xAxis.parent = ball;
 			axes.yAxis.parent = ball;
 			axes.zAxis.parent = ball;
+			ball.isVisible = false;
 		}
 		console.log("Balle creee avec succes !");
 	} catch (error) {

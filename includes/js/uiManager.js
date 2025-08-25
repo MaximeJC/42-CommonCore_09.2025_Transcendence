@@ -1,6 +1,8 @@
 // js/uiManager.js
 
 import { resetBall } from './gameLogic.js';
+import { create3DButton, createTextBox } from './gameObjects.js';
+import { scene } from './sceneSetup.js';
 
 /**
  * Cree toute l'interface utilisateur (GUI) du jeu de maniere responsive.
@@ -18,123 +20,118 @@ export function createGUI(gameState, engine) {
 	// --- ELEMENTS DU GUI POSITIONNES AVEC ANCRAGE ET POURCENTAGES ---
 
 	// Interface pour les FPS
-	const fpsText = new BABYLON.GUI.TextBlock("fpsText", "");
-	fpsText.color = "white";
-	fpsText.isHitTestVisible = false;
-	fpsText.height = "20%"; // Hauteur relative a l'ecran
-	fpsText.left = "-46%"; // Decalage de -46% de la largeur de l'ecran, depuis le centre
-	fpsText.top = "-46%";  // Decalage de -46% de la hauteur de l'ecran, depuis le centre
-	guiTexture.addControl(fpsText);
+	const fpsText = createTextBox("fpsText", "", scene);
+	fpsText.textBlock.background = "transparent";
+	fpsText.textBlock.color = "white";
+	fpsText.textBlock.thickness = 0;
+	fpsText.textBlock.isReadOnly = true;
+	fpsText.textBlock.isHitTestVisible = false;
+	fpsText.textBlock.fontSize = '30%';
+	fpsText.textBlock.text = "0"; // Mettre le texte initial
+	fpsText.mesh.position.set(0, 37, -32);
+	fpsText.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.fpsText = fpsText;
 
 	// Interface pour le score gauche
-	const scoreLeftText = new BABYLON.GUI.TextBlock("scoreLeft", "0");
-	scoreLeftText.color = "white";
-	//fontSize dynamique
-	scoreLeftText.height = "20%"; // Hauteur relative a l'ecran
-	scoreLeftText.left = "-10%"; // Decalage de 20% de la largeur de l'ecran, depuis le centre
-	scoreLeftText.top = "-15%";  // Decalage de 15% de la hauteur de l'ecran, depuis le centre
-	scoreLeftText.isHitTestVisible = false;
-	scoreLeftText.isVisible = false;
-	guiTexture.addControl(scoreLeftText);
-	gameState.ui.scoreLeftText = scoreLeftText;
+	const scoreLeft = createTextBox("scoreLeft", "", scene);
+	scoreLeft.textBlock.background = "transparent";
+	scoreLeft.textBlock.color = "white";
+	scoreLeft.textBlock.thickness = 0;
+	scoreLeft.textBlock.isReadOnly = true;
+	scoreLeft.textBlock.isHitTestVisible = false;
+	scoreLeft.textBlock.fontSize = '100%';
+	scoreLeft.textBlock.text = "0"; // Mettre le texte initial
+	scoreLeft.mesh.position.set(-8, 30, -20);
+	scoreLeft.mesh.rotation.y = -Math.PI / 2;
+	scoreLeft.mesh.isVisible = false;
+	gameState.ui.scoreLeft = scoreLeft;
 
 	// Interface pour le score droit
-	const scoreRightText = new BABYLON.GUI.TextBlock("scoreRight", "0");
-	scoreRightText.color = "white";
-	//fontSize dynamique
-	scoreRightText.height = "20%";
-	scoreRightText.left = "10%"; // Decalage de 10% a droite
-	scoreRightText.top = "-15%";
-	scoreRightText.isHitTestVisible = false;
-	scoreRightText.isVisible = false;
-	guiTexture.addControl(scoreRightText);
-	gameState.ui.scoreRightText = scoreRightText;
+	const scoreRight = createTextBox("scoreRight", "", scene);
+	scoreRight.textBlock.background = "transparent";
+	scoreRight.textBlock.color = "white";
+	scoreRight.textBlock.thickness = 0;
+	scoreRight.textBlock.isReadOnly = true;
+	scoreRight.textBlock.isHitTestVisible = false;
+	scoreRight.textBlock.fontSize = '100%';
+	scoreRight.textBlock.text = "0";
+	scoreRight.mesh.position.set(-8, 30, 20);
+	scoreRight.mesh.rotation.y = -Math.PI / 2;
+	scoreRight.mesh.isVisible = false;
+	gameState.ui.scoreRight = scoreRight;
 
-	// Bouton Start
-	const startButton = BABYLON.GUI.Button.CreateSimpleButton("startButton", "START");
-	startButton.width = "15%"; // 15% de la largeur de l'ecran
-	startButton.height = "10%"; // 10% de la hauteur de l'ecran
-	startButton.color = "white";
-	startButton.background = "green";
-    startButton.cornerRadius = 20;
-	// On ancre le bouton en bas de l'ecran
-	startButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-	startButton.paddingBottom = "5%"; // Marge de 5% par rapport au bas
-	startButton.top = "-10%";
-	guiTexture.addControl(startButton);
+	const startButton = create3DButton("startBtn", "START", scene);
+	// On positionne le bouton dans le monde 3D
+	startButton.mesh.position.set(7, -48, 0);
+	startButton.mesh.rotation.x = -0.1;
+	startButton.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.startButton = startButton;
 
-	// Texte pour annoncer le gagnant
-	const winnerText = new BABYLON.GUI.TextBlock("winnerText", "");
-	winnerText.color = "gold";
-	//fontSize dynamique
-	winnerText.top = "10%"; // Decalage de 10% depuis le centre
-	winnerText.isVisible = false;
-	winnerText.isHitTestVisible = false;
-	guiTexture.addControl(winnerText);
+	// On definit ce qui se passe quand on clique sur le bouton 3D
+	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+		BABYLON.ActionManager.OnPickTrigger, // OnPickTrigger = Clic
+		function () {
+			console.log("Le bouton start a ete clique !");
+			gameState.isGameStarted = true;
+			startButton.mesh.isVisible = false;
+			winnerText.isVisible = false;
+			gameState.ui.scoreRight.mesh.isVisible = true;
+			gameState.ui.scoreLeft.mesh.isVisible = true;
+			gameState.scoreLeft = 0;
+			gameState.scoreRight = 0;
+			gameState.ui.scoreLeft.textBlock.text = "0";
+			gameState.ui.scoreRight.textBlock.text = "0";
+			resetBall(gameState);
+
+		}
+	));
+
+	const winnerText = createTextBox("winnerText", "", {
+		meshWidth: 60,
+		meshHeight: 15,
+		textureWidth: 2048,
+		textureHeight: 512
+	}, scene);
+	winnerText.textBlock.background = "transparent";
+	winnerText.textBlock.color = "gold";
+	winnerText.textBlock.thickness = 0;
+	winnerText.textBlock.isReadOnly = true;
+	winnerText.textBlock.isHitTestVisible = false;
+	winnerText.textBlock.fontSize = '60%';
+	winnerText.textBlock.text = ""; // Mettre le texte initial
+	winnerText.mesh.position.set(0, 0, 0);
+	winnerText.mesh.rotation.y = -Math.PI / 2;
+	winnerText.mesh.isVisible = false;
 	gameState.ui.winnerText = winnerText;
 
-	// Texte pour le compte a rebours
-	const countdownText = new BABYLON.GUI.TextBlock("countdownText", "");
-	countdownText.color = "white";
-	//fontSize dynamique
-	countdownText.top = "10%";
-	countdownText.isVisible = false;
-	countdownText.isHitTestVisible = false;
-	guiTexture.addControl(countdownText);
+	// // Texte pour le compte a rebours
+	const countdownText = createTextBox("countdownText", "", scene);
+	countdownText.textBlock.background = "transparent";
+	countdownText.textBlock.color = "white";
+	countdownText.textBlock.thickness = 0;
+	countdownText.textBlock.isReadOnly = true;
+	countdownText.textBlock.isHitTestVisible = false;
+	countdownText.textBlock.fontSize = '100%';
+	countdownText.textBlock.text = "0";
+	countdownText.mesh.position.set(0, 0, 0);
+	countdownText.mesh.rotation.y = -Math.PI / 2;
+	countdownText.mesh.isVisible = false;
 	gameState.ui.countdownText = countdownText;
 
 	// Un texte pour afficher l'etat de pause
-	const pauseText = new BABYLON.GUI.TextBlock("pauseText", "PAUSE");
-	pauseText.color = "yellow";
-	//fontSize dynamique
-	pauseText.top = "10%";
-	pauseText.isVisible = false;
-	pauseText.isHitTestVisible = false;
-	guiTexture.addControl(pauseText);
+	const pauseText = createTextBox("pauseText", "", scene);
+	pauseText.textBlock.background = "transparent";
+	pauseText.textBlock.color = "yellow";
+	pauseText.textBlock.thickness = 0;
+	pauseText.textBlock.isReadOnly = true;
+	pauseText.textBlock.isHitTestVisible = false;
+	pauseText.textBlock.fontSize = '100%';
+	pauseText.textBlock.text = "PAUSE";
+	pauseText.mesh.position.set(0, 0, 0);
+	pauseText.mesh.rotation.y = -Math.PI / 2;
+	pauseText.mesh.isVisible = false;
 	gameState.ui.pauseText = pauseText;
 
-	//Logique du bouton Start
-	startButton.onPointerUpObservable.add(function() {
-		gameState.isGameStarted = true;
-		startButton.isVisible = false;
-		winnerText.isVisible = false;
-		scoreRightText.isVisible = true;
-		scoreLeftText.isVisible = true;
-		gameState.scoreLeft = 0;
-		gameState.scoreRight = 0;
-		scoreLeftText.text = "0";
-		scoreRightText.text = "0";
-		resetBall(gameState);
-	});
-
-    // --- GESTION DYNAMIQUE DE LA TAILLE DE POLICE ---
-    const allTextElements = {
-        fps: { element: fpsText, baseSize: 32 },
-        score: { element: scoreLeftText, baseSize: 80 },
-        scoreRight: { element: scoreRightText, baseSize: 80 },
-        winner: { element: winnerText, baseSize: 60 },
-        countdown: { element: countdownText, baseSize: 120 },
-        pause: { element: pauseText, baseSize: 100 }
-    };
-
-    function adaptFontSizes() {
-        const referenceHeight = 1080;
-        const currentHeight = engine.getRenderHeight();
-        const ratio = currentHeight / referenceHeight;
-
-        for (const key in allTextElements) {
-            const config = allTextElements[key];
-            config.element.fontSize = `${Math.round(config.baseSize * ratio)}px`;
-        }
-        
-        const newButtonFontSize = 24 * ratio;
-        startButton.textBlock.fontSize = `${Math.round(newButtonFontSize)}px`;
-    }
-
-    adaptFontSizes();
-    engine.onResizeObservable.add(adaptFontSizes);
 
 	//#endregion--------------------------------------GUI-jeu----------------------------------------
 }
