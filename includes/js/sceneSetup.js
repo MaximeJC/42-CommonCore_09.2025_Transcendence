@@ -26,11 +26,12 @@ export function initializeEngine() {
  * @param {BABYLON.Engine} engine L'instance du moteur de rendu.
  * @returns {BABYLON.Scene} L'instance de la scene.
  */
+export let scene;
 export function createScene(engine) {
 
 	//#region---------------------------------scene, lumiere et camera-------------------------------
-
-	const scene = new BABYLON.Scene(engine);
+	
+	scene = new BABYLON.Scene(engine);
 		
 	const camera = new BABYLON.ArcRotateCamera(
 		"Camera",
@@ -47,13 +48,13 @@ export function createScene(engine) {
 	camera.inputs.attached.mousewheel.detachControl();
 	// Pour desactiver le deplacement avec le clavier
 	camera.inputs.attached.keyboard.detachControl();
-	
-	const light = new BABYLON.HemisphericLight(
+
+	const directionalLight  = new BABYLON.DirectionalLight(
 		"light1",
-		new BABYLON.Vector3(0, 1, 0),
-		scene
-	); 
-	light.intensity = 1;
+		new BABYLON.Vector3(-1, 0, 0),
+		scene);
+	directionalLight.position = new BABYLON.Vector3(0, 5, 5); // Position de la lumière pour le calcul des ombres
+	directionalLight.intensity = 0.5;
 
 	//#endregion-----------------------------fin-scene, lumiere et camera----------------------------
 
