@@ -45,6 +45,8 @@ export function createScene(engine) {
 	camera.inputs.attached.pointers.detachControl();
 	// Pour desactiver le zoom avec la molette
 	camera.inputs.attached.mousewheel.detachControl();
+	// Pour desactiver le deplacement avec le clavier
+	camera.inputs.attached.keyboard.detachControl();
 	
 	const light = new BABYLON.HemisphericLight(
 		"light1",
