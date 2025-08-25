@@ -1,6 +1,6 @@
 // js/gameObjects.js
 
-import { debug } from './config.js';
+import { debug, debugVisuals } from './config.js';
 
 //region--------------------------------------fonctions-pong------------------------------------
 
@@ -12,8 +12,8 @@ export function createDebugArrow(scene) {
 		new BABYLON.Vector3(0, 0, 5)  // Point d'arrivee (longueur 5)
 	];
 	const arrow = BABYLON.MeshBuilder.CreateLines("debugArrow", {points: arrowPoints}, scene);
-	arrow.color = new BABYLON.Color3(0, 1, 0); // Vert vif
-	arrow.isVisible = false; // Cachee par defaut
+	arrow.color = new BABYLON.Color3(0, 1, 0);
+	arrow.isVisible = debugVisuals; // Cachee par defaut
 	return arrow;
 }
 
