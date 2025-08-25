@@ -22,8 +22,8 @@ export function createGUI(gameState, engine) {
 	fpsText.color = "white";
 	fpsText.isHitTestVisible = false;
 	fpsText.height = "20%"; // Hauteur relative a l'ecran
-	fpsText.left = "-46%"; // Decalage de 20% de la largeur de l'ecran, depuis le centre
-	fpsText.top = "-46%";  // Decalage de 15% de la hauteur de l'ecran, depuis le centre
+	fpsText.left = "-46%"; // Decalage de -46% de la largeur de l'ecran, depuis le centre
+	fpsText.top = "-46%";  // Decalage de -46% de la hauteur de l'ecran, depuis le centre
 	guiTexture.addControl(fpsText);
 	gameState.ui.fpsText = fpsText;
 
@@ -44,7 +44,7 @@ export function createGUI(gameState, engine) {
 	scoreRightText.color = "white";
 	//fontSize dynamique
 	scoreRightText.height = "20%";
-	scoreRightText.left = "10%"; // Decalage de 20% a droite
+	scoreRightText.left = "10%"; // Decalage de 10% a droite
 	scoreRightText.top = "-15%";
 	scoreRightText.isHitTestVisible = false;
 	scoreRightText.isVisible = false;
@@ -54,7 +54,7 @@ export function createGUI(gameState, engine) {
 	// Bouton Start
 	const startButton = BABYLON.GUI.Button.CreateSimpleButton("startButton", "START");
 	startButton.width = "15%"; // 15% de la largeur de l'ecran
-	startButton.height = "10%"; // 7% de la hauteur de l'ecran
+	startButton.height = "10%"; // 10% de la hauteur de l'ecran
 	startButton.color = "white";
 	startButton.background = "green";
     startButton.cornerRadius = 20;
