@@ -45,7 +45,9 @@ async function initializeApp() {
 	setupInputManager(scene, gameState);
 
 	// Demarre le "cerveau" de l'IA si necessaire
-	if (gameMode === '1P_VS_AI') {
+// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
+
+	if (gameMode == '1P_VS_AI' || gameMode == 'AI_VS_AI' || gameMode == '2AI_VS_2AI') {
 		startAIBrain(gameState);
 	}
 

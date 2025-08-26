@@ -26,9 +26,9 @@ export function createGUI(gameState, engine) {
 	fpsText.textBlock.thickness = 0;
 	fpsText.textBlock.isReadOnly = true;
 	fpsText.textBlock.isHitTestVisible = false;
-	fpsText.textBlock.fontSize = '30%';
+	fpsText.textBlock.fontSize = '20%';
 	fpsText.textBlock.text = "0"; // Mettre le texte initial
-	fpsText.mesh.position.set(0, 37, -32);
+	fpsText.mesh.position.set(0, 35, -31);
 	fpsText.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.fpsText = fpsText;
 
@@ -81,6 +81,7 @@ export function createGUI(gameState, engine) {
 			gameState.scoreRight = 0;
 			gameState.ui.scoreLeft.textBlock.text = "0";
 			gameState.ui.scoreRight.textBlock.text = "0";
+			gameState.ui.winnerText.mesh.isVisible = false;
 			resetBall(gameState);
 
 		}
@@ -104,7 +105,7 @@ export function createGUI(gameState, engine) {
 	winnerText.mesh.isVisible = false;
 	gameState.ui.winnerText = winnerText;
 
-	// // Texte pour le compte a rebours
+	// Texte pour le compte a rebours
 	const countdownText = createTextBox("countdownText", "", scene);
 	countdownText.textBlock.background = "transparent";
 	countdownText.textBlock.color = "white";

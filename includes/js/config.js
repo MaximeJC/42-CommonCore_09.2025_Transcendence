@@ -7,8 +7,8 @@ export const debugFps = true;
 
 
 // MODIFIER ICI LE MODE DE JEU
-// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
-export const gameMode = '1P_VS_AI'; 
+// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE', 2AI_VS_2AI
+export const gameMode = 'AI_VS_AI'; 
 
 // Definition des limites possibles pour le terrain
 export const limitUp2v2 = 25;

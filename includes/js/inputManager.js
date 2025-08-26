@@ -27,9 +27,9 @@ export function setupInputManager(scene, gameState) {
 					// Gere la visibilite du compte a rebours pendant la pause
 					if (gameState.countdownInterval) {
 						if (gameState.isGamePaused) {
-							gameState.ui.countdownText.isVisible = false;
+							gameState.ui.countdownText.mesh.isVisible = false;
 						} else {
-							gameState.ui.countdownText.isVisible = true;
+							gameState.ui.countdownText.mesh.isVisible = true;
 						}
 					}
 				}

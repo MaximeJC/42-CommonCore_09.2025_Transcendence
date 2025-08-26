@@ -23,6 +23,7 @@ export function createPlayer(scene, name, color, position, size) {
 	material.diffuseColor = color;
 	player.material = material;
 	player.position = position;
+	player.material.emissiveColor = color;
 		
 	player.scaling = size; 
 		
@@ -40,7 +41,15 @@ export async function createBall(scene) {
 	try {
 		ball = BABYLON.MeshBuilder.CreateSphere("ball", { diameter: 4 }, scene);
 		const material = new BABYLON.StandardMaterial("ballMat", scene);
-		material.diffuseColor = new BABYLON.Color3(1, 1, 1);
+		
+		// On definit la couleur de base
+		const ballColor = new BABYLON.Color3(0, 1, 1);
+		material.diffuseColor = ballColor;
+		
+		// La balle va briller de cette couleur, meme dans le noir.
+		material.emissiveColor = ballColor;
+		material.ambientColor = ballColor;
+
 		ball.material = material;
 		
 		if (debug){
@@ -205,7 +214,7 @@ export function createTable(scene) {
 	const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 80 }, scene);
 	const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
 	groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	groundMaterial.alpha = 0.50;
+	groundMaterial.alpha = 0;
 	ground.material = groundMaterial;
 	ground.position = new BABYLON.Vector3(-1, 0, 0);
 	ground.rotation = new BABYLON.Vector3(0, Math.PI, Math.PI / 2);

@@ -95,8 +95,11 @@ export function endGame(gameState, message) {
 
 // --- l'IA --- // TODO: implementer la vrai logique 
 export function startAIBrain(gameState) {
-	const aiPlayer = gameState.activePlayers.find(p => p.controlType === 'AI');
-	if (!aiPlayer) {
+	// --- On utilise .filter() pour trouver TOUS les joueurs IA ---
+	const aiPlayers = gameState.activePlayers.filter(p => p.controlType === 'AI');
+	
+	// S'il n'y a aucune IA dans ce mode de jeu, on ne fait rien.
+	if (aiPlayers.length === 0) {
 		return;
 	}
 
@@ -105,45 +108,53 @@ export function startAIBrain(gameState) {
 	}
 
 	gameState.aiUpdateInterval = setInterval(() => {
-		// La decision n'est prise que si le jeu est en cours et non en pause
-		if (gameState.isGameStarted && gameState.ball && !gameState.isPaused) {
-            
-            // On verifie si la balle se deplace bien vers le camp de l'IA.
-            // Si la position Z de l'IA et la direction Z de la balle ont le meme signe,
-            // alors le produit sera positif.
-            const isBallComingTowardsAI = (aiPlayer.mesh.position.z * gameState.ballDirection.z) > 0;
+		// On boucle sur chaque joueur IA trouve ---
+		aiPlayers.forEach(aiPlayer => {
 
-            if (isBallComingTowardsAI) {
-                // La balle vient vers l'IA : elle calcule sa cible.
-                const targetY = gameState.ball.position.y;
-                const currentY = aiPlayer.mesh.position.y;
-                
-                // Zone morte (ou "marge d'erreur") pour que l'IA ne soit pas parfaite
-                const errorMargin = 2; 
+			// La decision n'est prise que si le jeu est en cours et non en pause
+			if (gameState.isGameStarted && gameState.ball && !gameState.isPaused) {
+				
+				// On verifie si la balle se deplace bien vers le camp de CETTE IA
+				// Si la position Z de l'IA et la direction Z de la balle ont le meme signe,
+				// alors le produit sera positif.
+				const isBallComingTowardsAI = (aiPlayer.mesh.position.z * gameState.ballDirection.z) > 0;
 
-                if (Math.abs(targetY - currentY) > errorMargin) {
-                    aiPlayer.moveUp = targetY > currentY;
-                    aiPlayer.moveDown = targetY < currentY;
-                } else {
-                    // La raquette est deja bien positionnee
-                    aiPlayer.moveUp = false;
-                    aiPlayer.moveDown = false;
-                }
+				if (isBallComingTowardsAI) {
+					// La balle vient vers l'IA : elle calcule sa cible.
+					const targetY = gameState.ball.position.y;
+					const currentY = aiPlayer.mesh.position.y;
+					
+					// Zone morte (ou "marge d'erreur") pour que l'IA ne soit pas parfaite
+					const errorMargin = 2; 
 
-            } else {
-                // La balle s'eloigne : l'IA ne bouge pas.
-                aiPlayer.moveUp = false;
-                aiPlayer.moveDown = false;
-            }
+					if (Math.abs(targetY - currentY) > errorMargin) {
+						aiPlayer.moveUp = targetY > currentY;
+						aiPlayer.moveDown = targetY < currentY;
+					} else {
+						// La raquette est deja bien positionnee
+						aiPlayer.moveUp = false;
+						aiPlayer.moveDown = false;
+					}
 
-		} else {
-			// Le jeu est en pause ou termine : l'IA ne bouge pas.
-			aiPlayer.moveUp = false;
-			aiPlayer.moveDown = false;
-		}
+				} else {
+					// La balle s'eloigne : l'IA ne bouge pas.
+					aiPlayer.moveUp = false;
+					aiPlayer.moveDown = false;
+				}
+
+			} else {
+				// Le jeu est en pause ou termine : l'IA ne bouge pas.
+				aiPlayer.moveUp = false;
+				aiPlayer.moveDown = false;
+			}
+		}); // Fin de la boucle forEach
 	}, iaResponseTime);
+
+	// On s'assure que les IA sont immobiles au demarrage
+	aiPlayers.forEach(aiPlayer => {
 		aiPlayer.moveUp = false;
 		aiPlayer.moveDown = false;
+	});
 }
 // --- fin IA ---
 

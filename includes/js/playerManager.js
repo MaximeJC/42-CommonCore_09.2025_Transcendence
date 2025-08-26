@@ -24,7 +24,7 @@ export function setupPlayers(scene, gameState) {
 		'left_top': {
 			name: "player_left_top",
 			pseudo: "Player 1",
-			color: new BABYLON.Color3(0, 0, 1), // Bleu
+			color: new BABYLON.Color3(1, 1, 0), // jaune
 			position: new BABYLON.Vector3(0, midPointY + (gameState.limitUp - midPointY) / 2, -38),
 			keys: {
 				up: ['w', 'z'],
@@ -44,7 +44,7 @@ export function setupPlayers(scene, gameState) {
 		'right_top': {
 			name: "player_right_top",
 			pseudo: "Player 2",
-			color: new BABYLON.Color3(1, 0, 0), // Rouge
+			color: new BABYLON.Color3(1, 0, 1), // Rose
 			position: new BABYLON.Vector3(0, midPointY + (gameState.limitUp - midPointY) / 2, 38),
 			keys: {
 				up: 'arrowup',
@@ -54,7 +54,7 @@ export function setupPlayers(scene, gameState) {
 		'right_bottom': {
 			name: "player_right_bottom",
 			pseudo: "Player 4",
-			color: new BABYLON.Color3(1, 0.5, 0), // Orange
+			color: new BABYLON.Color3(0, 1, 0), // Orange
 			position: new BABYLON.Vector3(0, midPointY - (midPointY - gameState.limitDown) / 2, 38),
 			keys: {
 				up: 'i',
@@ -171,7 +171,30 @@ export function setupPlayers(scene, gameState) {
 				size: racketSize1v1
 			});
 			break;
-			
+		
+		case '2AI_VS_2AI':
+			playerSetups.push({
+					config: allPlayerConfigs.left_top,
+					controlType: 'AI',
+					size: racketSize2v2
+				});
+			playerSetups.push({
+					config: allPlayerConfigs.left_bottom,
+					controlType: 'AI',
+					size: racketSize2v2
+				}); 
+			playerSetups.push({
+					config: allPlayerConfigs.right_top,
+					controlType: 'AI',
+					size: racketSize2v2
+				});
+			playerSetups.push({
+					config: allPlayerConfigs.right_bottom,
+					controlType: 'AI',
+					size: racketSize2v2
+				});
+			break;
+
 		case '4P_ONLINE':
 			console.warn("Mode 4P_ONLINE: Seul le joueur en haut a gauche (bleu) est controlable localement.");
 			playerSetups.push({

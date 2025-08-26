@@ -49,12 +49,16 @@ export function createScene(engine) {
 	// Pour desactiver le deplacement avec le clavier
 	camera.inputs.attached.keyboard.detachControl();
 
-	const directionalLight  = new BABYLON.DirectionalLight(
+	const directionalLight  = new BABYLON.HemisphericLight(
 		"light1",
-		new BABYLON.Vector3(-1, 0, 0),
+		// new BABYLON.Vector3(-5, -3, 0),
+		new BABYLON.Vector3(-1, -1, 0),
 		scene);
-	directionalLight.position = new BABYLON.Vector3(0, 5, 5); // Position de la lumière pour le calcul des ombres
-	directionalLight.intensity = 0.5;
+	directionalLight.position = new BABYLON.Vector3(0, 0, 0); // Position de la lumière pour le calcul des ombres
+	directionalLight.intensity = 0.9;
+
+	const glowLayer = new BABYLON.GlowLayer("glow", scene);
+	glowLayer.intensity = 1;
 
 	//#endregion-----------------------------fin-scene, lumiere et camera----------------------------
 
