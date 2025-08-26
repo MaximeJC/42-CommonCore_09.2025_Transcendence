@@ -86,65 +86,78 @@ export function create3DButton(name, initialText, scene)
 		
 	// On peut lui donner un materiau simple si on veut voir l'arriere
 	const mat = new BABYLON.StandardMaterial(name + "_mat", scene);
-	mat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2); // Gris fonce
+	mat.alpha = 0; // invisible, juste support
 	buttonMesh.material = mat;
 
 	// CREER UNE TEXTURE GUI SPECIFIQUEMENT POUR CE MESH
-	const textureWidth = 1024;
-	const textureHeight = 300;
-	const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(
-		buttonMesh, 
-		textureWidth, 
-		textureHeight
-	);
+	const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(buttonMesh, 1024, 300);
+
+	
 	// CREER LES ELEMENTS GUI 2D SUR CETTE TEXTURE
 	// Un conteneur (Rectangle) pour le style visuel du bouton (fond, bordure...)
 	const buttonContainer = new BABYLON.GUI.Rectangle(name + "_container");
-
+	buttonContainer.background = "rgba(156, 50, 133, 1)"; // violet transparent
+	buttonContainer.color = "#e251ca"; // bordure rose
+	buttonContainer.thickness = 8; // border: 2px
+	buttonContainer.cornerRadius = 100; // border-radius: 5px
+	buttonContainer.paddingLeft = "40px";
+	buttonContainer.paddingRight = "40px";
 	buttonContainer.adaptWidthToChildren = true;
-	buttonContainer.height = "100%";
-	// On ajoute des marges interieures pour que le texte ne colle pas aux bords
-	buttonContainer.paddingLeft = "80px";
-	buttonContainer.paddingRight = "80px";
-
-	buttonContainer.cornerRadius = 20;
-	buttonContainer.color = "white"; // Couleur de la bordure
-	buttonContainer.thickness = 4;   // Epaisseur de la bordure
-	buttonContainer.background = "green";
 	advancedTexture.addControl(buttonContainer);
 
-	// Le texte dynamique
+	// Ombres (box-shadow simulé par glow)
+	const gl = new BABYLON.GlowLayer(name + "_glow", scene, { blurKernelSize: 64 });
+	gl.addIncludedOnlyMesh(buttonMesh);
+	gl.intensity = 1.5;
+	gl.customEmissiveColorSelector = function(mesh, subMesh, material, result) {
+		if (mesh === buttonMesh) {
+			result.set(0.87, 0.04, 0.73, 0.8); // #dd0aba violet
+		}
+	};
+
 	const textBlock = new BABYLON.GUI.TextBlock(name + "_text", initialText);
-	textBlock.resizeToFit = true;
-	textBlock.color = "white";
-	textBlock.fontSize = 200;
+	textBlock.fontFamily = "netron";
+	textBlock.color = "#aaaaaaff";
+	textBlock.fontSize = 220;
+	textBlock.fontWeight = "bold";
 	textBlock.paddingLeft = "40px";
 	textBlock.paddingRight = "40px";
-	buttonContainer.addControl(textBlock); // On ajoute le texte au conteneur
+	buttonContainer.addControl(textBlock);  // On ajoute le texte au conteneur
 
 	// RENDRE LE MESH 3D CLIQUABLE
 	buttonMesh.actionManager = new BABYLON.ActionManager(scene);
 
-	// On stocke la couleur initiale pour l'effet de survol
-	const initialColor = buttonContainer.background;
-
 	// Effet de survol (la souris passe dessus)
-	buttonMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-		BABYLON.ActionManager.OnPointerOverTrigger,
-		function () {
-			// On rend le bouton un peu plus clair
-			buttonContainer.background = "lime"; 
-		}
-	));
+	buttonMesh.actionManager.registerAction(
+		new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function () {
+			// On rend le bouton plus clair
+			buttonContainer.background = "rgba(84, 85, 0, 0.8)";
+			buttonContainer.color = "#fbff22"; // bordure jaune
+			
+			// glow hover (équiv box-shadow jaune)
+			gl.customEmissiveColorSelector = function(mesh, subMesh, material, result) {
+				if (mesh === buttonMesh) {
+					result.set(1, 1, 0.13, 0.8); // #fbff22 jaune
+				}
+			};
+		})
+	);
 
 	// Effet de sortie de survol (la souris quitte le mesh)
 	buttonMesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 		BABYLON.ActionManager.OnPointerOutTrigger,
 		function () {
 			// On remet la couleur initiale
-			buttonContainer.background = initialColor;
-		}
-	));
+			buttonContainer.background = "rgba(156, 50, 133, 1)";
+			buttonContainer.color = "#e251ca";
+
+			gl.customEmissiveColorSelector = function(mesh, subMesh, material, result) {
+				if (mesh === buttonMesh) {
+					result.set(0.87, 0.04, 0.73, 1); // violet
+				}
+			};
+		})
+	);
 
 	// RETOURNER LE MESH ET LE TEXTBLOCK
 	// On retourne un objet pour pouvoir acceder aux deux elements facilement
