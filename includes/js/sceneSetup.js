@@ -55,7 +55,7 @@ export function createScene(engine) {
 		new BABYLON.Vector3(-1, -1, 0),
 		scene);
 	directionalLight.position = new BABYLON.Vector3(0, 0, 0); // Position de la lumière pour le calcul des ombres
-	directionalLight.intensity = 0.9;
+	directionalLight.intensity = 1;
 
 	const glowLayer = new BABYLON.GlowLayer("glow", scene);
 	glowLayer.intensity = 1;

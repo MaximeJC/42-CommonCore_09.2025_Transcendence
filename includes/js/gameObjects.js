@@ -224,14 +224,14 @@ export function createTextBox(name, initialText, options, scene) {
 }
 
 export function createTable(scene) {
-	const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 80 }, scene);
-	const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
-	groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	groundMaterial.alpha = 0;
-	ground.material = groundMaterial;
-	ground.position = new BABYLON.Vector3(-1, 0, 0);
-	ground.rotation = new BABYLON.Vector3(0, Math.PI, Math.PI / 2);
-	return ground;
+	const table = BABYLON.MeshBuilder.CreateGround("table", { width: 80, height: 80 }, scene);
+	const tableMaterial = new BABYLON.StandardMaterial("tableMat", scene);
+	tableMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+	tableMaterial.alpha = 0;
+	table.material = tableMaterial;
+	table.position = new BABYLON.Vector3(-1, 0, 0);
+	table.rotation = new BABYLON.Vector3(0, Math.PI, Math.PI / 2);
+	return table;
 }
 
 export async function loadArcade(scene) {
@@ -266,3 +266,86 @@ export async function loadArcade(scene) {
 }
 
 //endregion---------------------------------fin-creation-objets---------------------------------
+
+//endregion------------------------------------decors-objets------------------------------------
+
+export function createRoom(scene) {
+	createGround(scene);
+	createCeiling(scene);
+	createWallBack(scene);
+	createWallFront(scene);
+	createWallRight(scene);
+	createWallLeft(scene);
+}
+
+function createGround(scene) {
+	const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1920, height: 1920 }, scene);
+	const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
+	groundMaterial.color = "#747474ff";
+	groundMaterial.alpha = 1;
+	groundMaterial.backFaceCulling = false;
+	ground.material = groundMaterial;
+	ground.position = new BABYLON.Vector3(870, -300, 0);
+	console.log("ground importee avec succes !");
+
+	return ground;
+}
+
+function createCeiling(scene) {
+	const Ceiling = BABYLON.MeshBuilder.CreateGround("Ceiling", { width: 1920, height: 1920 }, scene);
+	const CeilingMaterial = new BABYLON.StandardMaterial("CeilingMat", scene);
+	CeilingMaterial.color = "#747474ff";
+	CeilingMaterial.alpha = 1;
+	CeilingMaterial.backFaceCulling = false;
+	Ceiling.material = CeilingMaterial;
+	Ceiling.position = new BABYLON.Vector3(870, 250, 0);
+	console.log("Ceiling importee avec succes !");
+
+	return Ceiling;
+}
+
+function createWallBack(scene) {
+    const wallBack = BABYLON.MeshBuilder.CreatePlane("wallBack", { width: 1920, height: 550 }, scene);
+    const wallBackMaterial = new BABYLON.StandardMaterial("wallBackMat", scene);
+    wallBackMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+    wallBackMaterial.backFaceCulling = false;
+    wallBack.material = wallBackMaterial;
+    wallBack.position = new BABYLON.Vector3(-90, -25, 0);
+    wallBack.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
+    return wallBack;
+}
+
+function createWallFront(scene) {
+    const wallFront = BABYLON.MeshBuilder.CreatePlane("wallFront", { width: 1920, height: 550 }, scene);
+    const wallFrontMaterial = new BABYLON.StandardMaterial("wallFrontMat", scene);
+    wallFrontMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+    wallFrontMaterial.backFaceCulling = false;
+    wallFront.material = wallFrontMaterial;
+    wallFront.position = new BABYLON.Vector3(1830, -25, 0);
+    wallFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0); // orientation verticale
+    return wallFront;
+}
+
+function createWallRight(scene) {
+	const wallRight = BABYLON.MeshBuilder.CreatePlane("wallRight", { width: 550, height: 1920 }, scene);
+	const wallRightMaterial = new BABYLON.StandardMaterial("wallRightMat", scene);
+	wallRightMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	wallRightMaterial.backFaceCulling = false;
+	wallRight.material = wallRightMaterial;
+	wallRight.position = new BABYLON.Vector3(870, -25, 960);
+	wallRight.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
+	return wallRight;
+}
+
+function createWallLeft(scene) {
+	const wallLeft = BABYLON.MeshBuilder.CreatePlane("wallLeft", { width: 550, height: 1920 }, scene);
+	const wallLeftMaterial = new BABYLON.StandardMaterial("wallLeftMat", scene);
+	wallLeftMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	wallLeftMaterial.backFaceCulling = false;
+	wallLeft.material = wallLeftMaterial;
+	wallLeft.position = new BABYLON.Vector3(870, -25, -960);
+	wallLeft.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
+	return wallLeft;
+}
+
+//endregion---------------------------------fin-decors-objets-----------------------------------

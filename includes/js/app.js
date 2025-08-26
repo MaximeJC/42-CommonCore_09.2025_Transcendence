@@ -5,7 +5,7 @@ import { gameMode } from './config.js';
 import { debugVisuals } from './config.js'; 
 import { gameState } from './gameState.js';
 import { initializeEngine, createScene } from './sceneSetup.js';
-import { createBall, createTable, loadArcade, createDebugArrow } from './gameObjects.js';
+import { createBall, createTable, loadArcade, createDebugArrow, createRoom } from './gameObjects.js';
 import { setupPlayers } from './playerManager.js';
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
@@ -31,6 +31,7 @@ async function initializeApp() {
 
 	const table = createTable(scene);
 	const arcade = await loadArcade(scene);
+	const room = createRoom(scene);
 
 	if (debugVisuals) {
 		gameState.debugArrow = createDebugArrow(scene);
