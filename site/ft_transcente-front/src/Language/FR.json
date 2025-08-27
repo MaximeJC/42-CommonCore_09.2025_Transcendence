@@ -1,0 +1,10 @@
+{
+	"header": {
+	  "signUp": "INSCRIPTION",
+	  "language": "FR",
+	  "icon_lang": "../images/flag/france.png"
+	},
+	"home": {
+	  "connection": "CONNEXION"
+	}
+}

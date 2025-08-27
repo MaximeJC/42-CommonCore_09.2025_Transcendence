@@ -1,0 +1,10 @@
+{
+	"header": {
+	  "signUp": "Sign up",
+	  "language": "EN",
+	  "icon_lang": "../images/flag/united-kingdom.png"
+	},
+	"home": {
+	  "connection": "Login"
+	}
+}

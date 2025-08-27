@@ -1,0 +1,10 @@
+{
+	"header": {
+	  "signUp": "Registro",
+	  "language": "ES",
+	  "icon_lang": "../images/flag/Espana.png"
+	},
+	"home": {
+	  "connection": "conexión"
+	}
+}
