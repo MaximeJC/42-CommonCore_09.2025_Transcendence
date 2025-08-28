@@ -1,8 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+	import { ref } from 'vue';
+	const emit = defineEmits(['show-connection']);
+
+	
+</script>
 	
 <template>
 	<div class="pos-con-but">
-		<button class="connexion-button" title="connexion">
+		<button @click="emit('show-connection')" class="connexion-button" title="connexion">
 			<div data-i18n="home.connection"></div>
 		</button>
 	</div>
