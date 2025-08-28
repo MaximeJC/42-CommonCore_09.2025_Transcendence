@@ -1,7 +1,8 @@
 // js/gameLogic.js
 
 import { inputMap } from './inputManager.js';
-import { initialSpeedBall, maxScore, speedRacket, debugFps, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
+import { gameMode, initialSpeedBall, maxScore, speedRacket, debugFps, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
+import { networkManager } from './networkManager.js';
 
 //region--------------------------------------fonctions-pong------------------------------------
 
@@ -85,7 +86,7 @@ export function endGame(gameState, message) {
 	gameState.ui.countdownText.mesh.isVisible = false;
 	gameState.ui.winnerText.textBlock.text  = message;
 	gameState.ui.winnerText.mesh.isVisible = true;
-	gameState.ui.startButton.textBlock.text = "RESTART";
+	// gameState.ui.startButton.textBlock.text = "RESTART";
 	gameState.ui.startButton.mesh.isVisible = true;
 }
 
@@ -194,17 +195,15 @@ export function startGameLoop(scene, engine, gameState) {
  */
 function updatePlayers(deltaTime, gameState) {
 
-	 // --- LOGIQUE DE VITESSE PROPORTIONNELLE AJUSTABLE ---
-	// 1. On calcule de combien la vitesse de la balle a augmente par rapport au debut.
+	// On calcule de combien la vitesse de la balle a augmente par rapport au debut.
 	const ballSpeedIncrease = gameState.speedBall - initialSpeedBall;
 
-	// 2. On applique notre facteur a cette augmentation.
+	// On applique notre facteur a cette augmentation.
 	const racketSpeedBonus = ballSpeedIncrease * speedMultiplicator;
 
-	// 3. La vitesse finale est la vitesse de base PLUS le bonus calcule.
+	// La vitesse finale est la vitesse de base PLUS le bonus calcule.
 	const dynamicRacketSpeed = speedRacket + racketSpeedBonus;
 
-	// --- FIN DE LA NOUVELLE LOGIQUE ---
 	gameState.activePlayers.forEach(player => {
 		// Le switch determine la source de l'input en fonction du type de controleur
 		switch (player.controlType) {
@@ -278,6 +277,10 @@ function updatePlayers(deltaTime, gameState) {
 		if (movement !== 0) {
 			player.mesh.position.y += movement * dynamicRacketSpeed * deltaTime;
 			player.mesh.position.y = Math.max(gameState.limitDown, Math.min(gameState.limitUp, player.mesh.position.y));
+
+			if (player.controlType === 'KEYBOARD' && gameMode.includes("ONLINE")) {
+				networkManager.sendMessage('player_input', { y: player.mesh.position.y });
+			}
 		}
 	});
 }
@@ -286,16 +289,19 @@ function updateBall(deltaTime, gameState) {
 	const ball = gameState.ball;
 
 	// --- DEBOGAGE ---
-	if (debugVisuals) {
-		gameState.debugTrailPoints.push(ball.position.clone());
-		if (gameState.debugTrail) {
-			gameState.debugTrail.dispose();
-		}
-		if (gameState.debugTrailPoints.length > 1) {
-			gameState.debugTrail = BABYLON.MeshBuilder.CreateLines("debugTrail", {
-				points: gameState.debugTrailPoints
-			}, ball.getScene());
-			gameState.debugTrail.color = new BABYLON.Color3(1, 1, 0); // Jaune
+	if (gameMode.includes("ONLINE")) {
+		if (debugVisuals) {
+			gameState.debugTrailPoints.push(ball.position.clone());
+			if (gameState.debugTrail) {
+				gameState.debugTrail.dispose();
+			}
+			if (gameState.debugTrailPoints.length > 1) {
+				gameState.debugTrail = BABYLON.MeshBuilder.CreateLines("debugTrail", {
+					points: gameState.debugTrailPoints
+				}, ball.getScene());
+				gameState.debugTrail.color = new BABYLON.Color3(1, 1, 0); // Jaune
+			}
+			return;
 		}
 	}
 	// --- FIN DEBOGAGE ---

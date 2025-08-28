@@ -58,7 +58,7 @@ export function createScene(engine) {
 	directionalLight.intensity = 1;
 
 	const glowLayer = new BABYLON.GlowLayer("glow", scene);
-	glowLayer.intensity = 1;
+	glowLayer.intensity = 0.5;
 
 	//#endregion-----------------------------fin-scene, lumiere et camera----------------------------
 

@@ -2,14 +2,17 @@
 
 import { resetBall } from './gameLogic.js';
 import { create3DButton, createTextBox } from './gameObjects.js';
-import { scene } from './sceneSetup.js';
+// import { scene } from './sceneSetup.js';
+
+import { networkManager } from './networkManager.js';
+import { gameMode } from './config.js';
 
 /**
  * Cree toute l'interface utilisateur (GUI) du jeu de maniere responsive.
  * @param {object} gameState - L'etat central du jeu.
  * @param {BABYLON.Engine} engine - Le moteur de rendu de Babylon.
  */
-export function createGUI(gameState, engine) {
+export function createGUI(gameState, engine, scene, JwtToken) {
 
 	//#region----------------------------------------GUI-jeu-----------------------------------------
 
@@ -61,31 +64,76 @@ export function createGUI(gameState, engine) {
 	gameState.ui.scoreRight = scoreRight;
 
 	const startButton = create3DButton("startBtn", "START", scene);
-	// On positionne le bouton dans le monde 3D
-	startButton.mesh.position.set(7, -48, 0);
+	startButton.mesh.position.set(8, -30, 0);
 	startButton.mesh.rotation.x = -0.1;
 	startButton.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.startButton = startButton;
 
-	// On definit ce qui se passe quand on clique sur le bouton 3D
+	// --- MODIFICATION DE LA LOGIQUE DE CLIC DU BOUTON START ---
 	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-		BABYLON.ActionManager.OnPickTrigger, // OnPickTrigger = Clic
-		function () {
+		BABYLON.ActionManager.OnPickTrigger,
+		async function () { // La fonction devient 'async'
 			console.log("Le bouton start a ete clique !");
-			gameState.isGameStarted = true;
-			startButton.mesh.isVisible = false;
-			winnerText.isVisible = false;
-			gameState.ui.scoreRight.mesh.isVisible = true;
-			gameState.ui.scoreLeft.mesh.isVisible = true;
-			gameState.scoreLeft = 0;
-			gameState.scoreRight = 0;
-			gameState.ui.scoreLeft.textBlock.text = "0";
-			gameState.ui.scoreRight.textBlock.text = "0";
-			gameState.ui.winnerText.mesh.isVisible = false;
-			resetBall(gameState);
 
+			if (gameMode.includes("ONLINE")) {
+				console.log("ONLINE");
+				// Pour les modes en ligne, on se connecte et on cherche une partie
+				try {
+					statusText.textBlock.text = "CONNECTING...";
+					statusText.textBlock.fontSize = '50%';
+					statusText.textBlock.color = "white";
+					statusText.mesh.isVisible = true;
+					console.log("CONNECTING...");
+
+					await networkManager.connect(JwtToken);
+					
+					statusText.textBlock.text = "SEARCHING...";
+					statusText.textBlock.fontSize = '50%';
+					statusText.textBlock.color = "white";
+					statusText.mesh.isVisible = true;
+					console.log("SEARCHING...");
+					networkManager.sendMessage('find_match', { mode: gameMode });
+				} catch (error) {
+					statusText.textBlock.text = "ERROR";
+					statusText.textBlock.fontSize = '60%';
+					statusText.textBlock.color = "RED";
+					statusText.mesh.isVisible = true;
+					console.error("Echec de la connexion:", error);
+				}
+			} else {
+				// Pour les modes locaux, la logique reste la meme
+				gameState.isGameStarted = true;
+				startButton.mesh.isVisible = false;
+				gameState.ui.winnerText.mesh.isVisible = false; // Utilise gameState pour acceder a winnerText
+				gameState.ui.scoreRight.mesh.isVisible = true;
+				gameState.ui.scoreLeft.mesh.isVisible = true;
+				gameState.scoreLeft = 0;
+				gameState.scoreRight = 0;
+				gameState.ui.scoreLeft.textBlock.text = "0";
+				gameState.ui.scoreRight.textBlock.text = "0";
+				statusText.mesh.isVisible = false;
+				resetBall(gameState);
+			}
 		}
 	));
+
+	const statusText = createTextBox("statusText", "", {
+		meshWidth: 60,
+		meshHeight: 15,
+		textureWidth: 2048,
+		textureHeight: 512
+	}, scene);
+	statusText.textBlock.background = "transparent";
+	statusText.textBlock.color = "white";
+	statusText.textBlock.thickness = 0;
+	statusText.textBlock.isReadOnly = true;
+	statusText.textBlock.isHitTestVisible = false;
+	statusText.textBlock.fontSize = '60%';
+	statusText.textBlock.text = ""; // Mettre le texte initial
+	statusText.mesh.position.set(0, 0, 0);
+	statusText.mesh.rotation.y = -Math.PI / 2;
+	statusText.mesh.isVisible = false;
+	gameState.ui.statusText = statusText;
 
 	const winnerText = createTextBox("winnerText", "", {
 		meshWidth: 60,

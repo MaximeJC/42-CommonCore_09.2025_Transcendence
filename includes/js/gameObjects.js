@@ -92,17 +92,13 @@ export function create3DButton(name, initialText, scene)
 	// CREER UNE TEXTURE GUI SPECIFIQUEMENT POUR CE MESH
 	const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(buttonMesh, 1024, 300);
 
-	
-	// CREER LES ELEMENTS GUI 2D SUR CETTE TEXTURE
+		// CREER LES ELEMENTS GUI 2D SUR CETTE TEXTURE
 	// Un conteneur (Rectangle) pour le style visuel du bouton (fond, bordure...)
 	const buttonContainer = new BABYLON.GUI.Rectangle(name + "_container");
 	buttonContainer.background = "rgba(156, 50, 133, 1)"; // violet transparent
 	buttonContainer.color = "#e251ca"; // bordure rose
 	buttonContainer.thickness = 8; // border: 2px
 	buttonContainer.cornerRadius = 100; // border-radius: 5px
-	buttonContainer.paddingLeft = "40px";
-	buttonContainer.paddingRight = "40px";
-	buttonContainer.adaptWidthToChildren = true;
 	advancedTexture.addControl(buttonContainer);
 
 	// Ombres (box-shadow simulé par glow)
@@ -118,10 +114,12 @@ export function create3DButton(name, initialText, scene)
 	const textBlock = new BABYLON.GUI.TextBlock(name + "_text", initialText);
 	textBlock.fontFamily = "netron";
 	textBlock.color = "#aaaaaaff";
-	textBlock.fontSize = 220;
+	textBlock.fontSize = 200;
 	textBlock.fontWeight = "bold";
 	textBlock.paddingLeft = "40px";
 	textBlock.paddingRight = "40px";
+	textBlock.adaptWidthToChildren = true;
+
 	buttonContainer.addControl(textBlock);  // On ajoute le texte au conteneur
 
 	// RENDRE LE MESH 3D CLIQUABLE
@@ -210,8 +208,7 @@ export function createTextBox(name, initialText, options, scene) {
 	textBlock.color = finalOptions.color;
 	textBlock.background = finalOptions.background;
 	textBlock.fontSize = finalOptions.fontSize;
-		
-	// Le centrage avec TextBlock est fiable et direct.
+
 	textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
 	textBlock.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 
@@ -256,6 +253,7 @@ export async function loadArcade(scene) {
 		// 		mesh.material.freeze();
 		// 	}
 		// });
+		const table = createTable(scene);
 		
 		return pong_arcade;
 	} 
@@ -265,65 +263,278 @@ export async function loadArcade(scene) {
 	}
 }
 
+export async function loadArcadeMachines(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "ArcadeMachines.glb", scene);
+		const ArcadeMachines = result.meshes[0];
+		ArcadeMachines.position = new BABYLON.Vector3(50, -75, 300);
+
+		if (debug) {
+			const axesArcadeMachines = new BABYLON.AxesViewer(scene, 2);
+			axesArcadeMachines.xAxis.parent = ArcadeMachines;
+			axesArcadeMachines.yAxis.parent = ArcadeMachines;
+			axesArcadeMachines.zAxis.parent = ArcadeMachines;
+		}
+		console.log("Machine d'arcade importee avec succes !");
+		
+		// Optimisations
+		ArcadeMachines.freezeWorldMatrix(); 
+		return ArcadeMachines;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele machine d'arcade :", error);
+		return null;
+	}
+}
+
+export async function loadDDM(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "DDM.glb", scene);
+		const DDM = result.meshes[0];
+		DDM.position = new BABYLON.Vector3(200, -45, -650);
+
+		if (debug) {
+			const axesDDM = new BABYLON.AxesViewer(scene, 2);
+			axesDDM.xAxis.parent = DDM;
+			axesDDM.yAxis.parent = DDM;
+			axesDDM.zAxis.parent = DDM;
+		}
+		console.log("DDM importee avec succes !");
+		
+		// Optimisations
+		DDM.freezeWorldMatrix(); 
+		return DDM;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele DDM :", error);
+		return null;
+	}
+}
+
+export async function loadSugarRush(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "sugar_rush.glb", scene);
+		const SugarRush = result.meshes[0];
+		SugarRush.position = new BABYLON.Vector3(830, -10, -790);
+
+		if (debug) {
+			const axesSugarRush = new BABYLON.AxesViewer(scene, 2);
+			axesSugarRush.xAxis.parent = SugarRush;
+			axesSugarRush.yAxis.parent = SugarRush;
+			axesSugarRush.zAxis.parent = SugarRush;
+		}
+		console.log("SugarRush importee avec succes !");
+		
+		// Optimisations
+		SugarRush.freezeWorldMatrix(); 
+		return SugarRush;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele Sugar Rush :", error);
+		return null;
+	}
+}
+
+export async function loadHockey(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Hockey.glb", scene);
+		const Hockey = result.meshes[0];
+		Hockey.position = new BABYLON.Vector3(800, -166, -200);
+
+		if (debug) {
+			const axesHockey = new BABYLON.AxesViewer(scene, 2);
+			axesHockey.xAxis.parent = Hockey;
+			axesHockey.yAxis.parent = Hockey;
+			axesHockey.zAxis.parent = Hockey;
+		}
+		console.log("Hockey importee avec succes !");
+		
+		// Optimisations
+		Hockey.freezeWorldMatrix(); 
+		return Hockey;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele Hockey :", error);
+		return null;
+	}
+}
+
+export async function loadWhackAMole(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Whack_a_mole.glb", scene);
+		const WhackAMole = result.meshes[0];
+		WhackAMole.position = new BABYLON.Vector3(1300, -100, -875);
+
+		if (debug) {
+			const axesWhackAMole = new BABYLON.AxesViewer(scene, 2);
+			axesWhackAMole.xAxis.parent = WhackAMole;
+			axesWhackAMole.yAxis.parent = WhackAMole;
+			axesWhackAMole.zAxis.parent = WhackAMole;
+		}
+		console.log("WhackAMole importee avec succes !");
+		
+		// Optimisations
+		WhackAMole.freezeWorldMatrix(); 
+		return WhackAMole;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele WhackAMole :", error);
+		return null;
+	}
+}
+
+export async function loadBubblegum(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Bubblegum.glb", scene);
+		const Bubblegum = result.meshes[0];
+		Bubblegum.position = new BABYLON.Vector3(1300, -190, 400);
+
+		if (debug) {
+			const axesBubblegum = new BABYLON.AxesViewer(scene, 2);
+			axesBubblegum.xAxis.parent = Bubblegum;
+			axesBubblegum.yAxis.parent = Bubblegum;
+			axesBubblegum.zAxis.parent = Bubblegum;
+		}
+		console.log("Bubblegum importee avec succes !");
+		
+		// Optimisations
+		Bubblegum.freezeWorldMatrix(); 
+		return Bubblegum;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele Bubblegum :", error);
+		return null;
+	}
+}
+
+export async function loadTronArcade(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "TronArcade.glb", scene);
+		const TronArcade = result.meshes[0];
+		TronArcade.position = new BABYLON.Vector3(-125, -300, -200);
+		TronArcade.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
+
+
+		if (debug) {
+			const axesTronArcade = new BABYLON.AxesViewer(scene, 2);
+			axesTronArcade.xAxis.parent = TronArcade;
+			axesTronArcade.yAxis.parent = TronArcade;
+			axesTronArcade.zAxis.parent = TronArcade;
+		}
+		console.log("TronArcade importee avec succes !");
+		
+		// Optimisations
+		TronArcade.freezeWorldMatrix(); 
+		return TronArcade;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele TronArcade :", error);
+		return null;
+	}
+}
+
+export async function loadPacman(scene) {
+	try {
+		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "pacman.glb", scene);
+		const Pacman = result.meshes[0];
+		Pacman.position = new BABYLON.Vector3(-24, -300, 820);
+		Pacman.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
+
+
+		if (debug) {
+			const axesPacman = new BABYLON.AxesViewer(scene, 2);
+			axesPacman.xAxis.parent = Pacman;
+			axesPacman.yAxis.parent = Pacman;
+			axesPacman.zAxis.parent = Pacman;
+		}
+		console.log("Pacman importee avec succes !");
+		
+		// Optimisations
+		// Pacman.freezeWorldMatrix(); 
+		return Pacman;
+	} 
+	catch (error) {
+		console.error("Erreur lors de l'importation du modele Pacman :", error);
+		return null;
+	}
+}
+
 //endregion---------------------------------fin-creation-objets---------------------------------
 
 //endregion------------------------------------decors-objets------------------------------------
 
 export function createRoom(scene) {
 	createGround(scene);
-	createCeiling(scene);
+	// createCeiling(scene);
 	createWallBack(scene);
-	createWallFront(scene);
-	createWallRight(scene);
+	// createWallFront(scene);
+	// createWallRight(scene);
 	createWallLeft(scene);
 }
 
 function createGround(scene) {
 	const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1920, height: 1920 }, scene);
 	const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
-	groundMaterial.color = "#747474ff";
-	groundMaterial.alpha = 1;
+
+	const texturePath = "./includes/assets/textures/arcade_carpet_42.png";
+	groundMaterial.emissiveTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = groundMaterial.emissiveTexture;
+		
+	// repeter X fois sur la largeur et la hauteur.
+	texture.uScale = 2.0; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 2.0; // Repetition sur l'axe vertical (V)
+
+		
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
+
 	groundMaterial.backFaceCulling = false;
 	ground.material = groundMaterial;
 	ground.position = new BABYLON.Vector3(870, -300, 0);
+	ground.rotation = new BABYLON.Vector3(0, -Math.PI, 0);
 	console.log("ground importee avec succes !");
 
 	return ground;
 }
 
 function createCeiling(scene) {
-	const Ceiling = BABYLON.MeshBuilder.CreateGround("Ceiling", { width: 1920, height: 1920 }, scene);
-	const CeilingMaterial = new BABYLON.StandardMaterial("CeilingMat", scene);
-	CeilingMaterial.color = "#747474ff";
-	CeilingMaterial.alpha = 1;
-	CeilingMaterial.backFaceCulling = false;
-	Ceiling.material = CeilingMaterial;
-	Ceiling.position = new BABYLON.Vector3(870, 250, 0);
-	console.log("Ceiling importee avec succes !");
+	const ceilingMesh = BABYLON.MeshBuilder.CreateGround("ceilingMesh", { width: 1920, height: 1920 }, scene);
+	const ceilingMaterial = new BABYLON.StandardMaterial("ceilingMat", scene);
+	ceilingMaterial.diffuseColor = BABYLON.Color3.FromHexString("#747474");
+	ceilingMaterial.backFaceCulling = true; 
+	ceilingMesh.material = ceilingMaterial;
+	ceilingMesh.position = new BABYLON.Vector3(870, 250, 0);
+	ceilingMesh.rotation.x = Math.PI;
+	console.log("Plafond cree avec succes !");
 
-	return Ceiling;
+	return ceilingMesh;
 }
 
 function createWallBack(scene) {
-    const wallBack = BABYLON.MeshBuilder.CreatePlane("wallBack", { width: 1920, height: 550 }, scene);
-    const wallBackMaterial = new BABYLON.StandardMaterial("wallBackMat", scene);
-    wallBackMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
-    wallBackMaterial.backFaceCulling = false;
-    wallBack.material = wallBackMaterial;
-    wallBack.position = new BABYLON.Vector3(-90, -25, 0);
-    wallBack.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-    return wallBack;
+	const wallBack = BABYLON.MeshBuilder.CreatePlane("wallBack", { width: 1920, height: 550 }, scene);
+	const wallBackMaterial = new BABYLON.StandardMaterial("wallBackMat", scene);
+	const hexColor = "#00013b";
+	const alphaValue = 1.0;
+	wallBackMaterial.diffuseColor = BABYLON.Color3.FromHexString(hexColor);
+	wallBackMaterial.alpha = alphaValue;
+	wallBackMaterial.backFaceCulling = false;
+	wallBack.material = wallBackMaterial;
+	wallBack.position = new BABYLON.Vector3(-90, -25, 0);
+	wallBack.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
+	return wallBack;
 }
 
 function createWallFront(scene) {
-    const wallFront = BABYLON.MeshBuilder.CreatePlane("wallFront", { width: 1920, height: 550 }, scene);
-    const wallFrontMaterial = new BABYLON.StandardMaterial("wallFrontMat", scene);
-    wallFrontMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
-    wallFrontMaterial.backFaceCulling = false;
-    wallFront.material = wallFrontMaterial;
-    wallFront.position = new BABYLON.Vector3(1830, -25, 0);
-    wallFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0); // orientation verticale
-    return wallFront;
+	const wallFront = BABYLON.MeshBuilder.CreatePlane("wallFront", { width: 1920, height: 550 }, scene);
+	const wallFrontMaterial = new BABYLON.StandardMaterial("wallFrontMat", scene);
+	wallFrontMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	wallFrontMaterial.backFaceCulling = false;
+	wallFront.material = wallFrontMaterial;
+	wallFront.position = new BABYLON.Vector3(1830, -25, 0);
+	wallFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0); // orientation verticale
+	return wallFront;
 }
 
 function createWallRight(scene) {

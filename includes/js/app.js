@@ -1,16 +1,18 @@
 // js/app.js
 
 // --- IMPORTATIONS DES MODULES ---
-import { gameMode } from './config.js';
-import { debugVisuals } from './config.js'; 
+import { gameMode, debugVisuals, JwtToken } from './config.js';
 import { gameState } from './gameState.js';
 import { initializeEngine, createScene } from './sceneSetup.js';
-import { createBall, createTable, loadArcade, createDebugArrow, createRoom } from './gameObjects.js';
+import { createBall, createTable, loadArcade, 
+	createDebugArrow, createRoom,
+	loadArcadeMachines, loadDDM, loadSugarRush, 
+	loadHockey, loadWhackAMole, loadBubblegum,
+	loadTronArcade, loadPacman } from './gameObjects.js';
 import { setupPlayers } from './playerManager.js';
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
 import { startGameLoop, startAIBrain } from './gameLogic.js';
-
 
 /**
  * La fonction principale asynchrone qui initialise et demarre le jeu.
@@ -19,7 +21,14 @@ async function initializeApp() {
 	
 	// Initialise le moteur et la scene de base
 	const engine = initializeEngine();
+	BABYLON.DracoCompression.Configuration = {
+		decoder: {
+			wasmUrl: "https://cdn.babylonjs.com/draco/draco_decoder.js",
+			wasmBinaryUrl: "https://cdn.babylonjs.com/draco/draco_decoder.wasm"
+		}
+	};
 	const scene = createScene(engine);
+	scene.debugLayer.show({ embedMode: true });
 
 	// Definit les joueurs actifs en fonction du mode de jeu
 	setupPlayers(scene, gameState);
@@ -31,6 +40,15 @@ async function initializeApp() {
 
 	const table = createTable(scene);
 	const arcade = await loadArcade(scene);
+	const arcadeMachines = await loadArcadeMachines(scene);
+	const ddm = await loadDDM(scene);
+	const sugarRush = await loadSugarRush(scene);
+	const hockey = await loadHockey(scene);
+	const whackAMole = await loadWhackAMole(scene);
+	const bubblegum = await loadBubblegum(scene);
+	const tronArcade = await loadTronArcade(scene);
+	const pacMan = await loadPacman(scene);
+	// const arcadeRoom = await loadArcadeRoom(scene, engine);
 	const room = createRoom(scene);
 
 	if (debugVisuals) {
@@ -40,13 +58,13 @@ async function initializeApp() {
 	}
 
 	// Cree l'interface utilisateur (GUI)
-	createGUI(gameState, engine);
+	createGUI(gameState, engine, scene, JwtToken);
 
 	// Met en place la gestion des entrees clavier
 	setupInputManager(scene, gameState);
 
 	// Demarre le "cerveau" de l'IA si necessaire
-// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
+	// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
 
 	if (gameMode == '1P_VS_AI' || gameMode == 'AI_VS_AI' || gameMode == '2AI_VS_2AI') {
 		startAIBrain(gameState);
@@ -56,7 +74,7 @@ async function initializeApp() {
 	table.material.freeze();
 	table.freezeWorldMatrix();
 
-	// 8. Lance la boucle de logique de jeu
+	// Lance la boucle de logique de jeu
 	startGameLoop(scene, engine, gameState);
 
 	// Lance la boucle de rendu
