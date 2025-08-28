@@ -1,17 +1,26 @@
 <script setup lang="ts">
+	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 	}>();
+	const emit = defineEmits(['show-form']);
+
+	const isSignedUp = ref(false);
+
+	const toggleText = () => {
+		isSignedUp.value = !isSignedUp.value;
+	}
 </script>
 
 <template>
 	<header class="header">
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
-			<button class="my-button" title="sign_up" >
-				<div data-i18n="header.signUp"></div>
+			<button @click="emit('show-form'); toggleText()"  class="my-button" title="sign_up" >
+				<div v-show=" !isSignedUp" data-i18n="header.signUp"></div>
+				<div v-show=" isSignedUp" data-i18n="home.connection"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 		</div>

@@ -6,5 +6,15 @@
 	},
 	"home": {
 	  "connection": "CONNEXION"
+	},
+	"Signup":{
+		"login": "Nom d'utilisateur",
+		"password": "Mot de passe",
+		"conf_password": "Confirmation du mot de passe",
+		"login_error": "le Nom d'utilisateur doit faire entre 3 et 13 caractères.",
+		"mail_error": "Email invalide.",
+		"password_error": "Condition du mot de passe.",
+		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
+		"submit": "VALIDER"
 	}
 }

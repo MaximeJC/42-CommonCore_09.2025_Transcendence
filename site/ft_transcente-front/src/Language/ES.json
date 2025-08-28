@@ -6,5 +6,15 @@
 	},
 	"home": {
 	  "connection": "conexión"
+	},
+	"Signup":{
+		"login": "Usuario",
+		"password": "Contraseña",
+		"conf_password": "Confirmación de la contraseña",
+		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
+		"mail_error": "Correo electrónico no válido.",
+		"password_error": "Condiciones de la contraseña.",
+		"conf_password_error": "Las dos contraseñas no son idénticas.",
+		"submit": "ENVIAR"
 	}
 }
