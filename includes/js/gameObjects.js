@@ -220,15 +220,22 @@ export function createTextBox(name, initialText, options, scene) {
 	};
 }
 
-export function createTable(scene) {
+export async function createTable(scene) {
 	const table = BABYLON.MeshBuilder.CreateGround("table", { width: 80, height: 80 }, scene);
 	const tableMaterial = new BABYLON.StandardMaterial("tableMat", scene);
 	tableMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	tableMaterial.alpha = 0;
+	tableMaterial.alpha = 0; // Le materiau de la table est invisible
 	table.material = tableMaterial;
 	table.position = new BABYLON.Vector3(-1, 0, 0);
 	table.rotation = new BABYLON.Vector3(0, Math.PI, Math.PI / 2);
-	return table;
+		
+	const ball = await createBall(scene);
+	ball.isVisible = false;
+	
+	return {
+		table: table,
+		ball: ball
+	};
 }
 
 export async function loadArcade(scene) {
@@ -415,7 +422,7 @@ export async function loadTronArcade(scene) {
 		TronArcade.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
 
 
-		if (debug) {
+		if (debug === true) {
 			const axesTronArcade = new BABYLON.AxesViewer(scene, 2);
 			axesTronArcade.xAxis.parent = TronArcade;
 			axesTronArcade.yAxis.parent = TronArcade;
@@ -440,7 +447,6 @@ export async function loadPacman(scene) {
 		Pacman.position = new BABYLON.Vector3(-24, -300, 820);
 		Pacman.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
 
-
 		if (debug) {
 			const axesPacman = new BABYLON.AxesViewer(scene, 2);
 			axesPacman.xAxis.parent = Pacman;
@@ -450,7 +456,7 @@ export async function loadPacman(scene) {
 		console.log("Pacman importee avec succes !");
 		
 		// Optimisations
-		// Pacman.freezeWorldMatrix(); 
+		Pacman.freezeWorldMatrix(); 
 		return Pacman;
 	} 
 	catch (error) {
@@ -464,11 +470,13 @@ export async function loadPacman(scene) {
 //endregion------------------------------------decors-objets------------------------------------
 
 export function createRoom(scene) {
-	createGround(scene);
-	// createCeiling(scene);
+	if (debug === false) {
+		createGround(scene);
+	}
+	createCeiling(scene);
 	createWallBack(scene);
-	// createWallFront(scene);
-	// createWallRight(scene);
+	createWallFront(scene);
+	createWallRight(scene);
 	createWallLeft(scene);
 }
 
@@ -485,7 +493,6 @@ function createGround(scene) {
 	texture.uScale = 2.0; // Repetition sur l'axe horizontal (U)
 	texture.vScale = 2.0; // Repetition sur l'axe vertical (V)
 
-		
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
@@ -502,10 +509,19 @@ function createGround(scene) {
 function createCeiling(scene) {
 	const ceilingMesh = BABYLON.MeshBuilder.CreateGround("ceilingMesh", { width: 1920, height: 1920 }, scene);
 	const ceilingMaterial = new BABYLON.StandardMaterial("ceilingMat", scene);
-	ceilingMaterial.diffuseColor = BABYLON.Color3.FromHexString("#747474");
-	ceilingMaterial.backFaceCulling = true; 
+	const texturePath = "./includes/assets/textures/ceilling.png";
+	ceilingMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = ceilingMaterial.diffuseTexture;
+	texture.uScale = 1; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 1; // Repetition sur l'axe vertical (V)
+
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
+	// ceilingMaterial.backFaceCulling = false;
 	ceilingMesh.material = ceilingMaterial;
-	ceilingMesh.position = new BABYLON.Vector3(870, 250, 0);
+	ceilingMesh.position = new BABYLON.Vector3(870, 500, 0);
 	ceilingMesh.rotation.x = Math.PI;
 	console.log("Plafond cree avec succes !");
 
@@ -513,49 +529,82 @@ function createCeiling(scene) {
 }
 
 function createWallBack(scene) {
-	const wallBack = BABYLON.MeshBuilder.CreatePlane("wallBack", { width: 1920, height: 550 }, scene);
+	const wallBack = BABYLON.MeshBuilder.CreatePlane("wallBack", { width: 1920, height: 800 }, scene);
 	const wallBackMaterial = new BABYLON.StandardMaterial("wallBackMat", scene);
-	const hexColor = "#00013b";
-	const alphaValue = 1.0;
-	wallBackMaterial.diffuseColor = BABYLON.Color3.FromHexString(hexColor);
-	wallBackMaterial.alpha = alphaValue;
+	const texturePath = "./includes/assets/textures/wall.png";
+	wallBackMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = wallBackMaterial.diffuseTexture;
+	texture.uScale = 2.5; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 2; // Repetition sur l'axe vertical (V)
+
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
 	wallBackMaterial.backFaceCulling = false;
 	wallBack.material = wallBackMaterial;
-	wallBack.position = new BABYLON.Vector3(-90, -25, 0);
+	wallBack.position = new BABYLON.Vector3(-90, 100, 0);
 	wallBack.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
 	return wallBack;
 }
 
 function createWallFront(scene) {
-	const wallFront = BABYLON.MeshBuilder.CreatePlane("wallFront", { width: 1920, height: 550 }, scene);
+	const wallFront = BABYLON.MeshBuilder.CreatePlane("wallFront", { width: 1920, height: 800 }, scene);
 	const wallFrontMaterial = new BABYLON.StandardMaterial("wallFrontMat", scene);
-	wallFrontMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	const texturePath = "./includes/assets/textures/wall.png";
+	wallFrontMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = wallFrontMaterial.diffuseTexture;
+	texture.uScale = 2.5; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 2; // Repetition sur l'axe vertical (V)
+
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
 	wallFrontMaterial.backFaceCulling = false;
 	wallFront.material = wallFrontMaterial;
-	wallFront.position = new BABYLON.Vector3(1830, -25, 0);
+	wallFront.position = new BABYLON.Vector3(1830, 100, 0);
 	wallFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0); // orientation verticale
 	return wallFront;
 }
 
 function createWallRight(scene) {
-	const wallRight = BABYLON.MeshBuilder.CreatePlane("wallRight", { width: 550, height: 1920 }, scene);
+	const wallRight = BABYLON.MeshBuilder.CreatePlane("wallRight", { width: 1920, height: 800 }, scene);
 	const wallRightMaterial = new BABYLON.StandardMaterial("wallRightMat", scene);
-	wallRightMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	const texturePath = "./includes/assets/textures/wall.png";
+	wallRightMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = wallRightMaterial.diffuseTexture;
+	texture.uScale = 2.5; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 2; // Repetition sur l'axe vertical (V)
+
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
 	wallRightMaterial.backFaceCulling = false;
 	wallRight.material = wallRightMaterial;
-	wallRight.position = new BABYLON.Vector3(870, -25, 960);
-	wallRight.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
+	wallRight.position = new BABYLON.Vector3(870, 100, 960);
+	wallRight.rotation = new BABYLON.Vector3(0, 0, 0);
 	return wallRight;
 }
 
 function createWallLeft(scene) {
-	const wallLeft = BABYLON.MeshBuilder.CreatePlane("wallLeft", { width: 550, height: 1920 }, scene);
+	const wallLeft = BABYLON.MeshBuilder.CreatePlane("wallLeft", { width: 1920, height: 800 }, scene);
 	const wallLeftMaterial = new BABYLON.StandardMaterial("wallLeftMat", scene);
-	wallLeftMaterial.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.45); // #747474
+	const texturePath = "./includes/assets/textures/wall.png";
+	wallLeftMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+
+	const texture = wallLeftMaterial.diffuseTexture;
+	texture.uScale = 2.5; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 2; // Repetition sur l'axe vertical (V)
+
+	if (texturePath.endsWith(".png")) {
+		texture.hasAlpha = true;
+	}
 	wallLeftMaterial.backFaceCulling = false;
 	wallLeft.material = wallLeftMaterial;
-	wallLeft.position = new BABYLON.Vector3(870, -25, -960);
-	wallLeft.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
+	wallLeft.position = new BABYLON.Vector3(870, 100, -960);
+	wallLeft.rotation = new BABYLON.Vector3(0, 0, 0);
 	return wallLeft;
 }
 

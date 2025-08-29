@@ -1,7 +1,7 @@
 // js/app.js
 
 // --- IMPORTATIONS DES MODULES ---
-import { gameMode, debugVisuals, JwtToken } from './config.js';
+import { gameMode, debugVisuals, debug, JwtToken } from './config.js';
 import { gameState } from './gameState.js';
 import { initializeEngine, createScene } from './sceneSetup.js';
 import { createBall, createTable, loadArcade, 
@@ -18,37 +18,58 @@ import { startGameLoop, startAIBrain } from './gameLogic.js';
  * La fonction principale asynchrone qui initialise et demarre le jeu.
  */
 async function initializeApp() {
-	
 	// Initialise le moteur et la scene de base
 	const engine = initializeEngine();
-	BABYLON.DracoCompression.Configuration = {
-		decoder: {
-			wasmUrl: "https://cdn.babylonjs.com/draco/draco_decoder.js",
-			wasmBinaryUrl: "https://cdn.babylonjs.com/draco/draco_decoder.wasm"
-		}
-	};
+	
 	const scene = createScene(engine);
-	scene.debugLayer.show({ embedMode: true });
+	if (debug == true)
+	{
+		scene.debugLayer.show({
+			embedMode: true
+		});
+	}
+
+	// --- CHARGEMENT PARALLELE DES MODELES ---
+	console.time("Temps de chargement total des modeles");
+
+	// On cree une liste de toutes les "promesses" de chargement.
+	// Chaque appel a une fonction async retourne une promesse.
+	const loadingPromises = [
+		 loadArcade(scene),
+		 loadArcadeMachines(scene),
+		 loadDDM(scene),
+		 loadSugarRush(scene),
+		 loadHockey(scene),
+		 loadWhackAMole(scene),
+		 loadBubblegum(scene),
+		 loadTronArcade(scene),
+		 loadPacman(scene)
+	];
+
+	// Promise.all() attend que TOUTES les promesses de la liste soient resolues.
+	// Il retourne un tableau avec les resultats dans le meme ordre.
+	const [
+		 arcade,
+		 arcadeMachines,
+		 ddm,
+		 sugarRush,
+		 hockey,
+		 whackAMole,
+		 bubblegum,
+		 tronArcade,
+		 pacMan
+	] = await Promise.all(loadingPromises);
+
+	console.timeEnd("Temps de chargement total des modeles");
 
 	// Definit les joueurs actifs en fonction du mode de jeu
 	setupPlayers(scene, gameState);
 
-	// Cree les objets 3D restants (balle, table, etc.)
-	// On stocke la reference de la balle dans l'etat du jeu
-	gameState.ball = await createBall(scene); 
-	gameState.ball.isVisible = false;
+	const { table, ball } = await createTable(scene);
 
-	const table = createTable(scene);
-	const arcade = await loadArcade(scene);
-	const arcadeMachines = await loadArcadeMachines(scene);
-	const ddm = await loadDDM(scene);
-	const sugarRush = await loadSugarRush(scene);
-	const hockey = await loadHockey(scene);
-	const whackAMole = await loadWhackAMole(scene);
-	const bubblegum = await loadBubblegum(scene);
-	const tronArcade = await loadTronArcade(scene);
-	const pacMan = await loadPacman(scene);
-	// const arcadeRoom = await loadArcadeRoom(scene, engine);
+	// On stocke la balle dans gameState comme avant
+	gameState.ball = ball;
+
 	const room = createRoom(scene);
 
 	if (debugVisuals) {

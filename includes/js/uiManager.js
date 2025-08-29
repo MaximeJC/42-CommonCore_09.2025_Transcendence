@@ -69,7 +69,6 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	startButton.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.startButton = startButton;
 
-	// --- MODIFICATION DE LA LOGIQUE DE CLIC DU BOUTON START ---
 	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 		BABYLON.ActionManager.OnPickTrigger,
 		async function () { // La fonction devient 'async'
