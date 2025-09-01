@@ -74,7 +74,7 @@ export function createScene(engine) {
 	const directionalLight  = new BABYLON.HemisphericLight(
 		"light1",
 		// new BABYLON.Vector3(-5, -3, 0),
-		new BABYLON.Vector3(-1, -1, 0),
+		new BABYLON.Vector3(0, -10, 0),
 		scene);
 	directionalLight.position = new BABYLON.Vector3(0, 0, 0); // Position de la lumière pour le calcul des ombres
 	directionalLight.intensity = 1;

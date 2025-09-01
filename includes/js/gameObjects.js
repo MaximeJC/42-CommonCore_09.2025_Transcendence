@@ -224,7 +224,7 @@ export async function createTable(scene) {
 	const table = BABYLON.MeshBuilder.CreateGround("table", { width: 80, height: 80 }, scene);
 	const tableMaterial = new BABYLON.StandardMaterial("tableMat", scene);
 	tableMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	tableMaterial.alpha = 0; // Le materiau de la table est invisible
+	tableMaterial.alpha = 0;
 	table.material = tableMaterial;
 	table.position = new BABYLON.Vector3(-1, 0, 0);
 	table.rotation = new BABYLON.Vector3(0, Math.PI, Math.PI / 2);
@@ -252,14 +252,6 @@ export async function loadArcade(scene) {
 			axesArcade.zAxis.parent = pong_arcade;
 		}
 		console.log("Arcade importee avec succes !");
-		
-		// Optimisations
-		pong_arcade.freezeWorldMatrix(); 
-		// pong_arcade.getChildMeshes().forEach(mesh => {
-		// 	if(mesh.material){
-		// 		mesh.material.freeze();
-		// 	}
-		// });
 		const table = createTable(scene);
 		
 		return pong_arcade;
@@ -272,6 +264,7 @@ export async function loadArcade(scene) {
 
 export async function loadArcadeMachines(scene) {
 	try {
+		console.time("Temps de chargement ArcadeMachines");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "ArcadeMachines.glb", scene);
 		const ArcadeMachines = result.meshes[0];
 		ArcadeMachines.position = new BABYLON.Vector3(50, -75, 300);
@@ -283,19 +276,21 @@ export async function loadArcadeMachines(scene) {
 			axesArcadeMachines.zAxis.parent = ArcadeMachines;
 		}
 		console.log("Machine d'arcade importee avec succes !");
-		
-		// Optimisations
-		ArcadeMachines.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement ArcadeMachines");
+
 		return ArcadeMachines;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele machine d'arcade :", error);
+		console.timeEnd("Temps de chargement ArcadeMachines");
+
 		return null;
 	}
 }
 
 export async function loadDDM(scene) {
 	try {
+		console.time("Temps de chargement DDM");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "DDM.glb", scene);
 		const DDM = result.meshes[0];
 		DDM.position = new BABYLON.Vector3(200, -45, -650);
@@ -307,19 +302,21 @@ export async function loadDDM(scene) {
 			axesDDM.zAxis.parent = DDM;
 		}
 		console.log("DDM importee avec succes !");
-		
-		// Optimisations
-		DDM.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement DDM");
+
 		return DDM;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele DDM :", error);
+		console.timeEnd("Temps de chargement DDM");
+
 		return null;
 	}
 }
 
 export async function loadSugarRush(scene) {
 	try {
+		console.time("Temps de chargement sugar_rush");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "sugar_rush.glb", scene);
 		const SugarRush = result.meshes[0];
 		SugarRush.position = new BABYLON.Vector3(830, -10, -790);
@@ -331,19 +328,20 @@ export async function loadSugarRush(scene) {
 			axesSugarRush.zAxis.parent = SugarRush;
 		}
 		console.log("SugarRush importee avec succes !");
-		
-		// Optimisations
-		SugarRush.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement sugar_rush");
+
 		return SugarRush;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Sugar Rush :", error);
+		console.timeEnd("Temps de chargement sugar_rush");
 		return null;
 	}
 }
 
 export async function loadHockey(scene) {
 	try {
+		console.time("Temps de chargement Hockey");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Hockey.glb", scene);
 		const Hockey = result.meshes[0];
 		Hockey.position = new BABYLON.Vector3(800, -166, -200);
@@ -355,19 +353,20 @@ export async function loadHockey(scene) {
 			axesHockey.zAxis.parent = Hockey;
 		}
 		console.log("Hockey importee avec succes !");
-		
-		// Optimisations
-		Hockey.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement Hockey");
+
 		return Hockey;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Hockey :", error);
+		console.timeEnd("Temps de chargement Hockey");
 		return null;
 	}
 }
 
 export async function loadWhackAMole(scene) {
 	try {
+		console.time("Temps de chargement Whack_a_mole");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Whack_a_mole.glb", scene);
 		const WhackAMole = result.meshes[0];
 		WhackAMole.position = new BABYLON.Vector3(1300, -100, -875);
@@ -379,19 +378,20 @@ export async function loadWhackAMole(scene) {
 			axesWhackAMole.zAxis.parent = WhackAMole;
 		}
 		console.log("WhackAMole importee avec succes !");
-		
-		// Optimisations
-		WhackAMole.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement Whack_a_mole");
+
 		return WhackAMole;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele WhackAMole :", error);
+		console.timeEnd("Temps de chargement Whack_a_mole");
 		return null;
 	}
 }
 
 export async function loadBubblegum(scene) {
 	try {
+		console.time("Temps de chargement Bubblegum");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Bubblegum.glb", scene);
 		const Bubblegum = result.meshes[0];
 		Bubblegum.position = new BABYLON.Vector3(1300, -190, 400);
@@ -403,24 +403,24 @@ export async function loadBubblegum(scene) {
 			axesBubblegum.zAxis.parent = Bubblegum;
 		}
 		console.log("Bubblegum importee avec succes !");
-		
-		// Optimisations
-		Bubblegum.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement Bubblegum");
+
 		return Bubblegum;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Bubblegum :", error);
+		console.timeEnd("Temps de chargement Bubblegum");
 		return null;
 	}
 }
 
 export async function loadTronArcade(scene) {
 	try {
+		console.time("Temps de chargement TronArcade");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "TronArcade.glb", scene);
 		const TronArcade = result.meshes[0];
 		TronArcade.position = new BABYLON.Vector3(-125, -300, -200);
 		TronArcade.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
-
 
 		if (debug === true) {
 			const axesTronArcade = new BABYLON.AxesViewer(scene, 2);
@@ -429,19 +429,20 @@ export async function loadTronArcade(scene) {
 			axesTronArcade.zAxis.parent = TronArcade;
 		}
 		console.log("TronArcade importee avec succes !");
-		
-		// Optimisations
-		TronArcade.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement TronArcade");
+
 		return TronArcade;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele TronArcade :", error);
+		console.timeEnd("Temps de chargement TronArcade");
 		return null;
 	}
 }
 
 export async function loadPacman(scene) {
 	try {
+		console.time("Temps de chargement pacman");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "pacman.glb", scene);
 		const Pacman = result.meshes[0];
 		Pacman.position = new BABYLON.Vector3(-24, -300, 820);
@@ -454,13 +455,13 @@ export async function loadPacman(scene) {
 			axesPacman.zAxis.parent = Pacman;
 		}
 		console.log("Pacman importee avec succes !");
-		
-		// Optimisations
-		Pacman.freezeWorldMatrix(); 
+		console.timeEnd("Temps de chargement pacman");
+
 		return Pacman;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Pacman :", error);
+		console.timeEnd("Temps de chargement pacman");
 		return null;
 	}
 }
@@ -523,6 +524,7 @@ function createCeiling(scene) {
 	ceilingMesh.material = ceilingMaterial;
 	ceilingMesh.position = new BABYLON.Vector3(870, 500, 0);
 	ceilingMesh.rotation.x = Math.PI;
+	ceilingMesh.rotation.y = Math.PI / 2;
 	console.log("Plafond cree avec succes !");
 
 	return ceilingMesh;
@@ -607,5 +609,107 @@ function createWallLeft(scene) {
 	wallLeft.rotation = new BABYLON.Vector3(0, 0, 0);
 	return wallLeft;
 }
+
+//region--------------------------------------light-perso---------------------------------------
+
+export function createLightPerso(scene)
+{
+	createWallLight(scene, new BABYLON.Vector3(-84, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightBack");
+	createWallLightBack(scene);
+
+	createWallLight(scene, new BABYLON.Vector3(1824, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightFront");
+	createWallLightFront(scene);
+
+	createWallLight(scene, new BABYLON.Vector3(870, 490, 954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightRight");
+	createWallLightRight(scene)
+
+	createWallLight(scene, new BABYLON.Vector3(870, 490, -954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightLeft");
+	createWallLightLeft(scene);
+}
+
+function createWallLight(scene, position, rotation, name) {
+	const color = new BABYLON.Color3(0, 0, 1); // Bleu
+	const lightMesh = BABYLON.MeshBuilder.CreateBox(name + "Mesh", { width: 10, height: 1920 }, scene);
+	const material = new BABYLON.StandardMaterial(name + "Mat", scene);
+	material.diffuseColor = color;
+	material.emissiveColor = color;
+	material.emissiveIntensity = 2.5;
+	material.disableLighting = true;
+
+	lightMesh.material = material;
+	lightMesh.position = position;
+	lightMesh.rotation = rotation;
+	lightMesh.scaling = new BABYLON.Vector3(1, 1, 20);
+
+	const spotLight = new BABYLON.SpotLight(
+		name + "PointLight",
+		new BABYLON.Vector3(0, -1, 0),
+		new BABYLON.Vector3(0, -1, 0),
+		Math.PI * 0.8,
+		16,
+		scene
+	);
+	spotLight.diffuse = color;
+	spotLight.specular = color;
+	spotLight.intensity = 2.0;
+	spotLight.parent = lightMesh;
+
+	const glowLayer = scene.getGlowLayerByName("glow");
+	if (glowLayer) {
+		glowLayer.addIncludedOnlyMesh(lightMesh);
+	}
+
+	return lightMesh;
+}
+
+function createWallLightBack(scene) {
+	const wallLightBack = BABYLON.MeshBuilder.CreatePlane("wallLightBack", { width: 1884, height: 50 }, scene);
+	const wallLightBackMaterial = new BABYLON.StandardMaterial("wallLightBackMat", scene);
+	wallLightBackMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
+
+	wallLightBackMaterial.backFaceCulling = false;
+	wallLightBack.material = wallLightBackMaterial;
+	wallLightBack.position = new BABYLON.Vector3(-75, 480, 0);
+	wallLightBack.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
+	return wallLightBack;
+}
+
+function createWallLightFront(scene) {
+	const wallLightFront = BABYLON.MeshBuilder.CreatePlane("wallLightFront", { width: 1884, height: 50 }, scene);
+	const wallLightFrontMaterial = new BABYLON.StandardMaterial("wallLightFrontMat", scene);
+	wallLightFrontMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
+
+	wallLightFrontMaterial.FrontFaceCulling = false;
+	wallLightFront.material = wallLightFrontMaterial;
+	wallLightFront.position = new BABYLON.Vector3(1810, 480, 0);
+	wallLightFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
+	return wallLightFront;
+}
+
+function createWallLightRight(scene) {
+	const wallLightRight = BABYLON.MeshBuilder.CreatePlane("wallLightRight", { width: 1884, height: 50 }, scene);
+	const wallLightRightMaterial = new BABYLON.StandardMaterial("wallLightRightMat", scene);
+	wallLightRightMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
+
+	wallLightRightMaterial.backFaceCulling = false;
+	wallLightRight.material = wallLightRightMaterial;
+	wallLightRight.position = new BABYLON.Vector3(870, 480, 940);
+	wallLightRight.rotation = new BABYLON.Vector3(0, 0, 0);
+	return wallLightRight;
+}
+
+function createWallLightLeft(scene) {
+	const wallLightLeft = BABYLON.MeshBuilder.CreatePlane("wallLightLeft", { width: 1884, height: 50 }, scene);
+	const wallLightLeftMaterial = new BABYLON.StandardMaterial("wallLightLeftMat", scene);
+	wallLightLeftMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
+
+	wallLightLeftMaterial.backFaceCulling = false;
+	wallLightLeft.material = wallLightLeftMaterial;
+	wallLightLeft.position = new BABYLON.Vector3(870, 480, -940);
+	wallLightLeft.rotation = new BABYLON.Vector3(0, 0, 0);
+	return wallLightLeft;
+}
+
+//region--------------------------------------light-perso---------------------------------------
 
 //endregion---------------------------------fin-decors-objets-----------------------------------

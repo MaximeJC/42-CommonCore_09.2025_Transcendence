@@ -4,11 +4,13 @@
 import { gameMode, debugVisuals, debug, JwtToken } from './config.js';
 import { gameState } from './gameState.js';
 import { initializeEngine, createScene } from './sceneSetup.js';
-import { createBall, createTable, loadArcade, 
+import { 
+	createTable, loadArcade, 
 	createDebugArrow, createRoom,
 	loadArcadeMachines, loadDDM, loadSugarRush, 
 	loadHockey, loadWhackAMole, loadBubblegum,
-	loadTronArcade, loadPacman } from './gameObjects.js';
+	loadTronArcade, loadPacman, createLightPerso 
+} from './gameObjects.js';
 import { setupPlayers } from './playerManager.js';
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
@@ -29,11 +31,21 @@ async function initializeApp() {
 		});
 	}
 
-	// --- CHARGEMENT PARALLELE DES MODELES ---
+	// Activation de la decompression Draco 
+	BABYLON.DracoCompression.Configuration = {
+		decoder: {
+			wasmUrl: "https://cdn.babylonjs.com/draco/draco_decoder.js",
+			wasmBinaryUrl: "https://cdn.babylonjs.com/draco/draco_decoder.wasm"
+		}
+	};
+		
+	// Affichage d'un ecran de chargement
+	engine.displayLoadingUI();
 	console.time("Temps de chargement total des modeles");
 
+
 	// On cree une liste de toutes les "promesses" de chargement.
-	// Chaque appel a une fonction async retourne une promesse.
+	// chargement parallele.
 	const loadingPromises = [
 		 loadArcade(scene),
 		 loadArcadeMachines(scene),
@@ -58,19 +70,25 @@ async function initializeApp() {
 		 bubblegum,
 		 tronArcade,
 		 pacMan
-	] = await Promise.all(loadingPromises);
+		] = await Promise.all(loadingPromises);
 
 	console.timeEnd("Temps de chargement total des modeles");
 
+	// cache l'ecran de chargement
+	engine.hideLoadingUI();
+
+	await scene.whenReadyAsync();
+
+	
 	// Definit les joueurs actifs en fonction du mode de jeu
 	setupPlayers(scene, gameState);
-
+	
 	const { table, ball } = await createTable(scene);
-
+	
 	// On stocke la balle dans gameState comme avant
 	gameState.ball = ball;
-
 	const room = createRoom(scene);
+	const lightPerso = createLightPerso(scene);
 
 	if (debugVisuals) {
 		gameState.debugArrow = createDebugArrow(scene);
@@ -94,6 +112,12 @@ async function initializeApp() {
 	// Applique les optimisations finales
 	table.material.freeze();
 	table.freezeWorldMatrix();
+
+	// optimisations des modeles
+	const allLoadedModels = [arcade, tronArcade, pacMan, arcadeMachines, ddm, sugarRush, hockey, whackAMole, bubblegum];
+	allLoadedModels.forEach(model => {
+		if (model) model.freezeWorldMatrix();
+	});
 
 	// Lance la boucle de logique de jeu
 	startGameLoop(scene, engine, gameState);
