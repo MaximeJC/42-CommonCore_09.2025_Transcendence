@@ -38,15 +38,14 @@ export function createScene(engine) {
 		new BABYLON.Vector3(155, 25, 0),
 		scene
 	);
-	camera.cameraRotation.x = BABYLON.Tools.ToRadians(1);
-	camera.cameraRotation.y = BABYLON.Tools.ToRadians(-45.5);
+	camera.setTarget(new BABYLON.Vector3(0, 10, 0)); 
 
 	// ACTIVATION ET PERSONNALISATION DES CONTROLES DE LA UNIVERSALCAMERA
 	camera.attachControl(canvas, true);
 	camera.speed = 10.0;
 
-	if (debug === true) {
-
+	if (debug === true)
+	{
 		// ACTIVATION DU ZOOM A LA MOLETTE
 		camera.inputs.remove(camera.inputs.attached.mousewheel);
 		scene.onPrePointerObservable.add((pointerInfo) => {
