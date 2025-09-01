@@ -9,7 +9,7 @@
 	<div class="lang-menu-container">
 		<button class="lang-menu-button">
 			<img id="lang-flag-icon" class="lang-icon" src="" alt="flag" width="30" height="30"></img>
-			<span data-i18n="header.language"></span>
+			<div data-i18n="header.language"></div>
 		</button>
 		<ul class="lang-options">
 			<li>
@@ -28,16 +28,21 @@
 <style>
 
 	.lang-menu-container{
-	position: relative;
-	display: inline-block;
-	border-radius: 20px;
+		display: flex;
+		
+		position: relative;
+		border-radius: 20px;
 	}
 
 	.lang-menu-button{
-		gap: 14px;
+		position: relative;
+		display: flex;
+		width: 100%;
+		height: 100%;
+		justify-content:space-between;
 		font-family: netron;
 		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 200%;
+		font-size: 2rem;
 		color: white;
 		border: 2px solid #e251ca;
 		text-shadow: 
@@ -52,10 +57,15 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		padding: 10px 20px;
+		padding: 0.5rem 2rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+	}
+
+	.lang-menu-button > div{
+		align-self: center;
+		margin-top: 0.5rem;
 	}
 
 	.lang-menu-button:hover{
@@ -82,7 +92,7 @@
 		list-style: none;
 		position: absolute;
 		display: none;
-		top: 70%;
+		top: 4.3rem;
 		left: -8;
 		z-index: 10;
 		box-sizing: border-box;
@@ -95,20 +105,20 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		padding: 10px 17px;
-		border-radius: 5px;
+		padding: 1rem 1.15rem;
+		border-radius: 20px;
 		cursor: pointer;
 	}
 
 	.lang-button-option{
 		position: relative;
-		margin-bottom: 8px;
+		margin-bottom: 1rem;
 		font-family: netron;
 		align-self: center;
 		background-color: rgba(251, 255, 34, 0);
 		border: none;
 		text-align: center;
-		font-size: 100%;
+		font-size: 1.5rem;
 		color: white;
 		text-shadow: 
 		0 0 10px #dd0aba,
@@ -137,7 +147,10 @@
 
 	.lang-icon{
 		position:relative;
-		margin-right: 15px;
+		margin-bottom: 0.5rem;
+		width: 3.5rem;
+		height: 3.5rem;
+		margin-right: 1rem;
 		transform: translateY(10%); 
 	}
 </style>

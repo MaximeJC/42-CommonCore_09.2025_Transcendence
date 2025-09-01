@@ -36,15 +36,15 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		font-size: 4rem;
-		padding: 20px 40px;
+		font-size: 6rem;
+		padding: 1rem 4rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
 	.connexion-button > div {
-		margin-top: 5px;
+		margin-top: 1.5rem;
 	}
 
 	.connexion-button:hover{

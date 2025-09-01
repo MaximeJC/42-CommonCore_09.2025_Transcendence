@@ -7,20 +7,14 @@
 	}>();
 	const emit = defineEmits(['show-form']);
 
-	const isSignedUp = ref(false);
-
-	const toggleText = () => {
-		isSignedUp.value = !isSignedUp.value;
-	}
 </script>
 
 <template>
 	<header class="header">
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
-			<button @click="emit('show-form'); toggleText()"  class="my-button" title="sign_up" >
-				<div v-show=" !isSignedUp" data-i18n="header.signUp"></div>
-				<div v-show=" isSignedUp" data-i18n="home.connection"></div>
+			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
+				<div data-i18n="header.signUp"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 		</div>
@@ -46,16 +40,15 @@
 	.end-button{
 		display: flex;
 		justify-content: end;
-		margin-top: 25px;
-		margin-right: 1%;
-		gap: 15px;
+		margin-top: 2.5rem;
+		margin-right: 3rem;
+		gap: 2rem;
 	}
 
 	.my-button{
-		gap: 14px;
 		font-family: netron;
 		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 200%;
+		font-size: 2rem;
 		color: white;
 		border: 2px solid #e251ca;
 		text-shadow: 
@@ -70,14 +63,14 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		padding: 10px 20px;
+		padding: 1rem 2rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
 	.my-button > div {
-		margin-top: 5px;
+		margin-top: 0.5rem;
 	}
 	.my-button:hover{
 		background-color: rgba(251, 255, 34, 0.5);
@@ -102,10 +95,9 @@
 		background-color: rgba(156, 50, 133, 0);
 		font-family: neon;
 		color: #ffbcf4;
-		margin-left: 2%;
-		font-size: 500%;
-		text-underline-offset: 15px;
-		margin-top: 1px;
+		margin-left: 1.5rem;
+		font-size: 5rem;
+		margin-top: 1.4rem;
 		text-shadow: 
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
@@ -116,25 +108,19 @@
 		position: relative;
 	}
 	.logo::after {
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 4px;
-	background-color: #fafc95; /* Couleur de la ligne de soulignement */
-	box-shadow:
-		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
-	bottom: 0;
-	left: 0;
-	}
-
-	.lang-icon{
-		position:relative
-
-
+		content: '';
+		position: absolute;
+		width: 40rem;
+		height: 0.4rem;
+		background-color: #fafc95; /* Couleur de la ligne de soulignement */
+		box-shadow:
+			0 0 10px #fbff22,
+			0 0 10px #fbff22,
+			0 0 20px #fbff22,
+			0 0 40px #fbff22,
+			0 0 80px #fbff22,
+			0 0 120px #fbff22;
+		bottom: 0;
+		left: 0;
 	}
 </style>
