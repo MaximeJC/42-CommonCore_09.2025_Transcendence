@@ -3,15 +3,43 @@ import { ref } from 'vue';
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 		}>();
+
+	const login = ref("");
 	const email = ref("");
 	const password = ref("");
-	const handleConnection = () => {
-		//preparation envoie serveur
+
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_password = ref(false);
+	const message = ref("");
+
+	async function handleConnection() {
+		error_login.value = false;
+		error_email.value = false;
+		error_password.value = false;
+		message.value = "";
+
+		const result = await fetch("http://localhost:3000/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				login: login.value,
+				email: email.value,
+				password: password.value,
+			}),
+		});
+
+		const data = await result.json();
+
+		if (data.success) {
+			message.value = `Welcome ${data.users.login}!` //todo langues
+		} else {
+			message.value = data.message || "Connexion error"; //todo langues
+			error_login.value = true;
+			error_email.value = true;
+			error_password.value = true;
+		}
 	}
-
-	const error_email = ref(true);
-	const error_password = ref(true);
-
 </script>
 
 <template>
