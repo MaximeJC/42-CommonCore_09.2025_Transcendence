@@ -3,25 +3,29 @@
 </script>
 
 <template>
-	<div	tittle="connected_player_frame" class="frame">
+	<div tittle="connected_player_frame" class="frame">
 		<div>
 		<img src="../../images/default_avatar.png" alt="Avatar" class="avatar">
 		</div>
 		<div tittle="login" class="login">
-			<label>Login</label>
+			<div>Login</div>
 		</div>
-		<div tittle="nbr-game" class="stat">
-			<label>20</label>
-		</div>
-		<div tittle="nbr-victory" class="stat">
-			<label>15</label>
-		</div>
-		<div tittle="ratio" class="stat">
-			<label>19.09</label>
-		</div>
-		<div tittle="Rank" class="stat">
-			<label>1</label>
-		</div>
+			<div class="stat-container">
+				<div tittle="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
+				<div tittle="nbr_game_stat" class="stat">20</div>
+			</div>
+			<div class="stat-container">
+				<div tittle="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
+				<div tittle="nbr-victory_stat" class="stat">10</div>
+			</div>
+			<div class="stat-container">
+				<div tittle="ratio" class="label_stat">ratio</div>
+				<div tittle="ratio_stat" class="stat">19.09</div>
+			</div>
+			<div class="stat-container">
+				<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
+				<div tittle="rank_stat" class="stat">1</div>
+			</div>
 	</div>
 </template>
 
@@ -34,7 +38,7 @@
 	.frame{
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;
+		align-items: center;
 		width: 80rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
@@ -79,5 +83,56 @@
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
 		margin-bottom: 1rem;
+	}
+
+	.stat-container{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		/*gap: 3rem;*/
+	}
+
+	.label_stat{
+		font-family: netron;
+		color: white;
+		text-shadow: 
+		0 0 10px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #ff69b4,
+		0 0 120px #dd0aba;
+		font-size: 1.5rem;
+		font-family: netron;
+		color: white;
+		text-shadow: 
+		0 0 10px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #ff69b4,
+		0 0 120px #dd0aba;
+		margin-bottom: 1rem;
+	}
+
+	.stat{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: netron;
+		width: 6rem;
+		height: 6rem;;
+		border-radius: 50%;
+		font-size: 2rem;
+		border: 3px solid #ff69b4;
+		color: white;
+
+		text-shadow: 
+		0 0 10px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #ff69b4,
+		0 0 120px #dd0aba;
 	}
 </style>

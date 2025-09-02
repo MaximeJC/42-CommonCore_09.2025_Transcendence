@@ -84,7 +84,7 @@
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup"></connection_form>
 				</div>
 			</div>
-			<div tittle="home_connect" class="home_connect" >
+			<div v-show="!isConnect" tittle="home_connect" class="home_connect" >
 				<div>
 					<con_pla_fra></con_pla_fra>
 				</div>

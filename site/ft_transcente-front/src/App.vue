@@ -8,7 +8,7 @@
     fr,
     en,
 	es
-	};
+	};        
 
 	let currentLang = localStorage.getItem('lang') || 'fr';
 

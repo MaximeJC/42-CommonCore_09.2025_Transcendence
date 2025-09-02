@@ -16,5 +16,10 @@
 		"password_error": "Condiciones de la contraseña.",
 		"conf_password_error": "Las dos contraseñas no son idénticas.",
 		"submit": "ENVIAR"
-	}
+	},
+	"player_stat": {
+ 	   "nbr_games": "Partidas jugadas",
+ 	   "nbr_victory": "Victorias",
+ 	   "rank": "Clasificación"
+	}	
 }

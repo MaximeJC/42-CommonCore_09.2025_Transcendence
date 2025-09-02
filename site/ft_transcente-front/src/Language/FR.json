@@ -16,5 +16,10 @@
 		"password_error": "Condition du mot de passe.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
 		"submit": "VALIDER"
+	},
+	"player_stat": {
+		"nbr_games": "Parties jouées",
+		"nbr_victory": "Victoires",
+		"rank": "Rang"
 	}
 }

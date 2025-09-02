@@ -131,7 +131,7 @@ import { ref } from 'vue';
 
 	.input{
 		width: 60rem;
-		font-size: 1rem;
+		font-size: 1.5em;
 		margin-bottom: 0.5rem;
 	}
 

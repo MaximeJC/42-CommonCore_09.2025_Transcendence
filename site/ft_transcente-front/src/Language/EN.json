@@ -16,5 +16,10 @@
 		"password_error": "Password conditions.",
 		"conf_password_error": "The two passwords are not identical.",
 		"submit": "SUBMIT"
+	},
+	"player_stat": {
+		"nbr_games": "Games played",
+		"nbr_victory": "Victories",
+		"rank": "Rank"
 	}
 }
