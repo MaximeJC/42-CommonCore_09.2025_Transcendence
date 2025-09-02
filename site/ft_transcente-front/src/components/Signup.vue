@@ -3,18 +3,45 @@ import { ref } from 'vue';
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 		}>();
+
 	const login = ref("");
 	const email = ref("");
 	const password = ref("");
 	const conf_password = ref("");
-	const handleSubmit = () => {
-		//preparation envoie serveur
-	}
+	const message = ref("");
+	
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
 
-	const error_login = ref(true);
-	const error_email = ref(true);
-	const error_password = ref(true);
-	const error_conf_password = ref(true);
+	async function handleSubmit() {
+		message.value = "";
+		try {
+			const result = await fetch("http://localhost:3000/users", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ login: login.value, email: email.value, password: password.value }),
+			});
+			
+			const data = await result.json();
+			
+			if (data.success) {
+				message.value = "Account successfully created"; //todo langue
+				login.value = "";
+				email.value = "";
+				password.value = "";
+			} else {
+				error_login.value = true;
+				error_email.value = true;
+				error_password.value = true;
+				error_conf_password.value = true;
+				message.value = data.message || "Subscription error"; //todo langue
+			}
+		} catch (err) {
+			message.value = "Cannot contact server"; //todo langue
+		}
+	}
 </script>
 
 <template>
