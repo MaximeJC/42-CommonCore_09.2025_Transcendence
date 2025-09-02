@@ -78,9 +78,11 @@ export function createScene(engine) {
 		scene);
 	directionalLight.position = new BABYLON.Vector3(0, 0, 0); // Position de la lumière pour le calcul des ombres
 	directionalLight.intensity = 1;
+	directionalLight.diffuse = BABYLON.Color3.FromHexString("#2b5ce2")
 
 	const glowLayer = new BABYLON.GlowLayer("glow", scene);
 	glowLayer.intensity = 0.5;
+	
 
 	//#endregion-----------------------------fin-scene, lumiere et camera----------------------------
 	
@@ -97,6 +99,6 @@ function createDebugHelpers(scene) {
 	gridMaterial.gridRatio = 10;
 	gridMaterial.majorUnitFrequency = 5; 
 	groundDebug.material = gridMaterial;
-	groundDebug.position = new BABYLON.Vector3(870, -300, 0);
+	groundDebug.position = new BABYLON.Vector3(870, -301, 0);
 	new BABYLON.AxesViewer(scene, 20);
 }

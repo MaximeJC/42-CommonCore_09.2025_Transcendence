@@ -471,33 +471,39 @@ export async function loadPacman(scene) {
 //endregion------------------------------------decors-objets------------------------------------
 
 export function createRoom(scene) {
-	if (debug === false) {
-		createGround(scene);
-	}
+	createGround(scene);
 	createCeiling(scene);
 	createWallBack(scene);
 	createWallFront(scene);
 	createWallRight(scene);
 	createWallLeft(scene);
+	createLightPerso(scene);
+
 }
 
 function createGround(scene) {
 	const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 1920, height: 1920 }, scene);
 	const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
 
-	const texturePath = "./includes/assets/textures/arcade_carpet_42.png";
+	const texturePath = "./includes/assets/textures/arcade_carpet.png";
 	groundMaterial.emissiveTexture = new BABYLON.Texture(texturePath, scene);
 
 	const texture = groundMaterial.emissiveTexture;
 		
 	// repeter X fois sur la largeur et la hauteur.
-	texture.uScale = 2.0; // Repetition sur l'axe horizontal (U)
-	texture.vScale = 2.0; // Repetition sur l'axe vertical (V)
+	texture.uScale = 5.0; // Repetition sur l'axe horizontal (U)
+	texture.vScale = 5.0; // Repetition sur l'axe vertical (V)
 
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
 
+	groundMaterial.diffuseColor  = new BABYLON.Color3(0, 0, 0);
+	groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	groundMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
+	groundMaterial.emissiveTexture.level = 0.2;
+	
 	groundMaterial.backFaceCulling = false;
 	ground.material = groundMaterial;
 	ground.position = new BABYLON.Vector3(870, -300, 0);
@@ -520,7 +526,12 @@ function createCeiling(scene) {
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
-	// ceilingMaterial.backFaceCulling = false;
+
+	ceilingMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	ceilingMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
+	ceilingMaterial.diffuseTexture.level = 2;
+
 	ceilingMesh.material = ceilingMaterial;
 	ceilingMesh.position = new BABYLON.Vector3(870, 500, 0);
 	ceilingMesh.rotation.x = Math.PI;
@@ -543,6 +554,10 @@ function createWallBack(scene) {
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
+
+	wallBackMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	wallBackMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
 	wallBackMaterial.backFaceCulling = false;
 	wallBack.material = wallBackMaterial;
 	wallBack.position = new BABYLON.Vector3(-90, 100, 0);
@@ -563,6 +578,10 @@ function createWallFront(scene) {
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
+
+	wallFrontMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	wallFrontMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
 	wallFrontMaterial.backFaceCulling = false;
 	wallFront.material = wallFrontMaterial;
 	wallFront.position = new BABYLON.Vector3(1830, 100, 0);
@@ -583,6 +602,10 @@ function createWallRight(scene) {
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
+
+	wallRightMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	wallRightMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
 	wallRightMaterial.backFaceCulling = false;
 	wallRight.material = wallRightMaterial;
 	wallRight.position = new BABYLON.Vector3(870, 100, 960);
@@ -603,6 +626,10 @@ function createWallLeft(scene) {
 	if (texturePath.endsWith(".png")) {
 		texture.hasAlpha = true;
 	}
+
+	wallLeftMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	wallLeftMaterial.ambientColor  = new BABYLON.Color3(0, 0, 0);
+
 	wallLeftMaterial.backFaceCulling = false;
 	wallLeft.material = wallLeftMaterial;
 	wallLeft.position = new BABYLON.Vector3(870, 100, -960);
@@ -614,17 +641,17 @@ function createWallLeft(scene) {
 
 export function createLightPerso(scene)
 {
-	createWallLight(scene, new BABYLON.Vector3(-84, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightBack");
-	createWallLightBack(scene);
+	const lightBack = createWallLight(scene, new BABYLON.Vector3(-84, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightBack");
+	const wallLightBack = createWallLightBack(scene);
 
-	createWallLight(scene, new BABYLON.Vector3(1824, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightFront");
-	createWallLightFront(scene);
+	const lightFront = createWallLight(scene, new BABYLON.Vector3(1824, 490, 0),new BABYLON.Vector3(Math.PI / 2, 0, 0), "lightFront");
+	const wallLightFront = createWallLightFront(scene);
 
-	createWallLight(scene, new BABYLON.Vector3(870, 490, 954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightRight");
-	createWallLightRight(scene)
+	const lightRight = createWallLight(scene, new BABYLON.Vector3(870, 490, 954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightRight");
+	const wallLightRight = createWallLightRight(scene)
 
-	createWallLight(scene, new BABYLON.Vector3(870, 490, -954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightLeft");
-	createWallLightLeft(scene);
+	const lightLeft = createWallLight(scene, new BABYLON.Vector3(870, 490, -954),new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0), "lightLeft");
+	const wallLightLeft = createWallLightLeft(scene);
 }
 
 function createWallLight(scene, position, rotation, name) {
@@ -640,6 +667,9 @@ function createWallLight(scene, position, rotation, name) {
 	lightMesh.position = position;
 	lightMesh.rotation = rotation;
 	lightMesh.scaling = new BABYLON.Vector3(1, 1, 20);
+
+	material.freeze();
+	lightMesh.freezeWorldMatrix();
 
 	const spotLight = new BABYLON.SpotLight(
 		name + "PointLight",
@@ -679,7 +709,6 @@ function createWallLightFront(scene) {
 	const wallLightFrontMaterial = new BABYLON.StandardMaterial("wallLightFrontMat", scene);
 	wallLightFrontMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
 
-	wallLightFrontMaterial.FrontFaceCulling = false;
 	wallLightFront.material = wallLightFrontMaterial;
 	wallLightFront.position = new BABYLON.Vector3(1810, 480, 0);
 	wallLightFront.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
@@ -691,7 +720,6 @@ function createWallLightRight(scene) {
 	const wallLightRightMaterial = new BABYLON.StandardMaterial("wallLightRightMat", scene);
 	wallLightRightMaterial.diffuseColor = BABYLON.Color3.FromHexString("#8A2BE2");
 
-	wallLightRightMaterial.backFaceCulling = false;
 	wallLightRight.material = wallLightRightMaterial;
 	wallLightRight.position = new BABYLON.Vector3(870, 480, 940);
 	wallLightRight.rotation = new BABYLON.Vector3(0, 0, 0);
