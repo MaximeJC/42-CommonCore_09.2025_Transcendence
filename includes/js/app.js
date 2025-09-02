@@ -1,7 +1,7 @@
 // js/app.js
 
 // --- IMPORTATIONS DES MODULES ---
-import { gameMode, debugVisuals, debug, JwtToken } from './config.js';
+import { debugVisuals, debug, JwtToken } from './config.js';
 import { gameState } from './gameState.js';
 import { initializeEngine, createScene } from './sceneSetup.js';
 import { 
@@ -22,7 +22,7 @@ import { startGameLoop, startAIBrain } from './gameLogic.js';
 async function initializeApp() {
 	// Initialise le moteur et la scene de base
 	const engine = initializeEngine();
-	
+
 	const scene = createScene(engine);
 	if (debug == true)
 	{
@@ -79,7 +79,6 @@ async function initializeApp() {
 
 	await scene.whenReadyAsync();
 
-	
 	// Definit les joueurs actifs en fonction du mode de jeu
 	setupPlayers(scene, gameState);
 	
@@ -88,7 +87,6 @@ async function initializeApp() {
 	// On stocke la balle dans gameState comme avant
 	gameState.ball = ball;
 	const room = createRoom(scene);
-	const lightPerso = createLightPerso(scene);
 
 	if (debugVisuals) {
 		gameState.debugArrow = createDebugArrow(scene);
@@ -104,8 +102,7 @@ async function initializeApp() {
 
 	// Demarre le "cerveau" de l'IA si necessaire
 	// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
-
-	if (gameMode == '1P_VS_AI' || gameMode == 'AI_VS_AI' || gameMode == '2AI_VS_2AI') {
+	if (gameState.gameMode == '1P_VS_AI' || gameState.gameMode == 'AI_VS_AI' || gameState.gameMode == '2AI_VS_2AI') {
 		startAIBrain(gameState);
 	}
 

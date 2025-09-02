@@ -1,7 +1,5 @@
 // js/inputManager.js
 
-import { gameMode } from './config.js';
-
 export const inputMap = {};
 
 export function setupInputManager(scene, gameState) {
@@ -15,7 +13,7 @@ export function setupInputManager(scene, gameState) {
 			// Logique de la pause
 			if (key === 'escape' && gameState.isGameStarted) {
 				// La pause n'est disponible que pour les modes de jeu locaux
-				if (gameMode === '1P_VS_AI' || gameMode === '2P_LOCAL') {
+				if (gameState.gameMode === '1P_VS_AI' || gameState.gameMode === '2P_LOCAL') {
 					if (gameState.isGamePaused) {
 						gameState.isGamePaused = false;
 					} else {

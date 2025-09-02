@@ -1,7 +1,7 @@
 // js/gameLogic.js
 
 import { inputMap } from './inputManager.js';
-import { gameMode, initialSpeedBall, maxScore, speedRacket, debugFps, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
+import { initialSpeedBall, maxScore, speedRacket, debugFps, debugVisuals, speedMultiplicator, iaResponseTime } from './config.js';
 import { networkManager } from './networkManager.js';
 
 //region--------------------------------------fonctions-pong------------------------------------
@@ -205,6 +205,7 @@ function updatePlayers(deltaTime, gameState) {
 	const dynamicRacketSpeed = speedRacket + racketSpeedBonus;
 
 	gameState.activePlayers.forEach(player => {
+		let previousMovement = player.movement;
 		// Le switch determine la source de l'input en fonction du type de controleur
 		switch (player.controlType) {
 
@@ -259,7 +260,7 @@ function updatePlayers(deltaTime, gameState) {
 				// player.moveDown = receivedData.down;
 				break;
 		}
-
+		
 		// On calcule la direction du mouvement final
 		let movement = 0;
 		if (player.moveUp) {
@@ -273,13 +274,20 @@ function updatePlayers(deltaTime, gameState) {
 			movement = 0;
 		}
 
+		// envoyer les info au serveur
+		// console.debug("player name : " + player.config.pseudo + " player.moveUp : " + player.moveUp + " player.moveDown " + player.moveDown);
+		// console.debug("player name : " + player.config.pseudo + " player.movement " + player.movement);
+
 		// On applique le mouvement si necessaire
 		if (movement !== 0) {
 			player.mesh.position.y += movement * dynamicRacketSpeed * deltaTime;
 			player.mesh.position.y = Math.max(gameState.limitDown, Math.min(gameState.limitUp, player.mesh.position.y));
 
-			if (player.controlType === 'KEYBOARD' && gameMode.includes("ONLINE")) {
-				networkManager.sendMessage('player_input', { y: player.mesh.position.y });
+			// if (player.controlType === 'KEYBOARD' && gameState.gameMode.includes("ONLINE")) {
+			// 	networkManager.sendMessage('player_input', { y: player.mesh.position.y });
+			// }
+			if (player.controlType === 'KEYBOARD' && gameState.gameMode.includes("ONLINE") && player.movement !== previousMovement) {
+				networkManager.sendMessage('player_input', { movement: player.movement });
 			}
 		}
 	});
@@ -289,7 +297,7 @@ function updateBall(deltaTime, gameState) {
 	const ball = gameState.ball;
 
 	// --- DEBOGAGE ---
-	if (gameMode.includes("ONLINE")) {
+	if (gameState.gameMode.includes("ONLINE")) {
 		if (debugVisuals) {
 			gameState.debugTrailPoints.push(ball.position.clone());
 			if (gameState.debugTrail) {
@@ -301,7 +309,7 @@ function updateBall(deltaTime, gameState) {
 				}, ball.getScene());
 				gameState.debugTrail.color = new BABYLON.Color3(1, 1, 0); // Jaune
 			}
-			return;
+			// return;
 		}
 	}
 	// --- FIN DEBOGAGE ---
@@ -387,6 +395,11 @@ function updateBall(deltaTime, gameState) {
 		} else {
 			resetBall(gameState, -1);
 		}
+	}
+	if (gameState.gameMode.includes("ONLINE"))
+	{
+		networkManager.sendMessage('ball_position_y', { ball: ball.position.y });
+		networkManager.sendMessage('ball_position_z', { ball: ball.position.z });
 	}
 }
 

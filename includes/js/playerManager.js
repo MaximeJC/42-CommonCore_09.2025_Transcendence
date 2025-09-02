@@ -1,12 +1,12 @@
 // js/playerManager.js
 
 import { createPlayer } from './gameObjects.js';
-import { gameMode, limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './config.js';
+import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './config.js';
 
 export function setupPlayers(scene, gameState) {
 
 	// Choix des limites du terrain en fonction du mode de jeu
-	if (gameMode === '4P_ONLINE') {
+	if (gameState.gameMode === '4P_ONLINE') {
 		gameState.limitUp = limitUp4v4;
 		gameState.limitDown = limitDown4v4;
 	} else {
@@ -67,7 +67,7 @@ export function setupPlayers(scene, gameState) {
 	const playerSetups = [];
 
 	// Creation des joueurs en fonction du mode de jeu
-	switch (gameMode) {
+	switch (gameState.gameMode) {
 		case 'AI_VS_AI':
 			playerSetups.push({
 				config: {
@@ -235,7 +235,8 @@ export function setupPlayers(scene, gameState) {
 				setup.size
 			),
 			moveUp: false,
-			moveDown: false
+			moveDown: false,
+			movement: 0
 		};
 		gameState.activePlayers.push(playerData);
 	});

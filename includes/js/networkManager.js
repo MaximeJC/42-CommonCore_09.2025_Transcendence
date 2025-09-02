@@ -8,6 +8,34 @@ import { endGame, resetBall } from './gameLogic.js';
 // Utilisez 'wss://' pour la production avec SSL.
 const WS_URL = "ws://localhost:8000/ws/pong/"; // Exemple d'URL Django Channels
 
+// let playerLeftTopName; //Player 1
+// let playerLeftBottomName; //Player 3
+// let playerRightTopName; //Player 2
+// let playerRightBottomName; //Player 4
+
+// let playerLeftTopMove;
+// let playerLeftBottomMove;
+// let playerRightTopMove;
+// let playerRightBottomMove;
+
+// let team1;
+// let team2;
+
+// let ballPosX;
+// let ballPosY;
+// let ballPosZ;
+
+// let scoreLeft;
+// let scoreRight;
+
+// let winner;
+
+// let PartyTime;
+
+// networkManager.sendMessage('player_input', { movement: player.movement });
+// networkManager.sendMessage('ball_position_y', { ball: ball.position.y });
+// networkManager.sendMessage('ball_position_z', { ball: ball.position.z });
+
 class NetworkManager {
 	constructor() {
 		this.socket = null;
@@ -52,6 +80,8 @@ class NetworkManager {
 			console.log("Message recu:", message);
 
 			switch (message.type) {
+				case 'game_mode':
+					gameState.gameMode = message.data.gameMode;
 				case 'game_start':
 					gameState.isGameStarted = true;
 					gameState.ui.startButton.mesh.isVisible = false;
@@ -76,8 +106,11 @@ class NetworkManager {
 						if (player.controlType === 'ONLINE') {
 							// On suppose que le serveur envoie un objet avec les positions indexees par le nom du joueur
 							// Ex: { "player_right_top": { "y": 10 }, "player_left_bottom": { "y": -5 } }
+							// ou
+							// Ex: { "player_right_top": { "movement": 1 }, "player_left_bottom": { "movement": -1 } }
 							if (message.data.players && message.data.players[player.config.name]) {
-								player.mesh.position.y = message.data.players[player.config.name].y;
+								// player.mesh.position.y = message.data.players[player.config.name].y;
+								player.movement = message.data.players[player.config.name].movement;
 							}
 						}
 					});

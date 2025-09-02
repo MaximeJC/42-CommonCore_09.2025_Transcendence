@@ -5,7 +5,6 @@ import { create3DButton, createTextBox } from './gameObjects.js';
 // import { scene } from './sceneSetup.js';
 
 import { networkManager } from './networkManager.js';
-import { gameMode } from './config.js';
 
 /**
  * Cree toute l'interface utilisateur (GUI) du jeu de maniere responsive.
@@ -30,7 +29,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	fpsText.textBlock.isReadOnly = true;
 	fpsText.textBlock.isHitTestVisible = false;
 	fpsText.textBlock.fontSize = '20%';
-	fpsText.textBlock.text = "0"; // Mettre le texte initial
+	fpsText.textBlock.text = "0";
 	fpsText.mesh.position.set(0, 35, -31);
 	fpsText.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.fpsText = fpsText;
@@ -43,7 +42,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	scoreLeft.textBlock.isReadOnly = true;
 	scoreLeft.textBlock.isHitTestVisible = false;
 	scoreLeft.textBlock.fontSize = '100%';
-	scoreLeft.textBlock.text = "0"; // Mettre le texte initial
+	scoreLeft.textBlock.text = "0";
 	scoreLeft.mesh.position.set(-8, 30, -20);
 	scoreLeft.mesh.rotation.y = -Math.PI / 2;
 	scoreLeft.mesh.isVisible = false;
@@ -71,10 +70,10 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 
 	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 		BABYLON.ActionManager.OnPickTrigger,
-		async function () { // La fonction devient 'async'
+		async function () {
 			console.log("Le bouton start a ete clique !");
 
-			if (gameMode.includes("ONLINE")) {
+			if (gameState.gameMode.includes("ONLINE")) {
 				console.log("ONLINE");
 				// Pour les modes en ligne, on se connecte et on cherche une partie
 				try {
@@ -91,7 +90,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 					statusText.textBlock.color = "white";
 					statusText.mesh.isVisible = true;
 					console.log("SEARCHING...");
-					networkManager.sendMessage('find_match', { mode: gameMode });
+					networkManager.sendMessage('find_match', { mode: gameState.gameMode });
 				} catch (error) {
 					statusText.textBlock.text = "ERROR";
 					statusText.textBlock.fontSize = '60%';
@@ -128,7 +127,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	statusText.textBlock.isReadOnly = true;
 	statusText.textBlock.isHitTestVisible = false;
 	statusText.textBlock.fontSize = '60%';
-	statusText.textBlock.text = ""; // Mettre le texte initial
+	statusText.textBlock.text = "";
 	statusText.mesh.position.set(0, 0, 0);
 	statusText.mesh.rotation.y = -Math.PI / 2;
 	statusText.mesh.isVisible = false;
@@ -146,7 +145,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	winnerText.textBlock.isReadOnly = true;
 	winnerText.textBlock.isHitTestVisible = false;
 	winnerText.textBlock.fontSize = '60%';
-	winnerText.textBlock.text = ""; // Mettre le texte initial
+	winnerText.textBlock.text = "";
 	winnerText.mesh.position.set(0, 0, 0);
 	winnerText.mesh.rotation.y = -Math.PI / 2;
 	winnerText.mesh.isVisible = false;

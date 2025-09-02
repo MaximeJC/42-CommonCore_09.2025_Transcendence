@@ -13,6 +13,9 @@ export const gameState = {
 	isGamePaused: false,
 	isBallPaused: true,
 	countdownInterval: null,
+	// MODIFIER ICI LE MODE DE JEU
+	// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE', 2AI_VS_2AI
+	gameMode: '1P_VS_AI',
 		
 	//pour I.A
 	aiDecision: { moveUp: false, moveDown: false }, // Stocke la decision de l'IA
