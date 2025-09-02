@@ -10,7 +10,7 @@
 			setLanguage: (lang: string) => void;
 		}>();
 
-	const isConnect = ref(false)
+	const isConnect = ref(true)
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
