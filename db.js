@@ -1,4 +1,6 @@
-const sqlite = require('sqlite3').verbose();
+import sqlite3 from 'sqlite3';
+const sqlite = sqlite3.verbose();
+
 const db = new sqlite.Database('./database.db', (err)=>{
 	if (err) console.error("Erreur d'ouverture de la base de donnees: ", err.message);
 	else console.log("Connexion a la base de donnees etablie.");
@@ -75,12 +77,11 @@ export async function getUserByEmail(email) {
 	return db.get("SELECT * FROM users WHERE email = ?", [email]);
 }
 
-export async function getUsers() {
-	return db.all("SELECT login, email FROM users");
-}
+// export async function getUsers() {
+// 	return db.all("SELECT login, email FROM users");
+// }
 
-module.exports = db; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
-
+export default { db, getUserByEmail }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
 
 //todo salt_key ? cle de cryptage des mdp
 

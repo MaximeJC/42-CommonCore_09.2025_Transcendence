@@ -1,27 +1,24 @@
 const DEBUG_MODE = true;
 
-const fastify = require('fastify')({logger: true}); // importer fastify
-const db = require('./db'); // importer la base de donnees du fichier db.js
+import Fastify from 'fastify'; // importer fastify
+import cors from '@fastify/cors'; // permettra connexion au front
+import dbModule from './db.js' // importer cette fonction du fichier db.js
 
-import { getUsers, getUserByEmail } from './db.js';
-
-//!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONNEXION AU FRONT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// autoriser le front a acceder au back:
-await fastify.register(cors, {
-	origin: "*",
-});
+const { db, getUserByEmail } = dbModule;
+const fastify = Fastify({logger: true});
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SERVEUR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-fastify.listen({port: 3000}, (err)=>{
-	if (err) {
-		console.log(err);
-		process.exit(1);
-	} else {
-		console.log('Server running on http://localhost:3001');
-	}
-});
+async function configure() {
+	await fastify.register(cors, { origin: "*", }); // autoriser n'importe qui a appeler l'API de ce serveur
+
+	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
+
+	await fastify.listen({ port: 3000 });
+	console.log('Server running on http://localhost:3000');
+}
+
+configure();
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
