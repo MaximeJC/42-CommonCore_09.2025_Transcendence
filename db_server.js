@@ -20,6 +20,11 @@ async function configure() {
 
 configure();
 
+// racine de l'URL:
+fastify.get('/', async (request, reply)=>{
+	return { message: "Backend OK"};
+});
+
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // ajouter un utilisateur:
