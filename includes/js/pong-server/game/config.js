@@ -1,9 +1,9 @@
 // pong-server/game/config.js
 
-export const maxScore = 1;
+export const maxScore = 5;
 
 export const initialSpeedBall = 60;
-export const speedMultiplicator = 1;
+export const speedMultiplicator = 1.01;
 
 export const speedRacket = 60;
 

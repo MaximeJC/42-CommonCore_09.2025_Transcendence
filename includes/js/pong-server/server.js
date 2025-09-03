@@ -49,7 +49,7 @@ app.register(async function (fastify) {
 			if (clientInfo?.gameId) {
 				const game = games.get(clientInfo.gameId);
 				if (game) {
-					game.endGame("Adversaire deconnecte");
+					game.endGame("Opponent dDisconnects");
 					games.delete(clientInfo.gameId);
 				}
 			}

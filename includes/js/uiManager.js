@@ -126,6 +126,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 			statusText.textBlock.fontSize = '50%';
 			statusText.textBlock.color = "white";
 			statusText.mesh.isVisible = true;
+			winnerText.mesh.isVisible = false;
 			console.log("CONNECTING...");
 
 			// Connexion au serveur

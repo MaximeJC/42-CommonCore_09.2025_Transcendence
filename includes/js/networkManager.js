@@ -100,7 +100,14 @@ class NetworkManager {
 				case 'game_over':
 					console.log("La partie est terminee.");
 					gameState.ball.isVisible = false;
-					endGame(gameState, message.data.winner_pseudo + " Wins!");
+					const winnerPseudo = message.data.winner_pseudo;
+
+					if (winnerPseudo === "Opponent dDisconnects") {
+						endGame(gameState, winnerPseudo);
+						gameState.ui.winnerText.textBlock.fontSize = '35%';
+					} else {
+						endGame(gameState, winnerPseudo + " Wins!");
+					}
 					break;
 				
 				case 'error':

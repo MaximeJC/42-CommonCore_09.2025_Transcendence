@@ -33,7 +33,7 @@ export function startCountdown(gameState) {
 
 //Fonction pour reinitialiser l'affichage de la balle, suite a un ordre du serveur.
 export function resetBall(gameState) {
-	gameState.ball.isVisible = false;
+	gameState.ball.isVisible = true;
 	startCountdown(gameState); // On lance le compte a rebours au lieu de la balle
 }
 
@@ -45,9 +45,10 @@ export function endGame(gameState, message) {
 	if (gameState.countdownInterval) {
 		clearInterval(gameState.countdownInterval);
 	}
+	
 	gameState.ball.isVisible = false;
 	gameState.ui.countdownText.mesh.isVisible = false;
-	gameState.ui.winnerText.textBlock.text  = message;
+	gameState.ui.winnerText.textBlock.text = message;
 	gameState.ui.winnerText.mesh.isVisible = true;
 	gameState.ui.startButton.mesh.isVisible = true;
 }
