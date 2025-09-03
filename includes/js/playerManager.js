@@ -6,7 +6,7 @@ import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './config.js'
 export function setupPlayers(scene, gameState) {
 
 	// Choix des limites du terrain en fonction du mode de jeu
-	if (gameState.gameMode === '4P_ONLINE') {
+	if (gameState.gameMode === '4P_ONLINE' || gameState.gameMode === '2AI_VS_2AI') {
 		gameState.limitUp = limitUp4v4;
 		gameState.limitDown = limitDown4v4;
 	} else {
@@ -77,22 +77,22 @@ export function setupPlayers(scene, gameState) {
 					keys: allPlayerConfigs.left_top.keys,
 					position: new BABYLON.Vector3(0, 0, -38)
 				},
-				controlType: 'AI',
+				controlType: 'ONLINE', // Gere par le serveur
 				size: racketSize1v1
 			});
-			
 			playerSetups.push({
 				config: {
-					pseudo: "Bimo",
+					pseudo: allPlayerConfigs.right_top.pseudo,
 					name: allPlayerConfigs.right_top.name,
 					color: allPlayerConfigs.right_top.color,
 					keys: allPlayerConfigs.right_top.keys,
 					position: new BABYLON.Vector3(0, 0, 38)
 				},
-				controlType: 'AI',
+				controlType: 'ONLINE', // Gere par le serveur
 				size: racketSize1v1
 			});
 			break;
+
 		case '1P_VS_AI':
 			playerSetups.push({
 				config: {
@@ -105,7 +105,6 @@ export function setupPlayers(scene, gameState) {
 				controlType: 'KEYBOARD',
 				size: racketSize1v1
 			});
-			
 			playerSetups.push({
 				config: {
 					pseudo: "Bimo",
@@ -114,12 +113,13 @@ export function setupPlayers(scene, gameState) {
 					keys: allPlayerConfigs.right_top.keys,
 					position: new BABYLON.Vector3(0, 0, 38)
 				},
-				controlType: 'AI',
+				controlType: 'ONLINE', // L'IA est vue comme un joueur ONLINE
 				size: racketSize1v1
 			});
 			break;
 
 		case '2P_LOCAL':
+			console.log("Configuration pour 2 Joueurs Local (gere par le serveur).");
 			playerSetups.push({
 				config: {
 					pseudo: allPlayerConfigs.left_top.pseudo,
@@ -128,10 +128,9 @@ export function setupPlayers(scene, gameState) {
 					keys: allPlayerConfigs.left_top.keys,
 					position: new BABYLON.Vector3(0, 0, -38)
 				},
-				controlType: 'KEYBOARD',
+				controlType: 'KEYBOARD', // Le joueur 1 est controle au clavier.
 				size: racketSize1v1
 			});
-			
 			playerSetups.push({
 				config: {
 					pseudo: allPlayerConfigs.right_top.pseudo,
@@ -140,7 +139,7 @@ export function setupPlayers(scene, gameState) {
 					keys: allPlayerConfigs.right_top.keys,
 					position: new BABYLON.Vector3(0, 0, 38)
 				},
-				controlType: 'KEYBOARD',
+				controlType: 'KEYBOARD', // MODIFICATION CLE: Le 2e joueur est AUSSI controle au clavier.
 				size: racketSize1v1
 			});
 			break;
@@ -158,7 +157,6 @@ export function setupPlayers(scene, gameState) {
 				controlType: 'KEYBOARD',
 				size: racketSize1v1
 			});
-			
 			playerSetups.push({
 				config: {
 					pseudo: allPlayerConfigs.right_top.pseudo,
@@ -175,28 +173,28 @@ export function setupPlayers(scene, gameState) {
 		case '2AI_VS_2AI':
 			playerSetups.push({
 					config: allPlayerConfigs.left_top,
-					controlType: 'AI',
+					controlType: 'ONLINE',
 					size: racketSize2v2
 				});
 			playerSetups.push({
 					config: allPlayerConfigs.left_bottom,
-					controlType: 'AI',
+					controlType: 'ONLINE',
 					size: racketSize2v2
 				}); 
 			playerSetups.push({
 					config: allPlayerConfigs.right_top,
-					controlType: 'AI',
+					controlType: 'ONLINE',
 					size: racketSize2v2
 				});
 			playerSetups.push({
 					config: allPlayerConfigs.right_bottom,
-					controlType: 'AI',
+					controlType: 'ONLINE',
 					size: racketSize2v2
 				});
 			break;
 
 		case '4P_ONLINE':
-			console.warn("Mode 4P_ONLINE: Seul le joueur en haut a gauche (bleu) est controlable localement.");
+			console.warn("Mode 4P_ONLINE: Seul le joueur en haut a gauche est controlable localement.");
 			playerSetups.push({
 				config: allPlayerConfigs.left_top,
 				controlType: 'KEYBOARD',
@@ -236,7 +234,9 @@ export function setupPlayers(scene, gameState) {
 			),
 			moveUp: false,
 			moveDown: false,
-			movement: 0
+			// Cette variable stocke la derniere intention de mouvement envoyee au serveur
+			// pour eviter d'envoyer des messages redondants.
+			lastSentMovement: 0
 		};
 		gameState.activePlayers.push(playerData);
 	});

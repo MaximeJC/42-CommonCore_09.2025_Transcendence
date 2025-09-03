@@ -1,0 +1,20 @@
+{
+  "name": "pong-server",
+  "version": "1.0.0",
+  "description": "transcendence",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/websocket": "^11.2.0",
+    "fastify": "^5.5.0",
+    "uuid": "^11.1.0"
+  }
+}

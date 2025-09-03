@@ -68,90 +68,27 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	startButton.mesh.rotation.y = -Math.PI / 2;
 	gameState.ui.startButton = startButton;
 
-	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-		BABYLON.ActionManager.OnPickTrigger,
-		async function () {
-			console.log("Le bouton start a ete clique !");
-
-			if (gameState.gameMode.includes("ONLINE")) {
-				console.log("ONLINE");
-				// Pour les modes en ligne, on se connecte et on cherche une partie
-				try {
-					statusText.textBlock.text = "CONNECTING...";
-					statusText.textBlock.fontSize = '50%';
-					statusText.textBlock.color = "white";
-					statusText.mesh.isVisible = true;
-					console.log("CONNECTING...");
-
-					await networkManager.connect(JwtToken);
-					
-					statusText.textBlock.text = "SEARCHING...";
-					statusText.textBlock.fontSize = '50%';
-					statusText.textBlock.color = "white";
-					statusText.mesh.isVisible = true;
-					console.log("SEARCHING...");
-					networkManager.sendMessage('find_match', { mode: gameState.gameMode });
-				} catch (error) {
-					statusText.textBlock.text = "ERROR";
-					statusText.textBlock.fontSize = '60%';
-					statusText.textBlock.color = "RED";
-					statusText.mesh.isVisible = true;
-					console.error("Echec de la connexion:", error);
-				}
-			} else {
-				// Pour les modes locaux, la logique reste la meme
-				gameState.isGameStarted = true;
-				startButton.mesh.isVisible = false;
-				gameState.ui.winnerText.mesh.isVisible = false; // Utilise gameState pour acceder a winnerText
-				gameState.ui.scoreRight.mesh.isVisible = true;
-				gameState.ui.scoreLeft.mesh.isVisible = true;
-				gameState.scoreLeft = 0;
-				gameState.scoreRight = 0;
-				gameState.ui.scoreLeft.textBlock.text = "0";
-				gameState.ui.scoreRight.textBlock.text = "0";
-				statusText.mesh.isVisible = false;
-				resetBall(gameState);
-			}
-		}
-	));
-
-	const statusText = createTextBox("statusText", "", {
-		meshWidth: 60,
-		meshHeight: 15,
-		textureWidth: 2048,
-		textureHeight: 512
-	}, scene);
+	// Elements de statut et de victoire (pas de changement ici)
+	const statusText = createTextBox("statusText", "", { meshWidth: 60, meshHeight: 15, textureWidth: 2048, textureHeight: 512 }, scene);
 	statusText.textBlock.background = "transparent";
 	statusText.textBlock.color = "white";
 	statusText.textBlock.thickness = 0;
-	statusText.textBlock.isReadOnly = true;
-	statusText.textBlock.isHitTestVisible = false;
 	statusText.textBlock.fontSize = '60%';
-	statusText.textBlock.text = "";
 	statusText.mesh.position.set(0, 0, 0);
 	statusText.mesh.rotation.y = -Math.PI / 2;
 	statusText.mesh.isVisible = false;
 	gameState.ui.statusText = statusText;
 
-	const winnerText = createTextBox("winnerText", "", {
-		meshWidth: 60,
-		meshHeight: 15,
-		textureWidth: 2048,
-		textureHeight: 512
-	}, scene);
+	const winnerText = createTextBox("winnerText", "", { meshWidth: 60, meshHeight: 15, textureWidth: 2048, textureHeight: 512 }, scene);
 	winnerText.textBlock.background = "transparent";
 	winnerText.textBlock.color = "gold";
 	winnerText.textBlock.thickness = 0;
-	winnerText.textBlock.isReadOnly = true;
-	winnerText.textBlock.isHitTestVisible = false;
 	winnerText.textBlock.fontSize = '60%';
-	winnerText.textBlock.text = "";
 	winnerText.mesh.position.set(0, 0, 0);
 	winnerText.mesh.rotation.y = -Math.PI / 2;
 	winnerText.mesh.isVisible = false;
 	gameState.ui.winnerText = winnerText;
-
-	// Texte pour le compte a rebours
+	
 	const countdownText = createTextBox("countdownText", "", scene);
 	countdownText.textBlock.background = "transparent";
 	countdownText.textBlock.color = "white";
@@ -165,7 +102,6 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	countdownText.mesh.isVisible = false;
 	gameState.ui.countdownText = countdownText;
 
-	// Un texte pour afficher l'etat de pause
 	const pauseText = createTextBox("pauseText", "", scene);
 	pauseText.textBlock.background = "transparent";
 	pauseText.textBlock.color = "yellow";
@@ -179,6 +115,52 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	pauseText.mesh.isVisible = false;
 	gameState.ui.pauseText = pauseText;
 
+	/**
+	 * Encapsule la logique de connexion et de recherche de partie.
+	 * Cette fonction pourra etre appelee depuis n'importe ou, pas seulement par le bouton.
+	 */
+	async function startGame() {
+		try {
+			// Afficher le statut de connexion a l'utilisateur
+			statusText.textBlock.text = "CONNECTING...";
+			statusText.textBlock.fontSize = '50%';
+			statusText.textBlock.color = "white";
+			statusText.mesh.isVisible = true;
+			console.log("CONNECTING...");
+
+			// Connexion au serveur
+			await networkManager.connect(JwtToken);
+			
+			// Afficher le statut de recherche
+			statusText.textBlock.text = "SEARCHING...";
+			console.log(`Envoi de la demande de match pour le mode: ${gameState.gameMode}`);
+
+			// Envoyer la demande de match au serveur
+			networkManager.sendMessage('find_match', { mode: gameState.gameMode });
+				
+			// On cache le bouton pour eviter les clics multiples pendant la recherche.
+			startButton.mesh.isVisible = false;
+
+		} catch (error) {
+			// En cas d'echec de la connexion
+			statusText.textBlock.text = "ERROR";
+			statusText.textBlock.fontSize = '60%';
+			statusText.textBlock.color = "RED";
+			statusText.mesh.isVisible = true;
+			console.error("Echec de la connexion:", error);
+			// On s'assure que le bouton est a nouveau visible pour que l'utilisateur puisse reessayer.
+			startButton.mesh.isVisible = true;
+		}
+	}
+
+	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+		BABYLON.ActionManager.OnPickTrigger,
+		function () {
+			console.log("Le bouton start a ete clique !");
+			// Le bouton ne fait plus qu'appeler notre nouvelle fonction de demarrage.
+			startGame();
+		}
+	));
 
 	//#endregion--------------------------------------GUI-jeu----------------------------------------
 }

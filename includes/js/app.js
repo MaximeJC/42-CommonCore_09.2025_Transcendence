@@ -9,12 +9,12 @@ import {
 	createDebugArrow, createRoom,
 	loadArcadeMachines, loadDDM, loadSugarRush, 
 	loadHockey, loadWhackAMole, loadBubblegum,
-	loadTronArcade, loadPacman, createLightPerso 
+	loadTronArcade, loadPacman 
 } from './gameObjects.js';
 import { setupPlayers } from './playerManager.js';
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
-import { startGameLoop, startAIBrain } from './gameLogic.js';
+import { startGameLoop } from './gameLogic.js';
 
 /**
  * La fonction principale asynchrone qui initialise et demarre le jeu.
@@ -99,12 +99,6 @@ async function initializeApp() {
 
 	// Met en place la gestion des entrees clavier
 	setupInputManager(scene, gameState);
-
-	// Demarre le "cerveau" de l'IA si necessaire
-	// Options possibles: AI_VS_AI, '1P_VS_AI', '2P_LOCAL', '2P_ONLINE', '4P_ONLINE',
-	if (gameState.gameMode == '1P_VS_AI' || gameState.gameMode == 'AI_VS_AI' || gameState.gameMode == '2AI_VS_2AI') {
-		startAIBrain(gameState);
-	}
 
 	// Applique les optimisations finales
 	table.material.freeze();

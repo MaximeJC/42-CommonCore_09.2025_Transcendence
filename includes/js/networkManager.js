@@ -1,47 +1,17 @@
 // js/networkManager.js
 
 import { gameState } from './gameState.js';
-import { endGame, resetBall } from './gameLogic.js';
+import { endGame, resetBall, startCountdown } from './gameLogic.js';
 
-// Adaptez l'URL a votre configuration serveur.
-// Utilisez 'ws://' pour le developpement local sans SSL.
-// Utilisez 'wss://' pour la production avec SSL.
-const WS_URL = "ws://localhost:8000/ws/pong/"; // Exemple d'URL Django Channels
-
-// let playerLeftTopName; //Player 1
-// let playerLeftBottomName; //Player 3
-// let playerRightTopName; //Player 2
-// let playerRightBottomName; //Player 4
-
-// let playerLeftTopMove;
-// let playerLeftBottomMove;
-// let playerRightTopMove;
-// let playerRightBottomMove;
-
-// let team1;
-// let team2;
-
-// let ballPosX;
-// let ballPosY;
-// let ballPosZ;
-
-// let scoreLeft;
-// let scoreRight;
-
-// let winner;
-
-// let PartyTime;
-
-// networkManager.sendMessage('player_input', { movement: player.movement });
-// networkManager.sendMessage('ball_position_y', { ball: ball.position.y });
-// networkManager.sendMessage('ball_position_z', { ball: ball.position.z });
+const WS_URL = "ws://10.12.12.5:3000";
 
 class NetworkManager {
 	constructor() {
 		this.socket = null;
 	}
 
-	connect(jwtToken) { // Le token si necessaire pour l'authentification
+	connect(jwtToken) // Le token si necessaire pour l'authentification
+	{
 		return new Promise((resolve, reject) => {
 			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
 				console.log("Deja connecte.");
@@ -50,8 +20,7 @@ class NetworkManager {
 			}
 
 			console.log("Tentative de connexion au serveur de jeu...");
-			// L'authentification se fait souvent en passant le token dans l'URL
-			this.socket = new WebSocket(`${WS_URL}?token=${jwtToken}`);
+			this.socket = new WebSocket(WS_URL);
 
 			this.socket.onopen = () => {
 				console.log("Connecte au serveur de jeu !");
@@ -77,58 +46,65 @@ class NetworkManager {
 	handleServerMessage(data) {
 		try {
 			const message = JSON.parse(data);
-			console.log("Message recu:", message);
+			// console.log("Message recu:", message); // Decommenter pour un debug intensif
 
+			if (message.type === 'game_state_update') {
+				const state = message.data;
+				
+				// Le client ne fait qu'obeir et appliquer les positions dictees par le serveur.
+				if (gameState.ball) {
+					gameState.ball.position.z = state.ball_z;
+					gameState.ball.position.y = state.ball_y;
+				}
+				
+				// Appliquer les scores.
+				gameState.ui.scoreLeft.textBlock.text = state.score_left.toString();
+				gameState.ui.scoreRight.textBlock.text = state.score_right.toString();
+				
+				// Appliquer la position de TOUS les joueurs geres par le serveur.
+				// Cette boucle dynamique fonctionne pour 2 et 4 joueurs.
+				for (const playerName in state.players) {
+					const serverPlayerData = state.players[playerName];
+					const clientPlayerObject = gameState.activePlayers.find(p => p.config.name === playerName);
+
+					if (clientPlayerObject) {
+						// On met a jour directement la position du mesh 3D.
+						clientPlayerObject.mesh.position.y = serverPlayerData.y;
+					}
+				}
+				return; // On a traite le message, on sort de la fonction.
+			}
+
+
+			// Pour les messages moins frequents qui gerent les evenements du jeu.
 			switch (message.type) {
-				case 'game_mode':
-					gameState.gameMode = message.data.gameMode;
 				case 'game_start':
+					console.log("Le serveur a lance la partie contre:", message.data.opponent_pseudo);
 					gameState.isGameStarted = true;
 					gameState.ui.startButton.mesh.isVisible = false;
+					gameState.ui.statusText.mesh.isVisible = false;
 					gameState.ui.winnerText.mesh.isVisible = false;
 					gameState.ui.scoreLeft.mesh.isVisible = true;
 					gameState.ui.scoreRight.mesh.isVisible = true;
-					// On affiche le pseudo de l'adversaire
-					console.log("La partie commence contre:", message.data.opponent_pseudo);
-					break;
-
-				case 'game_state_update':
-					if (gameState.ball) {
-						gameState.ball.position.z = message.data.ball_z;
-						gameState.ball.position.y = message.data.ball_y;
-					}
+					gameState.ball.isVisible = true;
 					
-					gameState.ui.scoreLeft.textBlock.text = message.data.score_left;
-					gameState.ui.scoreRight.textBlock.text = message.data.score_right;
-					
-					// Met a jour la position des raquettes controlees par le reseau
-					gameState.activePlayers.forEach(player => {
-						if (player.controlType === 'ONLINE') {
-							// On suppose que le serveur envoie un objet avec les positions indexees par le nom du joueur
-							// Ex: { "player_right_top": { "y": 10 }, "player_left_bottom": { "y": -5 } }
-							// ou
-							// Ex: { "player_right_top": { "movement": 1 }, "player_left_bottom": { "movement": -1 } }
-							if (message.data.players && message.data.players[player.config.name]) {
-								// player.mesh.position.y = message.data.players[player.config.name].y;
-								player.movement = message.data.players[player.config.name].movement;
-							}
-						}
-					});
+					startCountdown(gameState);
 					break;
 
 				case 'goal_scored':
-					// Le serveur nous informe d'un but, on reinitialise le visuel
-					resetBall(gameState, message.data.ball_direction_z);
+					console.log("Un but a ete marque !");
+				
+					resetBall(gameState);
 					break;
 
 				case 'game_over':
-					// Le serveur declare la fin de la partie
+					console.log("La partie est terminee.");
+					gameState.ball.isVisible = false;
 					endGame(gameState, message.data.winner_pseudo + " Wins!");
 					break;
 				
 				case 'error':
-					console.error("Erreur du serveur:", message.data.message);
-					// On pourrait afficher cette erreur a l'utilisateur
+					console.error("Erreur renvoyee par le serveur:", message.data.message);
 					break;
 			}
 		} catch (e) {
