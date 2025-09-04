@@ -3,7 +3,7 @@
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
 
-const WS_URL = "ws://10.12.12.5:3000";
+const WS_URL = "ws://127.0.0.1:3000";
 
 class NetworkManager {
 	constructor() {
@@ -100,14 +100,10 @@ class NetworkManager {
 				case 'game_over':
 					console.log("La partie est terminee.");
 					gameState.ball.isVisible = false;
-					const winnerPseudo = message.data.winner_pseudo;
-
-					if (winnerPseudo === "Opponent dDisconnects") {
-						endGame(gameState, winnerPseudo);
-						gameState.ui.winnerText.textBlock.fontSize = '35%';
-					} else {
-						endGame(gameState, winnerPseudo + " Wins!");
-					}
+					gameState.ui.winnerText.textBlock.fontSize = '45%';
+					const finalMessage = message.data.end_message;
+					endGame(gameState, finalMessage);
+					
 					break;
 				
 				case 'error':

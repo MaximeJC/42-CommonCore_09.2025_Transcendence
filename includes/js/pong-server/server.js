@@ -46,13 +46,31 @@ app.register(async function (fastify) {
 		socket.on('close', () => {
 			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
 			const clientInfo = clients.get(socket.id);
-			if (clientInfo?.gameId) {
+
+			if (clientInfo && clientInfo.gameId) {
 				const game = games.get(clientInfo.gameId);
-				if (game) {
-					game.endGame("Opponent dDisconnects");
+				if (game && game.gameState.isGameStarted) {
+					clearInterval(game.gameLoop);
+					game.gameState.isGameStarted = false;
+
+					const remainingPlayer = game.gameState.activePlayers.find(p => p.controlType.includes('HUMAN') && p.id !== socket.id);
+					
+					let endMessage;
+					// Construire le message.
+					if (remainingPlayer && remainingPlayer.pseudo) {
+						endMessage = `Opponent has left.\n${remainingPlayer.pseudo} wins!`;
+					} else {
+						endMessage = `Opponent has left.\nYou Wins!`;
+
+					}
+
+					game.broadcast('game_over', { end_message: endMessage });
+					
+					console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
 					games.delete(clientInfo.gameId);
 				}
 			}
+			
 			clients.delete(socket.id);
 			matchmaking_1v1 = matchmaking_1v1.filter(s => s.id !== socket.id);
 			matchmaking_4p = matchmaking_4p.filter(s => s.id !== socket.id);

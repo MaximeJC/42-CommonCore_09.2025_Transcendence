@@ -220,18 +220,27 @@ export function setupPlayers(scene, gameState) {
 
 	// Boucle de creation des mesh 3D pour chaque joueur actif
 	// et ajout des donnees dans gameState
-	playerSetups.forEach(setup => {
+playerSetups.forEach(setup => {
+		const playerMesh = createPlayer(
+			scene,
+			setup.config.name,
+			setup.config.color,
+			setup.config.position,
+			setup.size
+		);
+
+		// Si le joueur est controle par le clavier, c'est le joueur local.
+		if (setup.controlType === 'KEYBOARD') {
+			// On rend sa couleur plus vive pour qu'il se demarque.
+			playerMesh.material.emissiveColor = setup.config.color.clone(); // On clone pour eviter de modifier la couleur originale
+			playerMesh.material.emissiveIntensity = 1.5;
+		}
+
 		const playerData = {
 			config: setup.config,
 			controlType: setup.controlType,
 			size: setup.size,
-			mesh: createPlayer(
-				scene,
-				setup.config.name,
-				setup.config.color,
-				setup.config.position,
-				setup.size
-			),
+			mesh: playerMesh, 
 			moveUp: false,
 			moveDown: false,
 			// Cette variable stocke la derniere intention de mouvement envoyee au serveur

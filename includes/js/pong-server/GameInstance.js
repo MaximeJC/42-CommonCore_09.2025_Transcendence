@@ -180,10 +180,12 @@ export class GameInstance {
 	}
 
 	endGame(winnerPseudo) {
-		if (!this.gameState.isGameStarted) return;
+		if (!this.gameState.isGameStarted)
+			return;
 		clearInterval(this.gameLoop);
 		this.gameState.isGameStarted = false;
-		this.broadcast('game_over', { winner_pseudo: winnerPseudo });
+		const endMessage = winnerPseudo + " Wins!";
+		this.broadcast('game_over', { end_message: endMessage });
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
 	}
 
