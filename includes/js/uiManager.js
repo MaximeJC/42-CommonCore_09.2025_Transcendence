@@ -62,12 +62,6 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	scoreRight.mesh.isVisible = false;
 	gameState.ui.scoreRight = scoreRight;
 
-	const startButton = create3DButton("startBtn", "START", scene);
-	startButton.mesh.position.set(8, -30, 0);
-	startButton.mesh.rotation.x = -0.1;
-	startButton.mesh.rotation.y = -Math.PI / 2;
-	gameState.ui.startButton = startButton;
-
 	// Elements de statut et de victoire (pas de changement ici)
 	const statusText = createTextBox("statusText", "", { meshWidth: 60, meshHeight: 15, textureWidth: 2048, textureHeight: 512 }, scene);
 	statusText.textBlock.background = "transparent";
@@ -154,14 +148,6 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 		}
 	}
 
-	startButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-		BABYLON.ActionManager.OnPickTrigger,
-		function () {
-			console.log("Le bouton start a ete clique !");
-			// Le bouton ne fait plus qu'appeler notre nouvelle fonction de demarrage.
-			startGame();
-		}
-	));
 
 	//#endregion--------------------------------------GUI-jeu----------------------------------------
 }

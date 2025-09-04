@@ -13,6 +13,12 @@ export function startCountdown(gameState) {
 	gameState.ui.countdownText.textBlock.text = count.toString();
 	gameState.ui.countdownText.mesh.isVisible = true;
 
+	// La balle reste invisible pendant le decompte.
+	if (gameState.ball) {
+		gameState.ball.isVisible = false;
+	}
+
+	// On s'assure de nettoyer un eventuel intervalle precedent
 	if (gameState.countdownInterval) {
 		clearInterval(gameState.countdownInterval);
 	}
@@ -25,6 +31,10 @@ export function startCountdown(gameState) {
 			} else {
 				// Fin du compte a rebours visuel
 				gameState.ui.countdownText.mesh.isVisible = false;
+				//affiche la balle
+				if (gameState.ball) {
+					gameState.ball.isVisible = true;
+				}
 				clearInterval(gameState.countdownInterval); // On arrete l'intervalle
 			}
 		}
@@ -33,8 +43,8 @@ export function startCountdown(gameState) {
 
 //Fonction pour reinitialiser l'affichage de la balle, suite a un ordre du serveur.
 export function resetBall(gameState) {
-	gameState.ball.isVisible = true;
-	startCountdown(gameState); // On lance le compte a rebours au lieu de la balle
+	// Cette fonction ne fait que lancer le decompte, qui gere lui-meme la visibilite de la balle.
+	startCountdown(gameState);
 }
 
 //Fonction pour terminer la partie et afficher le message du gagnant.
@@ -50,7 +60,6 @@ export function endGame(gameState, message) {
 	gameState.ui.countdownText.mesh.isVisible = false;
 	gameState.ui.winnerText.textBlock.text = message;
 	gameState.ui.winnerText.mesh.isVisible = true;
-	gameState.ui.startButton.mesh.isVisible = true;
 }
 
 //endregion---------------------------------fin-fonctions-pong----------------------------------
@@ -61,7 +70,9 @@ export function endGame(gameState, message) {
 export function startGameLoop(scene, engine, gameState) {
 	scene.onBeforeRenderObservable.add(() => {
 		// On affiche les FPS
-		gameState.ui.fpsText.textBlock.text = engine.getFps().toFixed() + " fps";
+		if (gameState.ui.fpsText && gameState.ui.fpsText.textBlock) {
+			gameState.ui.fpsText.textBlock.text = engine.getFps().toFixed() + " fps";
+		}
 
 		if (gameState.isGamePaused) {
 			return; // On sort immediatement de la boucle de rendu
@@ -70,9 +81,9 @@ export function startGameLoop(scene, engine, gameState) {
 		// recupere les entrees du ou des joueurs et les envoie au serveur.
 		updateAndSendInputs(gameState);
 
-		if (debugFps) {
+		if (debugFps && gameState.ui.fpsText) {
 			gameState.ui.fpsText.mesh.isVisible = true;
-        } else {
+        } else if (gameState.ui.fpsText) {
 			gameState.ui.fpsText.mesh.isVisible = false;
         }
 	});
@@ -84,6 +95,8 @@ export function startGameLoop(scene, engine, gameState) {
  * @param {object} gameState - L'etat du client.
  */
 function updateAndSendInputs(gameState) {
+	if (!gameState.isGameStarted)
+		return;
 	
 	// CAS SPECIAL: 2 JOUEURS SUR LE MEME CLAVIER
 	if (gameState.gameMode === '2P_LOCAL') {

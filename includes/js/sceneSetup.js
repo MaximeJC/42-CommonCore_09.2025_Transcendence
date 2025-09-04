@@ -86,7 +86,7 @@ export function createScene(engine) {
 
 	//#endregion-----------------------------fin-scene, lumiere et camera----------------------------
 	
-	return scene;
+	return { scene, camera };
 }
 
 /**

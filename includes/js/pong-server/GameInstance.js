@@ -8,7 +8,7 @@ import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4, iaResponseTime } fr
 const TICK_RATE = 60;
 
 export class GameInstance {
-	constructor(clientSockets, gameMode) {
+	constructor(clientInfos, gameMode) { // On recoit des 'infos' { socket, pseudo }
 		this.gameId = uuidv4();
 		this.sockets = {};
 		this.gameState = createInitialGameState();
@@ -24,36 +24,36 @@ export class GameInstance {
 
 		this.aiCooldown = 0;
 		this.iaResponseTime = iaResponseTime;
+		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
+		this.readyPlayers = new Set();
 		
 		console.log(`[Jeu ${this.gameId}] Creation d'une partie en mode ${gameMode}.`);
-		this.setupPlayers(clientSockets, gameMode);
+		this.setupPlayers(clientInfos, gameMode);
 
-		this.startGame();
+		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
+		this.notifyClientsToPrepare();
 	}
 
-	setupPlayers(clientSockets, gameMode) {
+	setupPlayers(clientInfos, gameMode) { // Le parametre est 'clientInfos'
 		const players = this.gameState.activePlayers;
 		let humanPlayerIndex = 0;
 
-		const createPlayer = (pseudo, name, controlType) => {
+		const createPlayer = (defaultPseudo, name, controlType) => {
 			let id;
+			let pseudo = defaultPseudo; // On garde un pseudo par defaut pour les IA
+
 			// Logique d'assignation d'ID adaptee a tous les cas
-			if (controlType === 'HUMAN') {
-				if (clientSockets[humanPlayerIndex]) {
-					id = clientSockets[humanPlayerIndex].id;
+			if (controlType.includes('HUMAN')) {
+				if (clientInfos[humanPlayerIndex]) {
+					const info = clientInfos[humanPlayerIndex];
+					id = info.socket.id;
+					pseudo = info.pseudo; // On utilise le pseudo fourni par le client
 					// On stocke le socket pour pouvoir communiquer avec ce joueur
-					this.sockets[id] = clientSockets[humanPlayerIndex];
+					this.sockets[id] = info.socket;
 				} else {
 					id = `human_${humanPlayerIndex}`;
 				}
 				humanPlayerIndex++;
-			} else if (controlType === 'HUMAN_LOCAL') {
-				// Pour 2P_LOCAL, les deux joueurs sont lies au meme socket.
-				id = clientSockets[0].id;
-				// On s'assure de n'ajouter le socket qu'une seule fois
-				if (!this.sockets[id]) {
-					this.sockets[id] = clientSockets[0];
-				}
 			} else {
 				id = `AI_${uuidv4()}`;
 			}
@@ -74,8 +74,13 @@ export class GameInstance {
 			case '2P_LOCAL':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN_LOCAL'));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN_LOCAL'));
+				// On s'assure que les deux joueurs partagent le meme ID de socket
+				if (players.length === 2) {
+					players[1].id = players[0].id;
+				}
 				break;
-
+			
+			case '2P_ONLINE': // Ajout pour la completude
 			case '1V1_ONLINE':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
@@ -103,44 +108,82 @@ export class GameInstance {
 		}
 	}
 
-	startGame() {
-		this.gameState.isGameStarted = true;
-
-		// On recupere les IDs des joueurs humains
+	/**
+	 * Notifie les clients qu'une partie est trouvee et qu'ils doivent commencer a se preparer.
+	 */
+	notifyClientsToPrepare() {
 		const humanPlayers = this.gameState.activePlayers.filter(p => p.controlType.includes('HUMAN'));
-
-		// On envoie a chaque joueur humain son role specifique
-		humanPlayers.forEach(player => {
-			const socket = this.sockets[player.id];
-			if (socket && socket.readyState === 1) {
+		
+		// Cas special pour 2P_LOCAL ou un seul client recoit les infos pour les deux joueurs
+		if (this.gameState.gameMode === '2P_LOCAL' && humanPlayers.length > 0) {
+			const clientSocket = this.sockets[humanPlayers[0].id];
+			if (clientSocket && clientSocket.readyState === 1) {
 				const message = {
 					type: 'game_start',
 					data: {
-						// On lui dit quel joueur il est
-						your_player_name: player.name,
-						// On envoie aussi les pseudos de tous les joueurs pour l'affichage futur
+						your_player_name: 'both', // Signal special pour le client
 						all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo }))
 					}
 				};
-				socket.send(JSON.stringify(message));
+				clientSocket.send(JSON.stringify(message));
 			}
-		});
-		
-		let initialDirection;
-		if (Math.random() < 0.5)
-		{
-			initialDirection = 1;
+		} else {
+			// Logique standard pour les autres modes
+			humanPlayers.forEach(player => {
+				const socket = this.sockets[player.id];
+				if (socket && socket.readyState === 1) {
+					const message = {
+						type: 'game_start',
+						data: {
+							your_player_name: player.name,
+							all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo }))
+						}
+					};
+					socket.send(JSON.stringify(message));
+				}
+			});
 		}
-		else
-		{
+	}
+
+	/**
+	 * appelee par le serveur quand un client envoie 'client_ready'.
+	 */
+	handlePlayerReady(playerId) {
+		console.log(`[Jeu ${this.gameId}] Le joueur ${playerId} est pret.`);
+		this.readyPlayers.add(playerId);
+
+		const humanPlayerCount = Object.keys(this.sockets).length;
+
+		// On verifie si TOUS les joueurs humains sont prets.
+		if (this.readyPlayers.size === humanPlayerCount) {
+			console.log(`[Jeu ${this.gameId}] Tous les joueurs sont prets. Lancement du jeu !`);
+			this.beginGame();
+		}
+	}
+
+	/**
+	 * lance reellement la boucle de jeu et le decompte.
+	 */
+	beginGame() {
+		this.gameState.isGameStarted = true;
+		
+		// On donne l'ordre a tous les clients de demarrer leur decompte visuel.
+		this.broadcast('start_countdown', {});
+
+		let initialDirection;
+		if (Math.random() < 0.5) {
+			initialDirection = 1;
+		} else {
 			initialDirection = -1;
 		}
 		GameLogic.resetBall(this.gameState, initialDirection);
 		
+		// Le serveur lance son propre decompte logique interne.
 		setTimeout(() => {
 			this.gameState.isBallPaused = false;
 		}, 3000);
 
+		// La boucle de jeu est lancee.
 		this.gameLoop = setInterval(() => {
 			this.update();
 		}, 1000 / TICK_RATE);
@@ -182,10 +225,8 @@ export class GameInstance {
 	 * @param {object} movements - Un objet comme { p1: 1, p2: -1 }.
 	 */
 	handleLocalPlayersInput(socketId, movements) {
-		// Le joueur 1 est le premier joueur de type HUMAN_LOCAL lie a ce socketId.
-		const player1 = this.gameState.activePlayers.find(p => p.id === socketId && p.controlType === 'HUMAN_LOCAL' && p.name === 'player_left_top');
-		// Le joueur 2 est le second.
-		const player2 = this.gameState.activePlayers.find(p => p.id === socketId && p.controlType === 'HUMAN_LOCAL' && p.name === 'player_right_top');
+		const player1 = this.gameState.activePlayers.find(p => p.id === socketId && p.name === 'player_left_top');
+		const player2 = this.gameState.activePlayers.find(p => p.id === socketId && p.name === 'player_right_top');
 		
 		if (player1) {
 			player1.movement = movements.p1;
@@ -204,7 +245,8 @@ export class GameInstance {
 			score_right: this.gameState.scoreRight
 		};
 		this.gameState.activePlayers.forEach(player => {
-			stateForClient.players[player.name] = { y: player.y };
+			// On inclut le pseudo dans les mises a jour pour que le client puisse l'afficher.
+			stateForClient.players[player.name] = { y: player.y, pseudo: player.pseudo };
 		});
 		this.broadcast('game_state_update', stateForClient);
 	}

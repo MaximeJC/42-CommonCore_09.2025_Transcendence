@@ -218,63 +218,26 @@ export function setupPlayers(scene, gameState) {
 			break;
 	}
 
-	const glowingMeshes = [];
-	
 	// Boucle de creation des mesh 3D pour chaque joueur actif
 	// et ajout des donnees dans gameState
 	playerSetups.forEach(setup => {
-		const playerMesh = createPlayer(
-			scene,
-			setup.config.name,
-			setup.config.color,
-			setup.config.position,
-			setup.size
-		);
-		
 		const playerData = {
 			config: setup.config,
 			controlType: setup.controlType,
 			size: setup.size,
-			mesh: playerMesh,
+			mesh: createPlayer(
+				scene,
+				setup.config.name,
+				setup.config.color,
+				setup.config.position,
+				setup.size
+			),
 			moveUp: false,
 			moveDown: false,
 			// Cette variable stocke la derniere intention de mouvement envoyee au serveur
 			// pour eviter d'envoyer des messages redondants.
 			lastSentMovement: 0
 		};
-
-		// On determine le type de controle et si le joueur doit briller
-		if (gameState.gameMode === '2P_LOCAL') {
-			playerData.controlType = 'KEYBOARD';
-			// En local, les deux joueurs brillent pour bien se voir.
-			glowingMeshes.push(playerMesh);
-		} else {
-			if (setup.config.name === gameState.myPlayerName) {
-				playerData.controlType = 'KEYBOARD';
-				playerData.config.keys = { up: ['w', 'z'], down: 's' };
-				// Seul le joueur local brille en ligne.
-				glowingMeshes.push(playerMesh);
-			} else {
-				playerData.controlType = 'ONLINE';
-			}
-		}
-		
 		gameState.activePlayers.push(playerData);
 	});
-
-	// Maintenant que la boucle est finie, on configure la GlowLayer UNE SEULE FOIS.
-	const glowLayer = scene.getGlowLayerByName("glow");
-	if (glowLayer) {
-		// On ajoute tous les meshs collectes a la GlowLayer.
-		glowingMeshes.forEach(mesh => {
-			glowLayer.addIncludedOnlyMesh(mesh);
-		});
-
-		glowLayer.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-			if (glowingMeshes.includes(mesh)) {
-				result.set(material.emissiveColor.r, material.emissiveColor.g, material.emissiveColor.b, 1.0);
-			}
-		};
-		glowLayer.intensity = 1.5;
-	}
 }

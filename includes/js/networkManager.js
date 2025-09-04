@@ -2,16 +2,27 @@
 
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
-import { setupPlayers } from './playerManager.js';
 
 const WS_URL = "ws://127.0.0.1:3000";
+
+// On cree une variable "boite" pour stocker la fonction initializeApp.
+let mainAppInitializer = null;
+
+/**
+ * Permet a app.js de "donner" sa fonction initializeApp au networkManager.
+ * @param {function} initializer - La fonction a appeler quand le jeu doit demarrer.
+ */
+export function setAppInitializer(initializer) {
+    mainAppInitializer = initializer;
+}
+
 
 class NetworkManager {
 	constructor() {
 		this.socket = null;
 	}
 
-	connect(jwtToken, scene) // Le token si necessaire pour l'authentification
+	connect(jwtToken) // Le token si necessaire pour l'authentification
 	{
 		return new Promise((resolve, reject) => {
 			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -39,94 +50,87 @@ class NetworkManager {
 			};
 
 			this.socket.onmessage = (event) => {
-				this.handleServerMessage(event.data, scene);
+				this.handleServerMessage(event.data);
 			};
 		});
 	}
 
-	handleServerMessage(data, scene) {
+	handleServerMessage(data) {
 		try {
 			const message = JSON.parse(data);
 			// console.log("Message recu:", message); // Decommenter pour un debug intensif
 
+			// C'est le message qui declenche la creation de la scene de jeu.
 			if (message.type === 'game_start') {
 				console.log("Le serveur a lance la partie ! Mon role est:", message.data.your_player_name);
 				
 				// On sauvegarde qui nous sommes dans le gameState.
 				gameState.myPlayerName = message.data.your_player_name;
-				
-				// On cree les joueurs.
-				setupPlayers(scene, gameState);
 
-				// On met a jour l'UI comme avant.
-				gameState.isGameStarted = true;
-				gameState.ui.startButton.mesh.isVisible = false;
-				gameState.ui.statusText.mesh.isVisible = false;
-				gameState.ui.winnerText.mesh.isVisible = false;
-				gameState.ui.scoreLeft.mesh.isVisible = true;
-				gameState.ui.scoreRight.mesh.isVisible = true;
-				gameState.ball.isVisible = true;
+				// On stocke les informations de tous les joueurs (y compris les pseudos).
+				if (message.data.all_players) {
+					gameState.allPlayersInfo = message.data.all_players;
+				}
 				
-				startCountdown(gameState);
+				// On appelle la fonction principale de l'application.
+				if (mainAppInitializer) {
+					mainAppInitializer();
+				} else {
+					console.error("Erreur critique: l'initialiseur de l'application (initializeApp) n'a pas ete fourni au networkManager.");
+				}
 				return;
 			}
 
 			if (message.type === 'game_state_update') {
 				const state = message.data;
 				
-				// Le client ne fait qu'obeir et appliquer les positions dictees par le serveur.
 				if (gameState.ball) {
 					gameState.ball.position.z = state.ball_z;
 					gameState.ball.position.y = state.ball_y;
 				}
-				
+
 				// Appliquer les scores.
-				gameState.ui.scoreLeft.textBlock.text = state.score_left.toString();
-				gameState.ui.scoreRight.textBlock.text = state.score_right.toString();
+				if (gameState.ui.scoreLeft && gameState.ui.scoreRight) {
+					gameState.ui.scoreLeft.textBlock.text = state.score_left.toString();
+					gameState.ui.scoreRight.textBlock.text = state.score_right.toString();
+				}
 				
 				// Appliquer la position de TOUS les joueurs geres par le serveur.
-				// Cette boucle dynamique fonctionne pour 2 et 4 joueurs.
 				for (const playerName in state.players) {
 					const serverPlayerData = state.players[playerName];
 					const clientPlayerObject = gameState.activePlayers.find(p => p.config.name === playerName);
 
 					if (clientPlayerObject) {
-						// On met a jour directement la position du mesh 3D.
 						clientPlayerObject.mesh.position.y = serverPlayerData.y;
+						// On met a jour le pseudo si le serveur nous en envoie un nouveau (pourrait etre utile plus tard)
+						if (serverPlayerData.pseudo) {
+							clientPlayerObject.config.pseudo = serverPlayerData.pseudo;
+						}
 					}
 				}
-				return; // On a traite le message, on sort de la fonction.
+				return;
 			}
-
 
 			// Pour les messages moins frequents qui gerent les evenements du jeu.
 			switch (message.type) {
-				case 'game_start':
-					console.log("Le serveur a lance la partie contre:", message.data.opponent_pseudo);
-					gameState.isGameStarted = true;
-					gameState.ui.startButton.mesh.isVisible = false;
-					gameState.ui.statusText.mesh.isVisible = false;
-					gameState.ui.winnerText.mesh.isVisible = false;
-					gameState.ui.scoreLeft.mesh.isVisible = true;
-					gameState.ui.scoreRight.mesh.isVisible = true;
-					gameState.ball.isVisible = true;
-					
+				
+				case 'start_countdown':
+					console.log("Ordre du serveur: demarrer le decompte !");
 					startCountdown(gameState);
 					break;
 
 				case 'goal_scored':
 					console.log("Un but a ete marque !");
-				
 					resetBall(gameState);
 					break;
 
 				case 'game_over':
 					console.log("La partie est terminee.");
-					gameState.ball.isVisible = false;
-					gameState.ui.winnerText.textBlock.fontSize = '45%';
+					if (gameState.ball) {
+						gameState.ball.isVisible = false;
+					}
 					const finalMessage = message.data.end_message;
 					endGame(gameState, finalMessage);
-					
 					break;
 				
 				case 'error':

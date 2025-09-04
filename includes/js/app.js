@@ -14,18 +14,107 @@ import {
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
 import { startGameLoop } from './gameLogic.js';
+import { networkManager, setAppInitializer } from './networkManager.js';
+import { setupPlayers } from './playerManager.js';
+
+// --- VARIABLES GLOBALES POUR LA GESTION DE BABYLON ---
+let engine = null;
+let activeScene = null;
 
 /**
- * La fonction principale asynchrone qui initialise et demarre le jeu.
+ * Affiche une scene d'attente simple pendant la recherche de partie.
+ */
+function showWaitingScreen() {
+	console.log("Affichage de l'ecran d'attente...");
+	
+	const waitingScene = new BABYLON.Scene(engine);
+	const camera = new BABYLON.FreeCamera("waitingCam", new BABYLON.Vector3(0, 0, -10), waitingScene);
+	waitingScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+	const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, waitingScene);
+	const text = new BABYLON.GUI.TextBlock();
+	text.text = "Searching for game...";
+	text.color = "white";
+	// text.fontFamily = "Courier New, monospace";
+	text.fontSize = 24;
+	ui.addControl(text);
+
+	activeScene = waitingScene;
+}
+
+/**
+ * Anime la camera de la scene de jeu sur une trajectoire predefinie.
+ */
+async function playCinematic(scene, camera) {
+	console.log("La cinematique demarre...");
+	
+	const frameRate = 60;
+	const durationInSeconds = 4; // Duree de la cinematique
+	const totalFrames = frameRate * durationInSeconds;
+
+	// Position de depart de la camera (vue de cote, de loin)
+	const startPosition = new BABYLON.Vector3(200, 50, 100);
+	// On recupere la position finale desiree de la camera pour etre sur.
+	const endPosition = new BABYLON.Vector3(155, 25, 0);
+	
+	// Cible de depart de la camera (regarde la raquette de droite)
+	const startTarget = new BABYLON.Vector3(0, 0, 40);
+	// Cible finale de la camera (la vue de jeu normale)
+	const endTarget = new BABYLON.Vector3(0, 10, 0);
+
+	// On place la camera a sa position de depart
+	camera.position = startPosition;
+	camera.setTarget(startTarget);
+
+	// Creation de l'animation pour la POSITION de la camera
+	const positionAnimation = new BABYLON.Animation(
+		"cameraPositionAnim", "position", frameRate,
+		BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+	positionAnimation.setKeys([
+		{ frame: 0, value: startPosition },
+		{ frame: totalFrames, value: endPosition }
+	]);
+
+	// Creation de l'animation pour la CIBLE de la camera
+	const targetAnimation = new BABYLON.Animation(
+		"cameraTargetAnim", "target", frameRate,
+		BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+	targetAnimation.setKeys([
+		{ frame: 0, value: startTarget },
+		{ frame: totalFrames, value: endTarget }
+	]);
+
+	// On ajoute une courbe de "liss" a l'animation pour un effet plus doux
+	const easingFunction = new BABYLON.QuadraticEase();
+	easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+	positionAnimation.setEasingFunction(easingFunction);
+	targetAnimation.setEasingFunction(easingFunction);
+
+	// On attache les animations a la camera
+	camera.animations.push(positionAnimation, targetAnimation);
+
+	await scene.beginAnimation(camera, 0, totalFrames, false).waitAsync();
+	
+	// Pour garantir la position finale exacte, on la reaffecte.
+	camera.position = endPosition;
+	camera.setTarget(endTarget);
+	
+	console.log("Cinematique terminee.");
+}
+
+/**
+ * La fonction principale qui initialise la scene de JEU.
  */
 async function initializeApp() {
-	// Initialise le moteur et la scene de base
-	const engine = initializeEngine();
+	console.log("Initialisation de la scene de jeu...");
 
-	const scene = createScene(engine);
+	// createScene retourne maintenant un objet { scene, camera }
+	const { scene: gameScene, camera } = createScene(engine);
 	if (debug == true)
 	{
-		scene.debugLayer.show({
+		gameScene.debugLayer.show({
 			embedMode: true
 		});
 	}
@@ -42,19 +131,20 @@ async function initializeApp() {
 	engine.displayLoadingUI();
 	console.time("Temps de chargement total des modeles");
 
-
+	
 	// On cree une liste de toutes les "promesses" de chargement.
 	// chargement parallele.
+	// On passe 'gameScene' a toutes les fonctions qui chargent des modeles.
 	const loadingPromises = [
-		 loadArcade(scene),
-		 loadArcadeMachines(scene),
-		 loadDDM(scene),
-		 loadSugarRush(scene),
-		 loadHockey(scene),
-		 loadWhackAMole(scene),
-		 loadBubblegum(scene),
-		 loadTronArcade(scene),
-		 loadPacman(scene)
+		 loadArcade(gameScene),
+		 loadArcadeMachines(gameScene),
+		 loadDDM(gameScene),
+		 loadSugarRush(gameScene),
+		 loadHockey(gameScene),
+		 loadWhackAMole(gameScene),
+		 loadBubblegum(gameScene),
+		 loadTronArcade(gameScene),
+		 loadPacman(gameScene)
 	];
 
 	// Promise.all() attend que TOUTES les promesses de la liste soient resolues.
@@ -75,26 +165,43 @@ async function initializeApp() {
 
 	// cache l'ecran de chargement
 	engine.hideLoadingUI();
+	await gameScene.whenReadyAsync();
 
-	await scene.whenReadyAsync();
-	
-	const { table, ball } = await createTable(scene);
-	
+	// On bascule l'affichage sur la scene de jeu pour qu'elle soit visible.
+	activeScene = gameScene;
+
+	setupPlayers(gameScene, gameState);
+
 	// On stocke la balle dans gameState comme avant
+	const { table, ball } = await createTable(gameScene);
 	gameState.ball = ball;
-	const room = createRoom(scene);
+	createRoom(gameScene);
 
 	if (debugVisuals) {
-		gameState.debugArrow = createDebugArrow(scene);
-		gameState.debugArrow.parent = gameState.ball;
-		gameState.debugArrow.isVisible = true;
+		const debugArrow = createDebugArrow(gameScene);
+		debugArrow.parent = gameState.ball;
+		debugArrow.isVisible = true;
+		gameState.debugArrow = debugArrow;
 	}
 
 	// Cree l'interface utilisateur (GUI)
-	createGUI(gameState, engine, scene, JwtToken);
+	createGUI(gameState, engine, gameScene, JwtToken);
+
+	// On met l'UI dans son etat initial de jeu.
+	gameState.isGameStarted = true;
+	if (gameState.ui.statusText)
+		gameState.ui.statusText.mesh.isVisible = false;
+	if (gameState.ui.winnerText)
+		gameState.ui.winnerText.mesh.isVisible = false;
+	if (gameState.ui.scoreLeft)
+		gameState.ui.scoreLeft.mesh.isVisible = true;
+	if (gameState.ui.scoreRight)
+		gameState.ui.scoreRight.mesh.isVisible = true;
+	if (gameState.ball)
+		gameState.ball.isVisible = false;
 
 	// Met en place la gestion des entrees clavier
-	setupInputManager(scene, gameState);
+	setupInputManager(gameScene, gameState);
 
 	// Applique les optimisations finales
 	table.material.freeze();
@@ -106,16 +213,67 @@ async function initializeApp() {
 		if (model) model.freezeWorldMatrix();
 	});
 
-	// Lance la boucle de logique de jeu
-	startGameLoop(scene, engine, gameState);
+	// On lance la cinematique sur la scene de jeu qui est prete.
+	await playCinematic(gameScene, camera);
 
-	// Lance la boucle de rendu
-	engine.runRenderLoop(function() { 
-		if (scene) {
-			scene.render();
-		}
-	});
+	// Une fois la cinematique finie, on se declare pret
+	networkManager.sendMessage('client_ready', {});
+	// startCountdown(gameState);
+	
+	// La boucle de logique de jeu est lancee en dernier.
+	startGameLoop(gameScene, engine, gameState);
 }
 
-// Point d'entree principal : on lance l'application
-initializeApp();
+// On donne la fonction initializeApp au networkManager pour qu'il puisse l'appeler.
+setAppInitializer(initializeApp);
+
+// --- POINT D'ENTREE DE L'APPLICATION ---
+
+window.addEventListener('DOMContentLoaded', () => {
+    const lobby = document.getElementById('lobby');
+    const startButton = document.getElementById('start-game-button');
+    const pseudoInput = document.getElementById('pseudo-input');
+    const gamemodeSelect = document.getElementById('gamemode-select');
+    const canvas = document.getElementById('renderCanvas');
+
+    startButton.addEventListener('click', async () => {
+        const pseudo = pseudoInput.value.trim();
+        if (!pseudo) {
+            alert("Please enter a pseudo.");
+            return;
+        }
+
+        gameState.pseudo = pseudo;
+        gameState.gameMode = gamemodeSelect.value;
+		
+        lobby.style.display = 'none';
+		canvas.style.display = 'block';
+
+		// On cree le moteur UNE SEULE FOIS.
+		engine = initializeEngine();
+
+		// On lance la boucle de rendu principale.
+		engine.runRenderLoop(() => {
+			if (activeScene) {
+				activeScene.render();
+			}
+		});
+
+		// On affiche un simple ecran d'attente.
+		showWaitingScreen();
+
+		// On contacte le serveur.
+		try {
+			await networkManager.connect(JwtToken);
+			networkManager.sendMessage('find_match', {
+				mode: gameState.gameMode,
+				pseudo: gameState.pseudo
+			});
+		} catch (error) {
+			console.error("Echec de la connexion:", error);
+			lobby.style.display = 'block';
+			canvas.style.display = 'none';
+			alert("Connection to the server failed. Please try again.");
+		}
+    });
+});

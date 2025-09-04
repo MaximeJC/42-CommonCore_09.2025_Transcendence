@@ -27,16 +27,23 @@ app.register(async function (fastify) {
 
 				switch(parsed.type) {
 					case 'find_match':
-						handleMatchmaking(socket, parsed.data.mode);
+						// On passe le socket et le pseudo a la fonction de matchmaking
+						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo);
 						break;
 					case 'player_input':
 						if (clientInfo?.gameId) {
 							games.get(clientInfo.gameId)?.handlePlayerInput(socket.id, parsed.data.movement);
 						}
 						break;
-					case 'local_players_input': // Message special pour le 2P_LOCAL
+					case 'local_players_input':// Message special pour le 2P_LOCAL
 						if (clientInfo?.gameId) {
 							games.get(clientInfo.gameId)?.handleLocalPlayersInput(socket.id, parsed.data.movements);
+						}
+						break;
+					// Ajout du cas client_ready pour la synchronisation
+					case 'client_ready':
+						if (clientInfo?.gameId) {
+							games.get(clientInfo.gameId)?.handlePlayerReady(socket.id);
 						}
 						break;
 				}
@@ -58,10 +65,9 @@ app.register(async function (fastify) {
 					let endMessage;
 					// Construire le message.
 					if (remainingPlayer && remainingPlayer.pseudo) {
-						endMessage = `Opponent has left.\n${remainingPlayer.pseudo} wins!`;
+						endMessage = `Opponent has left. ${remainingPlayer.pseudo} wins!`;
 					} else {
-						endMessage = `Opponent has left.\nYou Wins!`;
-
+						endMessage = "Opponent has left the game.";
 					}
 
 					game.broadcast('game_over', { end_message: endMessage });
@@ -72,31 +78,32 @@ app.register(async function (fastify) {
 			}
 			
 			clients.delete(socket.id);
-			matchmaking_1v1 = matchmaking_1v1.filter(s => s.id !== socket.id);
-			matchmaking_4p = matchmaking_4p.filter(s => s.id !== socket.id);
+			matchmaking_1v1 = matchmaking_1v1.filter(info => info.socket.id !== socket.id);
+			matchmaking_4p = matchmaking_4p.filter(info => info.socket.id !== socket.id);
 		});
 	});
 });
 
-function handleMatchmaking(socket, gameMode) {
-	const isInQueue = matchmaking_1v1.some(p => p.id === socket.id) || matchmaking_4p.some(p => p.id === socket.id);
+function handleMatchmaking(socket, gameMode, pseudo) {
+	const playerInfo = { socket, pseudo }; // On cree l'objet info
+
+	const isInQueue = matchmaking_1v1.some(p => p.socket.id === socket.id) || matchmaking_4p.some(p => p.socket.id === socket.id);
 	if (isInQueue) {
 		console.log(`[Matchmaking] Le joueur ${socket.id} est deja en file d'attente.`);
 		return;
 	}
 
 	let game;
-	// Les modes qui se lancent instantanement avec un seul client
 	const modesInstants = ['1P_VS_AI', 'AI_VS_AI', '2AI_VS_2AI', '2P_LOCAL'];
 	if (modesInstants.includes(gameMode)) {
-		game = new GameInstance([socket], gameMode);
-	} else if (['1V1_ONLINE'].includes(gameMode)) {
-		matchmaking_1v1.push(socket);
+		game = new GameInstance([playerInfo], gameMode);
+	} else if (['1V1_ONLINE', '2P_ONLINE'].includes(gameMode)) {
+		matchmaking_1v1.push(playerInfo);
 		if (matchmaking_1v1.length >= 2) {
 			game = new GameInstance(matchmaking_1v1.splice(0, 2), '1V1_ONLINE');
 		}
 	} else if (gameMode === '4P_ONLINE') {
-		matchmaking_4p.push(socket);
+		matchmaking_4p.push(playerInfo);
 		if (matchmaking_4p.length >= 4) {
 			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
 		}
@@ -120,6 +127,6 @@ function handleMatchmaking(socket, gameMode) {
 app.listen(
 	{
 	port: PORT,
-	host: '0.0.0.0' 
+	host: '0.0.0.0'
 	}
 );
