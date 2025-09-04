@@ -76,7 +76,6 @@ export class GameInstance {
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN_LOCAL'));
 				break;
 
-			case '2P_ONLINE':
 			case '1V1_ONLINE':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
@@ -106,14 +105,45 @@ export class GameInstance {
 
 	startGame() {
 		this.gameState.isGameStarted = true;
-		this.broadcast('game_start', { opponent_pseudo: "Adversaire(s)" });
 
+		// On recupere les IDs des joueurs humains
+		const humanPlayers = this.gameState.activePlayers.filter(p => p.controlType.includes('HUMAN'));
+
+		// On envoie a chaque joueur humain son role specifique
+		humanPlayers.forEach(player => {
+			const socket = this.sockets[player.id];
+			if (socket && socket.readyState === 1) {
+				const message = {
+					type: 'game_start',
+					data: {
+						// On lui dit quel joueur il est
+						your_player_name: player.name,
+						// On envoie aussi les pseudos de tous les joueurs pour l'affichage futur
+						all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo }))
+					}
+				};
+				socket.send(JSON.stringify(message));
+			}
+		});
+		
 		let initialDirection;
-		if (Math.random() < 0.5) { initialDirection = 1; } else { initialDirection = -1; }
+		if (Math.random() < 0.5)
+		{
+			initialDirection = 1;
+		}
+		else
+		{
+			initialDirection = -1;
+		}
 		GameLogic.resetBall(this.gameState, initialDirection);
 		
-		setTimeout(() => { this.gameState.isBallPaused = false; }, 3000);
-		this.gameLoop = setInterval(() => { this.update(); }, 1000 / TICK_RATE);
+		setTimeout(() => {
+			this.gameState.isBallPaused = false;
+		}, 3000);
+
+		this.gameLoop = setInterval(() => {
+			this.update();
+		}, 1000 / TICK_RATE);
 	}
 
 	update() {
@@ -147,7 +177,7 @@ export class GameInstance {
 	}
 
 	/**
-	 * NOUVELLE FONCTION pour gerer les inputs de deux joueurs locaux depuis un seul client.
+	 * Fonction pour gerer les inputs de deux joueurs locaux depuis un seul client.
 	 * @param {string} socketId - L'ID du socket du client.
 	 * @param {object} movements - Un objet comme { p1: 1, p2: -1 }.
 	 */

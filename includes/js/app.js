@@ -11,7 +11,6 @@ import {
 	loadHockey, loadWhackAMole, loadBubblegum,
 	loadTronArcade, loadPacman 
 } from './gameObjects.js';
-import { setupPlayers } from './playerManager.js';
 import { createGUI } from './uiManager.js';
 import { setupInputManager } from './inputManager.js';
 import { startGameLoop } from './gameLogic.js';
@@ -78,9 +77,6 @@ async function initializeApp() {
 	engine.hideLoadingUI();
 
 	await scene.whenReadyAsync();
-
-	// Definit les joueurs actifs en fonction du mode de jeu
-	setupPlayers(scene, gameState);
 	
 	const { table, ball } = await createTable(scene);
 	

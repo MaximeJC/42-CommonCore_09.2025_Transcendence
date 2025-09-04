@@ -2,6 +2,7 @@
 
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
+import { setupPlayers } from './playerManager.js';
 
 const WS_URL = "ws://127.0.0.1:3000";
 
@@ -10,7 +11,7 @@ class NetworkManager {
 		this.socket = null;
 	}
 
-	connect(jwtToken) // Le token si necessaire pour l'authentification
+	connect(jwtToken, scene) // Le token si necessaire pour l'authentification
 	{
 		return new Promise((resolve, reject) => {
 			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -38,15 +39,37 @@ class NetworkManager {
 			};
 
 			this.socket.onmessage = (event) => {
-				this.handleServerMessage(event.data);
+				this.handleServerMessage(event.data, scene);
 			};
 		});
 	}
 
-	handleServerMessage(data) {
+	handleServerMessage(data, scene) {
 		try {
 			const message = JSON.parse(data);
 			// console.log("Message recu:", message); // Decommenter pour un debug intensif
+
+			if (message.type === 'game_start') {
+				console.log("Le serveur a lance la partie ! Mon role est:", message.data.your_player_name);
+				
+				// On sauvegarde qui nous sommes dans le gameState.
+				gameState.myPlayerName = message.data.your_player_name;
+				
+				// On cree les joueurs.
+				setupPlayers(scene, gameState);
+
+				// On met a jour l'UI comme avant.
+				gameState.isGameStarted = true;
+				gameState.ui.startButton.mesh.isVisible = false;
+				gameState.ui.statusText.mesh.isVisible = false;
+				gameState.ui.winnerText.mesh.isVisible = false;
+				gameState.ui.scoreLeft.mesh.isVisible = true;
+				gameState.ui.scoreRight.mesh.isVisible = true;
+				gameState.ball.isVisible = true;
+				
+				startCountdown(gameState);
+				return;
+			}
 
 			if (message.type === 'game_state_update') {
 				const state = message.data;

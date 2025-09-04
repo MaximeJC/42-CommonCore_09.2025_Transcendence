@@ -130,7 +130,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 			console.log("CONNECTING...");
 
 			// Connexion au serveur
-			await networkManager.connect(JwtToken);
+			await networkManager.connect(JwtToken, scene);
 			
 			// Afficher le statut de recherche
 			statusText.textBlock.text = "SEARCHING...";
