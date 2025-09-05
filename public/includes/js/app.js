@@ -49,17 +49,23 @@ async function playCinematic(scene, camera) {
 	console.log("La cinematique demarre...");
 	
 	const frameRate = 60;
-	const durationInSeconds = 4; // Duree de la cinematique
+	const durationInSeconds = 6; // Duree de la cinematique
 	const totalFrames = frameRate * durationInSeconds;
+	// On definit le moment ou la camera doit passer par le point intermediaire
+	const middleFrame = totalFrames / 2;
 
-	// Position de depart de la camera (vue de cote, de loin)
-	const startPosition = new BABYLON.Vector3(200, 50, 100);
+	// Position de depart de la camera
+	const startPosition = new BABYLON.Vector3(1530, 25, 250);
+
+	//Position du milieu de la camera
+	const middlePosition = new BABYLON.Vector3(750, 25, 250);
+	
 	// On recupere la position finale desiree de la camera pour etre sur.
 	const endPosition = new BABYLON.Vector3(155, 25, 0);
 	
-	// Cible de depart de la camera (regarde la raquette de droite)
-	const startTarget = new BABYLON.Vector3(0, 0, 40);
-	// Cible finale de la camera (la vue de jeu normale)
+	// Cible de depart de la camera
+	const startTarget = new BABYLON.Vector3(0, 10, 0);
+	// Cible finale de la camera
 	const endTarget = new BABYLON.Vector3(0, 10, 0);
 
 	// On place la camera a sa position de depart
@@ -73,6 +79,7 @@ async function playCinematic(scene, camera) {
 	);
 	positionAnimation.setKeys([
 		{ frame: 0, value: startPosition },
+		{ frame: middleFrame, value: middlePosition }, // Point de passage
 		{ frame: totalFrames, value: endPosition }
 	]);
 
@@ -95,11 +102,18 @@ async function playCinematic(scene, camera) {
 	// On attache les animations a la camera
 	camera.animations.push(positionAnimation, targetAnimation);
 
+	// On desactive les controles manuels pendant la cinematique pour eviter les conflits.
+	const canvas = scene.getEngine().getRenderingCanvas();
+	camera.detachControl(canvas);
+
 	await scene.beginAnimation(camera, 0, totalFrames, false).waitAsync();
 	
 	// Pour garantir la position finale exacte, on la reaffecte.
 	camera.position = endPosition;
 	camera.setTarget(endTarget);
+
+	// On reactive les controles manuels a la fin.
+	camera.attachControl(canvas, true);
 	
 	console.log("Cinematique terminee.");
 }

@@ -79,8 +79,7 @@ export class GameInstance {
 					players[1].id = players[0].id;
 				}
 				break;
-			
-			case '2P_ONLINE': // Ajout pour la completude
+
 			case '1V1_ONLINE':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
