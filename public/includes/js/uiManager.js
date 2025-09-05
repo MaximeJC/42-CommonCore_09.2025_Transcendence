@@ -1,10 +1,11 @@
 // js/uiManager.js
 
-import { resetBall } from './gameLogic.js';
+// import { resetBall } from './gameLogic.js';
 import { create3DButton, createTextBox } from './gameObjects.js';
+import { returnToLobby } from './app.js';
 // import { scene } from './sceneSetup.js';
 
-import { networkManager } from './networkManager.js';
+// import { networkManager } from './networkManager.js';
 
 /**
  * Cree toute l'interface utilisateur (GUI) du jeu de maniere responsive.
@@ -62,7 +63,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	scoreRight.mesh.isVisible = false;
 	gameState.ui.scoreRight = scoreRight;
 
-	// Elements de statut et de victoire (pas de changement ici)
+	// Elements de statut et de victoire
 	const statusText = createTextBox("statusText", "", { meshWidth: 60, meshHeight: 15, textureWidth: 2048, textureHeight: 512 }, scene);
 	statusText.textBlock.background = "transparent";
 	statusText.textBlock.color = "white";
@@ -109,44 +110,88 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	pauseText.mesh.isVisible = false;
 	gameState.ui.pauseText = pauseText;
 
-	/**
-	 * Encapsule la logique de connexion et de recherche de partie.
-	 * Cette fonction pourra etre appelee depuis n'importe ou, pas seulement par le bouton.
-	 */
-	async function startGame() {
-		try {
-			// Afficher le statut de connexion a l'utilisateur
-			statusText.textBlock.text = "CONNECTING...";
-			statusText.textBlock.fontSize = '50%';
-			statusText.textBlock.color = "white";
-			statusText.mesh.isVisible = true;
-			winnerText.mesh.isVisible = false;
-			console.log("CONNECTING...");
+	// /**
+	//  * Encapsule la logique de connexion et de recherche de partie.
+	//  * Cette fonction pourra etre appelee depuis n'importe ou, pas seulement par le bouton.
+	//  */
+	// async function startGame() {
+	// 	try {
+	// 		// Afficher le statut de connexion a l'utilisateur
+	// 		statusText.textBlock.text = "CONNECTING...";
+	// 		statusText.textBlock.fontSize = '50%';
+	// 		statusText.textBlock.color = "white";
+	// 		statusText.mesh.isVisible = true;
+	// 		winnerText.mesh.isVisible = false;
+	// 		console.log("CONNECTING...");
 
-			// Connexion au serveur
-			await networkManager.connect(JwtToken, scene);
+	// 		// Connexion au serveur
+	// 		await networkManager.connect(JwtToken, scene);
 			
-			// Afficher le statut de recherche
-			statusText.textBlock.text = "SEARCHING...";
-			console.log(`Envoi de la demande de match pour le mode: ${gameState.gameMode}`);
+	// 		// Afficher le statut de recherche
+	// 		statusText.textBlock.text = "SEARCHING...";
+	// 		console.log(`Envoi de la demande de match pour le mode: ${gameState.gameMode}`);
 
-			// Envoyer la demande de match au serveur
-			networkManager.sendMessage('find_match', { mode: gameState.gameMode });
+	// 		// Envoyer la demande de match au serveur
+	// 		networkManager.sendMessage('find_match', { mode: gameState.gameMode });
 				
-			// On cache le bouton pour eviter les clics multiples pendant la recherche.
-			startButton.mesh.isVisible = false;
+	// 		// On cache le bouton pour eviter les clics multiples pendant la recherche.
+	// 		startButton.mesh.isVisible = false;
 
-		} catch (error) {
-			// En cas d'echec de la connexion
-			statusText.textBlock.text = "ERROR";
-			statusText.textBlock.fontSize = '60%';
-			statusText.textBlock.color = "RED";
-			statusText.mesh.isVisible = true;
-			console.error("Echec de la connexion:", error);
-			// On s'assure que le bouton est a nouveau visible pour que l'utilisateur puisse reessayer.
-			startButton.mesh.isVisible = true;
+	// 	} catch (error) {
+	// 		// En cas d'echec de la connexion
+	// 		statusText.textBlock.text = "ERROR";
+	// 		statusText.textBlock.fontSize = '60%';
+	// 		statusText.textBlock.color = "RED";
+	// 		statusText.mesh.isVisible = true;
+	// 		console.error("Echec de la connexion:", error);
+	// 		// On s'assure que le bouton est a nouveau visible pour que l'utilisateur puisse reessayer.
+	// 		startButton.mesh.isVisible = true;
+	// 	}
+	// }
+
+	const returnButton = create3DButton("returnBtn", "MENU", scene);
+	returnButton.mesh.position.set(8, -30, 0);
+	returnButton.mesh.rotation.x = -0.1;
+	returnButton.mesh.rotation.y = -Math.PI / 2;
+	returnButton.mesh.isVisible = false; // Important: il est cache au debut
+	gameState.ui.returnButton = returnButton;
+
+	const exitButton = BABYLON.GUI.Button.CreateSimpleButton("exitBtn", "X");
+	exitButton.width = "40px";
+	exitButton.height = "40px";
+	exitButton.color = "white";
+	exitButton.fontSize = '3%';
+	exitButton.background = "rgba(200, 50, 50, 0.8)"; // Un fond rouge semi-transparent
+	exitButton.cornerRadius = 5;
+	exitButton.thickness = 1; // Bordure
+	exitButton.fontFamily = "Courier New, monospace";
+	
+	// Positionnement en haut a droite de l'ecran
+	exitButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+	exitButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+	exitButton.left = "-20px"; // Marge par rapport a la droite
+	exitButton.top = "20px";   // Marge par rapport au haut
+	
+	// Action du bouton: appeler la fonction de retour au lobby
+	exitButton.onPointerUpObservable.add(() => {
+		console.log("Le bouton 'Quitter' a ete clique.");
+		returnToLobby();
+	});
+
+	// On l'ajoute a l'interface
+	guiTexture.addControl(exitButton);
+	// On le sauvegarde dans le gameState pour pouvoir le manipuler plus tard
+	gameState.ui.exitButton = exitButton;
+	// 
+
+	// On attache une action simple au clic sur ce bouton: recharger la page.
+	returnButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+		BABYLON.ActionManager.OnPickTrigger,
+		function () {
+			console.log("Retour au menu principal...");
+			returnToLobby();
 		}
-	}
+	));
 
 
 	//#endregion--------------------------------------GUI-jeu----------------------------------------

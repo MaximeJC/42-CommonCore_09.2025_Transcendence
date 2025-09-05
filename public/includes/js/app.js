@@ -22,6 +22,49 @@ let engine = null;
 let activeScene = null;
 
 /**
+ * Nettoie la scene de jeu actuelle et retourne au lobby.
+ */
+function returnToLobby() {
+	console.log("Nettoyage de la scene et retour au lobby...");
+
+	// Arreter la boucle de rendu pour eviter les erreurs
+	if (engine) {
+		engine.stopRenderLoop();
+	}
+
+	// S'assurer que le socket est ferme pour ne pas recevoir de messages fantomes
+	if (networkManager.socket && networkManager.socket.readyState === WebSocket.OPEN) {
+		networkManager.socket.close();
+	}
+
+	// Detruire la scene actuelle pour liberer la memoire
+	if (activeScene) {
+		activeScene.dispose();
+		activeScene = null;
+	}
+	
+	// Detruire le moteur pour un nettoyage complet
+	if (engine) {
+		engine.dispose();
+		engine = null;
+	}
+
+	// Reinitialiser les parties importantes du gameState
+	gameState.isGameStarted = false;
+	gameState.activePlayers = [];
+	gameState.ball = null;
+	// ... (reinitialiser d'autres etats si besoin)
+	
+	// Reafficher le lobby HTML
+	const lobby = document.getElementById('lobby');
+	const canvas = document.getElementById('renderCanvas');
+	if (lobby)
+		lobby.style.display = 'block';
+	if (canvas)
+		canvas.style.display = 'none';
+}
+
+/**
  * Affiche une scene d'attente simple pendant la recherche de partie.
  */
 function showWaitingScreen() {
@@ -306,3 +349,5 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
     });
 });
+
+export { returnToLobby };

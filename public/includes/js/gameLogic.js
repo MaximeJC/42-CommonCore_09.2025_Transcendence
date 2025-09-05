@@ -61,6 +61,11 @@ export function endGame(gameState, message) {
 	gameState.ui.winnerText.textBlock.text = message;
 	gameState.ui.winnerText.textBlock.fontSize = '35%';
 	gameState.ui.winnerText.mesh.isVisible = true;
+
+	// On verifie que le bouton a bien ete cree avant d'essayer de l'afficher.
+	if (gameState.ui.returnButton) {
+		gameState.ui.returnButton.mesh.isVisible = true;
+	}
 }
 
 //endregion---------------------------------fin-fonctions-pong----------------------------------
