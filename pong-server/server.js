@@ -22,6 +22,8 @@ app.register(websocket);
 
 let matchmaking_1v1 = [];
 let matchmaking_4p = [];
+// structure pour partie privee
+const privateWaitingRooms = new Map();
 const games = new Map();
 const clients = new Map();
 
@@ -41,6 +43,10 @@ app.register(async function (fastify) {
 					case 'find_match':
 						// On passe le socket et le pseudo a la fonction de matchmaking
 						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo);
+						break;
+					// Pour partie privee
+					case 'create_private_match':
+						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode);
 						break;
 					case 'player_input':
 						if (clientInfo?.gameId) {
@@ -133,6 +139,54 @@ function handleMatchmaking(socket, gameMode, pseudo) {
 				client.gameId = game.gameId;
 			}
 		});
+	}
+}
+
+/**
+ * Pour gerer le matchmaking prive.
+ */
+function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode) {
+	const playerInfo = { socket, pseudo: myPseudo };
+
+	// La cle de la salle est basee sur les pseudos tries, pour que "A vs B" et "B vs A" soient identiques.
+	const roomKey = [myPseudo, opponentPseudo].sort().join('_vs_');
+
+	if (privateWaitingRooms.has(roomKey)) {
+		const room = privateWaitingRooms.get(roomKey);
+		
+		// Verifier que le joueur qui rejoint est bien celui qui etait attendu.
+		if (myPseudo === room.opponent_pseudo) {
+			console.log(`[Partie Privee] ${myPseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.`);
+			const player1 = room.player1;
+			const player2 = playerInfo;
+			
+			// Determiner le mode de jeu (par exemple, 1v1 par defaut pour les matchs prives)
+			const finalGameMode = gameMode || '1V1_ONLINE';
+
+			const game = new GameInstance([player1, player2], finalGameMode);
+			if (game) {
+				games.set(game.gameId, game);
+				[player1.socket, player2.socket].forEach(sock => {
+					const client = clients.get(sock.id);
+					if (client) client.gameId = game.gameId;
+				});
+			}
+			privateWaitingRooms.delete(roomKey);
+		} else {
+			// Un intrus essaie de rejoindre la partie.
+			console.warn(`[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${myPseudo}`);
+		}
+	} else {
+		// La salle n'existe pas, on la cree.
+		console.log(`[Partie Privee] ${myPseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
+		privateWaitingRooms.set(roomKey, {
+			player1: playerInfo,
+			opponent_pseudo: opponentPseudo,
+			gameMode: gameMode
+		});
+		// On pourrait envoyer un message au joueur 1 pour lui dire "En attente de votre adversaire..."
+		const waitingMessage = { type: 'waiting_for_opponent', data: { opponent: opponentPseudo } };
+		socket.send(JSON.stringify(waitingMessage));
 	}
 }
 

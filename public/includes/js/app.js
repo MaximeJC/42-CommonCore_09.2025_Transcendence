@@ -252,6 +252,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', async () => {
         const pseudo = pseudoInput.value.trim();
+		// On recupere le pseudo de l'adversaire
+        const opponentPseudo = document.getElementById('opponent-pseudo-input').value.trim();
         if (!pseudo) {
             alert("Please enter a pseudo.");
             return;
@@ -279,10 +281,23 @@ window.addEventListener('DOMContentLoaded', () => {
 		// On contacte le serveur.
 		try {
 			await networkManager.connect(JwtToken);
-			networkManager.sendMessage('find_match', {
-				mode: gameState.gameMode,
-				pseudo: gameState.pseudo
-			});
+			if (opponentPseudo) {
+				// Si un adversaire est specifie, on cree une partie privee
+				console.log(`Demande de partie privee contre ${opponentPseudo}`);
+				networkManager.sendMessage('create_private_match', {
+					my_pseudo: gameState.pseudo,
+					opponent_pseudo: opponentPseudo,
+					mode: gameState.gameMode // On envoie aussi le mode de jeu
+				});
+			} else {
+				// Sinon, on rejoint le matchmaking public
+				console.log("Demande de partie publique.");
+				networkManager.sendMessage('find_match', {
+					mode: gameState.gameMode,
+					pseudo: gameState.pseudo
+				});
+			}
+
 		} catch (error) {
 			console.error("Echec de la connexion:", error);
 			lobby.style.display = 'block';
