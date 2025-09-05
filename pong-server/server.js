@@ -1,11 +1,23 @@
 // pong-server/server.js
 import fastify from 'fastify';
 import websocket from '@fastify/websocket';
+import fastifyStatic from '@fastify/static'
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { GameInstance } from './GameInstance.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = fastify({ logger: true });
 const PORT = 3000;
+
+app.register(fastifyStatic, {
+	root: path.join(__dirname, '..', 'public'),
+	prefix: '/', // Servir depuis la racine (ex: /index.html)
+});
+
 app.register(websocket);
 
 let matchmaking_1v1 = [];
@@ -65,7 +77,7 @@ app.register(async function (fastify) {
 					let endMessage;
 					// Construire le message.
 					if (remainingPlayer && remainingPlayer.pseudo) {
-						endMessage = `Opponent has left. ${remainingPlayer.pseudo} wins!`;
+						endMessage = `Opponent has left.\n${remainingPlayer.pseudo} wins!`;
 					} else {
 						endMessage = "Opponent has left the game.";
 					}

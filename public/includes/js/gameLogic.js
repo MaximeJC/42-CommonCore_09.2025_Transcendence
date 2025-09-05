@@ -59,6 +59,7 @@ export function endGame(gameState, message) {
 	gameState.ball.isVisible = false;
 	gameState.ui.countdownText.mesh.isVisible = false;
 	gameState.ui.winnerText.textBlock.text = message;
+	gameState.ui.winnerText.textBlock.fontSize = '35%';
 	gameState.ui.winnerText.mesh.isVisible = true;
 }
 

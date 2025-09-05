@@ -3,7 +3,17 @@
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
 
-const WS_URL = "ws://127.0.0.1:3000";
+// On determine le protocole WebSocket. Si la page est en HTTPS, on utilise 'wss:', sinon 'ws:'.
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+
+// On recupere l'hote (domaine + port) de la page actuelle.
+// 
+const host = window.location.host;
+
+// On assemble l'URL complete du WebSocket.
+const WS_URL = `${protocol}//${host}`;
+
+console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
 // On cree une variable "boite" pour stocker la fonction initializeApp.
 let mainAppInitializer = null;
