@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
-	import LangMenu from './disconnected_home_view/LanguageMenu.vue';
+	import LangMenu from './LanguageMenu.vue';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
