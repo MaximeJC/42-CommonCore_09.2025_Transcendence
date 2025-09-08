@@ -60,14 +60,9 @@
 
 <style scoped>
 	.home-container{
-		background-image: url(../../images/fond.png);
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
 		display: flex;
 		height: 100vh;
 		flex-direction: column;
-		/*justify-content: space-between;*/
 		position: relative;
 	}
 </style>
