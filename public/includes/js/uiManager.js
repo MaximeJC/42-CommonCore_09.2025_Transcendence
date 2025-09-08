@@ -7,6 +7,94 @@ import { returnToLobby } from './app.js';
 
 // import { networkManager } from './networkManager.js';
 
+/* Cree la modale "VS" mais la laisse cachee.
+ * @param {BABYLON.GUI.AdvancedDynamicTexture} guiTexture - La texture sur laquelle dessiner.
+ * @param {object} gameState - L'etat du jeu.
+ */
+function createVSModal(guiTexture, gameState) {
+
+	// Conteneur principal (le fond)
+	const vsContainer = new BABYLON.GUI.Rectangle("vsContainer");
+	vsContainer.width = "80%";
+	vsContainer.height = "300px"; // On definit une hauteur fixe en pixels
+	vsContainer.cornerRadius = 20;
+	vsContainer.color = "#e251ca";
+	vsContainer.thickness = 4;
+	vsContainer.background = "rgba(10, 10, 20, 0.85)";
+	
+	vsContainer.alpha = 0;
+	vsContainer.isVisible = false;
+	guiTexture.addControl(vsContainer);
+
+	// Grille de positionnement
+	const grid = new BABYLON.GUI.Grid("vsGrid");
+	// Par defaut, on configure la grille pour 4 joueurs
+	grid.addRowDefinition(0.33); // Ligne du haut
+	grid.addRowDefinition(0.34); // Ligne du milieu
+	grid.addRowDefinition(0.33); // Ligne du bas
+	grid.addColumnDefinition(0.40);
+	grid.addColumnDefinition(0.20);
+	grid.addColumnDefinition(0.40);
+	vsContainer.addControl(grid);
+
+	// Creation des 4 emplacements de pseudos + le "VS"
+	const playerLeftTopText = new BABYLON.GUI.TextBlock("vsP_LT", "");
+	playerLeftTopText.color = "white";
+	playerLeftTopText.fontSize = 40;
+	playerLeftTopText.fontWeight = "bold";
+	playerLeftTopText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+	playerLeftTopText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT; // Aligner a droite dans sa cellule
+	playerLeftTopText.paddingRight = "20px";
+
+	const playerLeftBottomText = new BABYLON.GUI.TextBlock("vsP_LB", "");
+	playerLeftBottomText.color = "white";
+	playerLeftBottomText.fontSize = 40;
+	playerLeftBottomText.fontWeight = "bold";
+	playerLeftBottomText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+	playerLeftBottomText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+	playerLeftBottomText.paddingRight = "20px";
+
+	const vsText = new BABYLON.GUI.TextBlock("vsText", "VS");
+	vsText.color = "#e251ca";
+	vsText.fontSize = 60;
+	vsText.fontWeight = "bold";
+
+	const playerRightTopText = new BABYLON.GUI.TextBlock("vsP_RT", "");
+	playerRightTopText.color = "white";
+	playerRightTopText.fontSize = 40;
+	playerRightTopText.fontWeight = "bold";
+	playerRightTopText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+	playerRightTopText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT; // Aligner a gauche dans sa cellule
+	playerRightTopText.paddingLeft = "20px";
+
+	const playerRightBottomText = new BABYLON.GUI.TextBlock("vsP_RB", "");
+	playerRightBottomText.color = "white";
+	playerRightBottomText.fontSize = 40;
+	playerRightBottomText.fontWeight = "bold";
+	playerRightBottomText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+	playerRightBottomText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+	playerRightBottomText.paddingLeft = "20px";
+
+	// Positionnement initial sur la grille (pour 4 joueurs)
+	grid.addControl(playerLeftTopText, 0, 0);
+	grid.addControl(playerLeftBottomText, 2, 0);
+	grid.addControl(vsText, 1, 1);
+	grid.addControl(playerRightTopText, 0, 2);
+	grid.addControl(playerRightBottomText, 2, 2);
+
+	// On stocke les references dans le gameState
+	gameState.ui.vsModal = {
+		container: vsContainer,
+		grid: grid, // On a besoin de la reference a la grille
+		playerSlots: {
+			player_left_top: playerLeftTopText,
+			player_left_bottom: playerLeftBottomText,
+			player_right_top: playerRightTopText,
+			player_right_bottom: playerRightBottomText,
+		}
+	};
+}
+
 /**
  * Cree toute l'interface utilisateur (GUI) du jeu de maniere responsive.
  * @param {object} gameState - L'etat central du jeu.
@@ -182,6 +270,9 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 		console.log("Le bouton 'Quitter' a ete clique.");
 		returnToLobby();
 	});
+
+	// On appelle notre nouvelle fonction pour creer la modale VS cachee
+	createVSModal(guiTexture, gameState);
 
 	// On l'ajoute a l'interface
 	guiTexture.addControl(exitButton);

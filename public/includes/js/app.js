@@ -95,12 +95,59 @@ function showWaitingScreen() {
  */
 async function playCinematic(scene, camera) {
 	console.log("La cinematique demarre...");
-	
+
 	const frameRate = 60;
 	const durationInSeconds = 6; // Duree de la cinematique
 	const totalFrames = frameRate * durationInSeconds;
 	// On definit le moment ou la camera doit passer par le point intermediaire
 	const middleFrame = totalFrames / 2;
+
+	// LOGIQUE DE LA MODALE "VS" 
+	const vsModal = gameState.ui.vsModal;
+	if (vsModal && gameState.allPlayersInfo) {
+		const playerCount = gameState.allPlayersInfo.length;
+		const isTwoPlayerGame = playerCount <= 2;
+
+		// On reinitialise tous les textes des emplacements
+		Object.values(vsModal.playerSlots).forEach(textBlock => {
+			textBlock.text = "";
+			textBlock.isVisible = true; // On s'assure que tout est visible au depart
+		});
+		// On s'assure que le "VS" est aussi visible
+		if (vsModal.vsText) {
+			vsModal.vsText.isVisible = true;
+		}
+
+
+		if (isTwoPlayerGame) {
+			// Si c'est un jeu a 2 joueurs, on cache les emplacements du bas qui ne seront pas utilises.
+			vsModal.playerSlots.player_left_bottom.isVisible = false;
+			vsModal.playerSlots.player_right_bottom.isVisible = false;
+			vsModal.vsText = "VS";
+			
+			// Et on deplace les pseudos du haut vers la ligne du milieu (ligne 1).
+			vsModal.grid.removeControl(vsModal.playerSlots.player_left_top);
+			vsModal.grid.addControl(vsModal.playerSlots.player_left_top, 1, 0);
+			vsModal.grid.removeControl(vsModal.playerSlots.player_right_top);
+			vsModal.grid.addControl(vsModal.playerSlots.player_right_top, 1, 2);
+		}
+		
+		// On parcourt les informations des joueurs recues du serveur
+		gameState.allPlayersInfo.forEach(playerInfo => {
+			// On cherche le TextBlock correspondant au nom du joueur (ex: "player_left_top")
+			const textBlock = vsModal.playerSlots[playerInfo.name];
+			if (textBlock) {
+				// On lui assigne le bon pseudo
+				textBlock.text = playerInfo.pseudo;
+			}
+		});
+
+		// On rend le conteneur visible et on lance l'animation de fondu
+		vsModal.container.isVisible = true;
+		const fadeIn = new BABYLON.Animation("fadeIn", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		fadeIn.setKeys([{ frame: 0, value: 0 }, { frame: 60, value: 1 }]);
+		scene.beginDirectAnimation(vsModal.container, [fadeIn], 0, 60, false);
+	}
 
 	// Position de depart de la camera
 	const startPosition = new BABYLON.Vector3(1530, 25, 250);
@@ -156,6 +203,16 @@ async function playCinematic(scene, camera) {
 
 	await scene.beginAnimation(camera, 0, totalFrames, false).waitAsync();
 	
+	//  DISPARITION EN FONDU DE LA MODALE 
+	if (vsModal) {
+		const fadeOut = new BABYLON.Animation("fadeOut", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		fadeOut.setKeys([
+			{ frame: 0, value: 1 },
+			{ frame: 60, value: 0 }]);
+		await scene.beginDirectAnimation(vsModal.container, [fadeOut], 0, 60, false).waitAsync();
+		vsModal.container.isVisible = false;
+	}
+
 	// Pour garantir la position finale exacte, on la reaffecte.
 	camera.position = endPosition;
 	camera.setTarget(endTarget);

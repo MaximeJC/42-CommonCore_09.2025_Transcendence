@@ -37,6 +37,7 @@ class NetworkManager {
 		return new Promise((resolve, reject) => {
 			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
 				console.log("Deja connecte.");
+				gameState.isConnected = true;
 				resolve();
 				return;
 			}
@@ -46,16 +47,19 @@ class NetworkManager {
 
 			this.socket.onopen = () => {
 				console.log("Connecte au serveur de jeu !");
+				gameState.isConnected = true;
 				resolve();
 			};
 
 			this.socket.onclose = (event) => {
 				console.log("Deconnecte du serveur de jeu.", event.reason);
+				gameState.isConnected = false;
 				// Gerer la reconnexion ou afficher un message a l'utilisateur
 			};
 
 			this.socket.onerror = (error) => {
 				console.error("Erreur WebSocket:", error);
+				gameState.isConnected = false;
 				reject(error);
 			};
 

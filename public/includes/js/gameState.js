@@ -24,4 +24,6 @@ export const gameState = {
 
 	language: 'en',
 	myClientId: '',
+
+	isConnected: false,
 };
