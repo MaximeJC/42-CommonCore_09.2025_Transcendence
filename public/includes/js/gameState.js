@@ -21,4 +21,7 @@ export const gameState = {
 	
 	debugTrail: null,	   // Le mesh de la ligne jaune
 	debugTrailPoints: [],	// Le tableau des points de la trajectoire
+
+	language: 'en',
+	myClientId: '',
 };

@@ -123,7 +123,12 @@ class NetworkManager {
 
 			// Pour les messages moins frequents qui gerent les evenements du jeu.
 			switch (message.type) {
-				
+				case 'connection_established':
+					console.log("Connexion etablie avec le serveur. Ma langue est:", message.data.server_language);
+					// On stocke la langue dans notre etat de jeu global.
+					gameState.language = message.data.server_language;
+					gameState.myClientId = message.data.clientId;
+					break;
 				case 'start_countdown':
 					console.log("Ordre du serveur: demarrer le decompte !");
 					startCountdown(gameState);

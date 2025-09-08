@@ -13,6 +13,8 @@ const __dirname = path.dirname(__filename);
 const app = fastify({ logger: true });
 const PORT = 3000;
 
+export const serverLanguage = 'es'; // 'en', 'fr', 'es'
+
 app.register(fastifyStatic, {
 	root: path.join(__dirname, '..', 'public'),
 	prefix: '/', // Servir depuis la racine (ex: /index.html)
@@ -32,7 +34,16 @@ app.register(async function (fastify) {
 		const socket = connection;
 		socket.id = uuidv4();
 		clients.set(socket.id, { socket, gameId: null });
-		console.log(`[Serveur] Client connecte: ${socket.id}`);
+		console.log("[Serveur] Client connecte: ${socket.id}");
+
+		const welcomeMessage = {
+			type: 'connection_established',
+			data: {
+				clientId: socket.id,
+				server_language: serverLanguage
+			}
+		};
+		socket.send(JSON.stringify(welcomeMessage));
 
 		socket.on('message', (message) => {
 			try {
@@ -42,11 +53,11 @@ app.register(async function (fastify) {
 				switch(parsed.type) {
 					case 'find_match':
 						// On passe le socket et le pseudo a la fonction de matchmaking
-						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo);
+						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo, parsed.data.language);
 						break;
 					// Pour partie privee
 					case 'create_private_match':
-						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode);
+						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode, parsed.data.language);
 						break;
 					case 'player_input':
 						if (clientInfo?.gameId) {
@@ -69,7 +80,7 @@ app.register(async function (fastify) {
 		});
 
 		socket.on('close', () => {
-			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
+			console.log("[Serveur] Client deconnecte: ${socket.id}");
 			const clientInfo = clients.get(socket.id);
 
 			if (clientInfo && clientInfo.gameId) {
@@ -83,14 +94,32 @@ app.register(async function (fastify) {
 					let endMessage;
 					// Construire le message.
 					if (remainingPlayer && remainingPlayer.pseudo) {
-						endMessage = `Opponent has left.\n${remainingPlayer.pseudo} wins!`;
+						const lang = remainingPlayer.language || 'en';
+						const winnerPseudo = remainingPlayer.pseudo;
+						let opponentLeftText;
+						let winText;
+						if (lang === 'fr') {
+							winText = `${winnerPseudo} gagne !`;
+						} else if (lang === 'es') {
+							winText = `¡${winnerPseudo} gana!`;
+						} else {
+							winText = `${winnerPseudo} Wins!`;
+						}
+						if (lang === 'fr') {
+							opponentLeftText = "L'adversaire a quitte.\n";
+						} else if (lang === 'es') {
+							opponentLeftText = "El oponente se ha ido.\n";
+						} else {
+							opponentLeftText = "Opponent has left.\n";
+						}
+						endMessage = opponentLeftText + winText;
 					} else {
 						endMessage = "Opponent has left the game.";
 					}
 
 					game.broadcast('game_over', { end_message: endMessage });
 					
-					console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
+					console.log("[Jeu ${game.gameId}] Partie terminee. ${endMessage}");
 					games.delete(clientInfo.gameId);
 				}
 			}
@@ -102,12 +131,12 @@ app.register(async function (fastify) {
 	});
 });
 
-function handleMatchmaking(socket, gameMode, pseudo) {
-	const playerInfo = { socket, pseudo }; // On cree l'objet info
+function handleMatchmaking(socket, gameMode, pseudo, language) {
+	const playerInfo = { socket, pseudo, language: language || 'en'}; // On cree l'objet info
 
 	const isInQueue = matchmaking_1v1.some(p => p.socket.id === socket.id) || matchmaking_4p.some(p => p.socket.id === socket.id);
 	if (isInQueue) {
-		console.log(`[Matchmaking] Le joueur ${socket.id} est deja en file d'attente.`);
+		console.log("[Matchmaking] Le joueur ${socket.id} est deja en file d'attente.");
 		return;
 	}
 
@@ -126,7 +155,7 @@ function handleMatchmaking(socket, gameMode, pseudo) {
 			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
 		}
 	} else {
-		console.error(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
+		console.error("[Matchmaking] Mode de jeu '${gameMode}' non reconnu.");
 		return;
 	}
 
@@ -145,8 +174,8 @@ function handleMatchmaking(socket, gameMode, pseudo) {
 /**
  * Pour gerer le matchmaking prive.
  */
-function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode) {
-	const playerInfo = { socket, pseudo: myPseudo };
+function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode, language) {
+	const playerInfo = { socket, pseudo: myPseudo, language: language || 'en' };
 
 	// La cle de la salle est basee sur les pseudos tries, pour que "A vs B" et "B vs A" soient identiques.
 	const roomKey = [myPseudo, opponentPseudo].sort().join('_vs_');
@@ -156,7 +185,7 @@ function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode) {
 		
 		// Verifier que le joueur qui rejoint est bien celui qui etait attendu.
 		if (myPseudo === room.opponent_pseudo) {
-			console.log(`[Partie Privee] ${myPseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.`);
+			console.log("[Partie Privee] ${myPseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.");
 			const player1 = room.player1;
 			const player2 = playerInfo;
 			
@@ -174,11 +203,11 @@ function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode) {
 			privateWaitingRooms.delete(roomKey);
 		} else {
 			// Un intrus essaie de rejoindre la partie.
-			console.warn(`[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${myPseudo}`);
+			console.warn("[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${myPseudo}");
 		}
 	} else {
 		// La salle n'existe pas, on la cree.
-		console.log(`[Partie Privee] ${myPseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
+		console.log("[Partie Privee] ${myPseudo} a cree une salle pour jouer contre ${opponentPseudo}.");
 		privateWaitingRooms.set(roomKey, {
 			player1: playerInfo,
 			opponent_pseudo: opponentPseudo,

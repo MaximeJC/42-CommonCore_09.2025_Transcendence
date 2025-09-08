@@ -76,7 +76,12 @@ function showWaitingScreen() {
 
 	const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, waitingScene);
 	const text = new BABYLON.GUI.TextBlock();
-	text.text = "Searching for game...";
+	if (gameState.language == 'fr')
+		text.text = "Recherche d'une partie...";
+	else if (gameState.language == 'es')
+		text.text = "Buscando partida...";
+	else
+		text.text = "Searching for game...";
 	text.color = "white";
 	// text.fontFamily = "Courier New, monospace";
 	text.fontSize = 24;
@@ -292,6 +297,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const pseudoInput = document.getElementById('pseudo-input');
     const gamemodeSelect = document.getElementById('gamemode-select');
     const canvas = document.getElementById('renderCanvas');
+	const languageSelect = document.getElementById('language-select');
 
     startButton.addEventListener('click', async () => {
         const pseudo = pseudoInput.value.trim();
@@ -304,6 +310,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         gameState.pseudo = pseudo;
         gameState.gameMode = gamemodeSelect.value;
+		gameState.language = languageSelect.value;
 		
         lobby.style.display = 'none';
 		canvas.style.display = 'block';
@@ -326,7 +333,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			await networkManager.connect(JwtToken);
 			if (opponentPseudo) {
 				// Si un adversaire est specifie, on cree une partie privee
-				console.log(`Demande de partie privee contre ${opponentPseudo}`);
+				console.log("Demande de partie privee contre ${opponentPseudo}");
 				networkManager.sendMessage('create_private_match', {
 					my_pseudo: gameState.pseudo,
 					opponent_pseudo: opponentPseudo,
@@ -337,7 +344,8 @@ window.addEventListener('DOMContentLoaded', () => {
 				console.log("Demande de partie publique.");
 				networkManager.sendMessage('find_match', {
 					mode: gameState.gameMode,
-					pseudo: gameState.pseudo
+					pseudo: gameState.pseudo,
+					language: gameState.language	
 				});
 			}
 

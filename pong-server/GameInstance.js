@@ -27,7 +27,7 @@ export class GameInstance {
 		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
 		this.readyPlayers = new Set();
 		
-		console.log(`[Jeu ${this.gameId}] Creation d'une partie en mode ${gameMode}.`);
+		console.log("[Jeu ${this.gameId}] Creation d'une partie en mode ${gameMode}.");
 		this.setupPlayers(clientInfos, gameMode);
 
 		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
@@ -41,6 +41,7 @@ export class GameInstance {
 		const createPlayer = (defaultPseudo, name, controlType) => {
 			let id;
 			let pseudo = defaultPseudo; // On garde un pseudo par defaut pour les IA
+			let language = 'en'
 
 			// Logique d'assignation d'ID adaptee a tous les cas
 			if (controlType.includes('HUMAN')) {
@@ -49,15 +50,16 @@ export class GameInstance {
 					id = info.socket.id;
 					pseudo = info.pseudo; // On utilise le pseudo fourni par le client
 					// On stocke le socket pour pouvoir communiquer avec ce joueur
+					language = info.language;
 					this.sockets[id] = info.socket;
 				} else {
-					id = `human_${humanPlayerIndex}`;
+					id = "human_${humanPlayerIndex}";
 				}
 				humanPlayerIndex++;
 			} else {
-				id = `AI_${uuidv4()}`;
+				id = "AI_${uuidv4()}";
 			}
-			return { id, pseudo, name, y: 0, movement: 0, controlType };
+			return { id, pseudo, name, y: 0, movement: 0, controlType, language };
 		};
 
 		switch (gameMode) {
@@ -100,7 +102,7 @@ export class GameInstance {
 				break;
 
 			default:
-				console.error(`[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.`);
+				console.error("[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.");
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
 				break;
@@ -148,14 +150,14 @@ export class GameInstance {
 	 * appelee par le serveur quand un client envoie 'client_ready'.
 	 */
 	handlePlayerReady(playerId) {
-		console.log(`[Jeu ${this.gameId}] Le joueur ${playerId} est pret.`);
+		console.log("[Jeu ${this.gameId}] Le joueur ${playerId} est pret.");
 		this.readyPlayers.add(playerId);
 
 		const humanPlayerCount = Object.keys(this.sockets).length;
 
 		// On verifie si TOUS les joueurs humains sont prets.
 		if (this.readyPlayers.size === humanPlayerCount) {
-			console.log(`[Jeu ${this.gameId}] Tous les joueurs sont prets. Lancement du jeu !`);
+			console.log("[Jeu ${this.gameId}] Tous les joueurs sont prets. Lancement du jeu !");
 			this.beginGame();
 		}
 	}
@@ -255,8 +257,29 @@ export class GameInstance {
 			return;
 		clearInterval(this.gameLoop);
 		this.gameState.isGameStarted = false;
-		const endMessage = winnerPseudo + " Wins!";
-		this.broadcast('game_over', { end_message: endMessage });
+		this.gameState.activePlayers.forEach(player => {
+			if (player.controlType.includes('HUMAN')) {
+				const socket = this.sockets[player.id.split('_')[0]];
+				if (socket) {
+					let winMessage;
+					const lang = player.language;
+					
+					if (lang === 'fr') {
+						winMessage = `${winnerPseudo} a gagne !`;
+					} else if (lang === 'es') {
+						winMessage = `¡${winnerPseudo} ha ganado!`;
+					} else { // 'en' par defaut
+						winMessage = `${winnerPseudo} Wins!`;
+					}
+					
+					socket.send(JSON.stringify({
+						type: 'game_over',
+						data: { end_message: winMessage }
+					}));
+				}
+			}
+		});
+
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
 	}
 

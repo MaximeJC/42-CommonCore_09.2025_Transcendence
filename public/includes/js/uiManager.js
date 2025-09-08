@@ -97,18 +97,23 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	countdownText.mesh.isVisible = false;
 	gameState.ui.countdownText = countdownText;
 
-	const pauseText = createTextBox("pauseText", "", scene);
-	pauseText.textBlock.background = "transparent";
-	pauseText.textBlock.color = "yellow";
-	pauseText.textBlock.thickness = 0;
-	pauseText.textBlock.isReadOnly = true;
-	pauseText.textBlock.isHitTestVisible = false;
-	pauseText.textBlock.fontSize = '100%';
-	pauseText.textBlock.text = "PAUSE";
-	pauseText.mesh.position.set(0, 0, 0);
-	pauseText.mesh.rotation.y = -Math.PI / 2;
-	pauseText.mesh.isVisible = false;
-	gameState.ui.pauseText = pauseText;
+	// const pauseText = createTextBox("pauseText", "", scene);
+	// pauseText.textBlock.background = "transparent";
+	// pauseText.textBlock.color = "yellow";
+	// pauseText.textBlock.thickness = 0;
+	// pauseText.textBlock.isReadOnly = true;
+	// pauseText.textBlock.isHitTestVisible = false;
+	// pauseText.textBlock.fontSize = '100%';
+	// if (gameState.language === 'fr')
+	// 	pauseText.textBlock.text = "PAUSE";
+	// else if (gameState.language === 'es')
+	// 	pauseText.textBlock.text = "PAUSA";
+	// else
+	// 	pauseText.textBlock.text = "PAUSE";
+	// pauseText.mesh.position.set(0, 0, 0);
+	// pauseText.mesh.rotation.y = -Math.PI / 2;
+	// pauseText.mesh.isVisible = false;
+	// gameState.ui.pauseText = pauseText;
 
 	// /**
 	//  * Encapsule la logique de connexion et de recherche de partie.
@@ -129,7 +134,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 			
 	// 		// Afficher le statut de recherche
 	// 		statusText.textBlock.text = "SEARCHING...";
-	// 		console.log(`Envoi de la demande de match pour le mode: ${gameState.gameMode}`);
+	// 		console.log("Envoi de la demande de match pour le mode: ${gameState.gameMode}");
 
 	// 		// Envoyer la demande de match au serveur
 	// 		networkManager.sendMessage('find_match', { mode: gameState.gameMode });
@@ -164,7 +169,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	exitButton.background = "rgba(200, 50, 50, 0.8)"; // Un fond rouge semi-transparent
 	exitButton.cornerRadius = 5;
 	exitButton.thickness = 1; // Bordure
-	exitButton.fontFamily = "Courier New, monospace";
+	// exitButton.fontFamily = "Courier New, monospace";
 	
 	// Positionnement en haut a droite de l'ecran
 	exitButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
