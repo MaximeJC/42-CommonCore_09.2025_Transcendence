@@ -1,9 +1,9 @@
 <script setup lang="ts">
 	import con_home_view from './connected_home_view.vue'
 	import Head from '../components/Header.vue';
-	import Connexion from '../components/ConnexionButton.vue';
-	import connection_form from '../components/connection_form.vue';
-	import Signup from '@/components/Signup.vue';
+	import Connexion from '../components/disconnected_home_view/ConnexionButton.vue';
+	import connection_form from '../components/disconnected_home_view/connection_form.vue';
+	import Signup from '@/components/disconnected_home_view/Signup.vue';
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
 
 	const props = defineProps<{

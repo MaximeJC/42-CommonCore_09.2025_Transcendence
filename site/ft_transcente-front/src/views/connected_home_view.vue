@@ -1,8 +1,8 @@
 <script setup lang="ts">
 	import { ref, onMounted, nextTick, watch } from 'vue';
-	import player_frame from '../components/connected_player_frame.vue'
-	import leaderbord from '../components/leaderbord.vue';
-	import friendlist from '../components/friendlist.vue';
+	import player_frame from '../components/connected_home_view/connected_player_frame.vue'
+	import leaderbord from '../components/connected_home_view/leaderbord.vue';
+	import friendlist from '../components/connected_home_view/friendlist.vue';
 
 
 	

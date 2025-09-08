@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
-	import LangMenu from './LanguageMenu.vue';
+	import LangMenu from './disconnected_home_view/LanguageMenu.vue';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
@@ -42,7 +42,7 @@
 	.end-button{
 		display: flex;
 		justify-content: end;
-		margin-top: 2.5rem;
+		margin-top: 2rem;
 		margin-right: 3rem;
 		gap: 2rem;
 	}
