@@ -28,11 +28,15 @@
 		"Leaderbord": "Classement",
 		"historic": "Historique",
 		"social": "Social",
+		"return": "Retour",
 		"account": "Mon Compte"
 	},
 	"friendlist":{
 		"friendlist": "Liste d'Amis",
 		"addfriends": "Ajouter un ami"
-	}
+	},
 
+	"historic":{
+		"historic": "Historique"
+	}
 }
