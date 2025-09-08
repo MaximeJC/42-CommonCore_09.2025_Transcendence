@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, defineProps } from 'vue';
 import play_historic from "./play&historic_button.vue" 
+import play_return from "./play&return_button.vue" 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
+			historic: boolean;
 	}>();
 
-	
+	const emit = defineEmits(['show-historic']);
 
 </script>
 
@@ -29,7 +31,8 @@ import play_historic from "./play&historic_button.vue"
 			<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div tittle="rank_stat" class="stat">1</div>
 		</div>
-		<play_historic></play_historic>
+		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic"></play_historic>
+		<play_return @show-historic="emit('show-historic')" v-show="historic"></play_return>
 	</div>
 </template>
 

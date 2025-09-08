@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { EmitFlags } from 'typescript';
 
-
-const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
-	const emit = defineEmits(['show-historic']);
+const emit = defineEmits(['show-historic']);
 
 
 </script>
@@ -15,8 +10,8 @@ const props = defineProps<{
 		<button tittle="play-button" class="play-button">
 			<div data-i18n="home_player_button.play"></div>
 		</button>
-		<button @click="emit('show-historic')" tittle="historic-button" class="historic-button">
-			<div data-i18n="home_player_button.historic"></div>
+		<button @click="emit('show-historic')" tittle="return-button" class="return-button">
+			<div data-i18n="home_player_button.return"></div>
 		</button>
 	</div>
 </template>
@@ -54,7 +49,7 @@ const props = defineProps<{
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
-	.historic-button{
+	.return-button{
 		width: fit-content;
 		height: auto;
 		justify-self: center;
@@ -96,7 +91,7 @@ const props = defineProps<{
 		0 0 20px #dd0aba;
 	}
 
-	.historic-button:hover{
+	.return-button:hover{
 		background-color: rgba(251, 255, 34, 0.5);
 		border: 2px solid #fbff22;
 		box-shadow:
