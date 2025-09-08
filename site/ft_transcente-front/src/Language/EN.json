@@ -1,6 +1,7 @@
 {
 	"header": {
 	  "signUp": "Sign up",
+	  "signOut": "SIGN OUT",
 	  "language": "EN",
 	  "icon_lang": "../images/flag/united-kingdom.png"
 	},
@@ -18,8 +19,19 @@
 		"submit": "SUBMIT"
 	},
 	"player_stat": {
-		"nbr_games": "Games played",
+		"nbr_games": "Games",
 		"nbr_victory": "Victories",
 		"rank": "Rank"
+	},
+	"home_player_button": {
+		"play": "PLAY",
+		"leaderboard": "Leaderboard",
+		"historic": "History",
+		"social": "Social",
+		"account": "My Account"
+	},
+	"friendlist":{
+		"friendlist": "Friend list",
+		"addfriends": "Add friends"
 	}
 }

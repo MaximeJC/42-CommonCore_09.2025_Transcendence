@@ -42,7 +42,6 @@ import { ref } from 'vue';
 		</form>
 		<div tittle="line_button" class="line-button">
 			<div class="icon-button">
-				<button tittle="google-signup" class="google-button"></button>
 				<button tittle="ft-signup" class="ft-button"></button>
 			</div>
 			<button tittle="Submit-button" class="Submit-button">
@@ -94,7 +93,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 4rem;
+		font-size: 3rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -162,95 +161,60 @@ import { ref } from 'vue';
 		justify-content: end;
 	}
 
-	.google-button{
-		display:block;
-		background: url("../../images/google.png");
-		background-size: contain;
-		background-color: rgba(116, 240, 157, 0.8) ;
-
-		height: 7rem;
-		width: 7rem;
-		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
-		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d,
-			0 0 120px #74f09d;
-		cursor: pointer;
-		margin-top: 0.5rem;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-
-	}
-
-	.google-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
-
-		border: 1px solid #fafd4e;
-		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
-	}
-
 	.ft-button{
 		display:block;
 		background: url("../../images/42logo.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
-		background-color: rgba(116, 240, 157, 0.8) ;
+		background-color: #fbff22cc ;
 		height: 7rem;
 		width: 7rem;
 		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
+		border: 1px solid rgb(255, 255, 255);
 		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d;
+			0 0 10px #fbff22,
+			0 0 10px #fbff22,
+			0 0 20px #fbff22,
+			0 0 40px #fbff22;
 		cursor: pointer;
-		margin-left: 3rem;
 		margin-top: 0.5rem;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 
 	}
 
 	.ft-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
+		background-color: #dd0abacc ;
 
-		border: 1px solid #fafd4e;
+		border: 1px solid #ffffff;
 		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 120px #dd0aba;
 	}
 
 
 	.Submit-button{
 		margin-top: 1rem;
 		font-family: netron;
-		background-color: rgba(156, 50, 133, 0.5);
+		background-color: rgba(251, 255, 34, 0.502);
 		font-size: 4rem;
 		color: white;
 		border: 2px solid #caece8;
 		text-shadow: 
-		0 0 10px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d,
-		0 0 80px #74f09d,
-		0 0 120px #74f09d;
+		0 0 10px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22,
+		0 0 40px #fbff22,
+		0 0 80px #fbff22,
+		0 0 120px #fbff22;
 		box-shadow: 
-		0 0 5px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d;
+		0 0 5px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22,
+		0 0 40px #fbff22;
 		padding: 0.5rem 2rem;
 		border-radius: 20px;
 		cursor: pointer;
@@ -262,19 +226,63 @@ import { ref } from 'vue';
 	}
 
 	.Submit-button:hover{
-		background-color: rgba(251, 255, 34, 0.5);
-		border: 2px solid #fbff22;
+		background-color: #dd0abacc ;
+
+		border: 2px solid #dd0aba;
 		box-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
 		text-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
+	}
+	@media (max-width: 1600px) {
+		.frame-signup{
+			width: 40rem;
+			padding: 2rem 3rem;
+			margin-top: 3rem
+		}
+		.signUpTitle{
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+		}
+		.input{
+		width: 40rem;
+		font-size: 1.2em;
+		}
+		.error{
+			font-size: 0.8rem;
+		}
+		.line-button{
+			margin-top: 0.1rem;
+		}
+		.ft-button{
+			height: 4.5rem;
+			width: 4.5rem;
+			margin-top: 0.2rem;
+		}
+		.Submit-button{
+			margin-top: 0.4rem;
+
+			font-size: 2rem;
+			padding: 0.5rem 2rem;
+		}
+		.Submit-button > div{
+			margin-top:  0.5rem;
+		}
+
+	}
+
+	@media (max-width: 992px) {
+    	
+	}
+	@media (max-width: 576px) {
+    	
 	}
 </style>

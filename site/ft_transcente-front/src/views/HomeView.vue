@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import con_pla_fra from '../components/connected_player_frame.vue'
+	import con_home_view from './connected_home_view.vue'
 	import Head from '../components/Header.vue';
 	import Connexion from '../components/ConnexionButton.vue';
 	import connection_form from '../components/connection_form.vue';
@@ -22,6 +22,10 @@
 	const showConnection = ref(false);
 	const toggleConnection = () => {
 		showConnection.value = !showConnection.value;
+	}
+
+	const toggleisconnected = () => {
+		isConnect.value = !isConnect.value;
 	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
@@ -70,7 +74,7 @@
 <template>
 	<div>
 		<div>
-		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"></Head>
+		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
 		</div>
 		<div>
 			<div v-show="isConnect" tittle="home_disconnect" class="home_disconnect" >
@@ -81,12 +85,12 @@
 					<Signup :setLanguage="props.setLanguage" v-show="showSignup"></Signup>
 				</div>
 				<div ref="connectionBox">
-					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup"></connection_form>
+					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
 			<div v-show="!isConnect" tittle="home_connect" class="home_connect" >
 				<div>
-					<con_pla_fra></con_pla_fra>
+					<con_home_view :setLanguage="props.setLanguage"></con_home_view>
 				</div>
 			</div>
 		</div>
@@ -107,9 +111,5 @@
 	.home_connect{
 		display: flex;
 		justify-content: center;
-		/*position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);*/
 	}
 </style>
