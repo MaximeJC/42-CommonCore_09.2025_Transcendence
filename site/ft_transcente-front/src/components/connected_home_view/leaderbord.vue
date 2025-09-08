@@ -113,9 +113,9 @@
 		color: white;
 		font-size: 1rem;
 		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22;
+		0 0 10px #18c3cf,
+		0 0 20px #18c3cf,
+		0 0 40px #18c3cf;
 	}
 
 	.sub1{
@@ -124,13 +124,18 @@
 	}
 	.sub2{
 		text-align: end;
+
 	}
 	.stat1{
 		text-align: center;
+		font-size: 1.5rem;
+
 	}
 
 	.stat2{
 		text-align: end;
+		font-size: 1.5rem;
+
 	}
 
 	.name-button{

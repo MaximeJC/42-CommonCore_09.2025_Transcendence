@@ -45,10 +45,13 @@
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+					<button class="avatar_button">
+						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+					</button>
 					<button class="friend-button">{{ friend.name }}</button>
 					<button class="delete-button">
-						<img src="../../images/trash_can.png" alt="trash can">
+						<img src="../../../images/trash_can.png" alt="trash can">
+						<img src="../../../images/trash_can_yellow.png" alt="trash can">
 					</button>
 				</li>
 			</ul>
@@ -80,11 +83,8 @@
 		color: white;
 		font-size: 1rem;
 		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 10px #18c3cf,
+		0 0 20px #18c3cf;
 	}
 
 	.input-add-friends{
@@ -99,7 +99,8 @@
 		width: auto;
 		font-size: 1.2rem;
 		margin-bottom: 0.5rem;
-
+		border-radius: 20px;
+		border: none;
 	}
 
 	.input-add-friends > button{
@@ -108,23 +109,20 @@
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
-		height: 2.5rem;
-		width: 2.5rem;
+		height: 2rem;
+		width: 2rem;
 		border-radius: 50%;
 		border: 1px solid #fbff22;
 		box-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 20px #fbff22;
 		transition:background-image 0.3s ease-in-out background-color 0.3s ease-in-out, background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
 		cursor: pointer;
 		margin-bottom: 0.5rem;
 	}
 
 	.input-add-friends > button:hover{
-		background-image:  url("../../images/add_button_alt.png");
+		background-image:  url("../../../images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
 		box-shadow: 
@@ -147,13 +145,15 @@
 	}
 
 	.friend{
-		display: flex;
+		display: grid;
+		grid-template-rows: min-content;
+		grid-template-columns:  0.1fr 1fr 0.1fr;
 		border: 2px solid #dd0aba;
 		padding: 0.3rem 0.6rem;
 		margin-bottom: 1rem;
 		margin-right: 1rem;
 		align-content: center;
-		justify-content: space-between;
+		border-radius: 12px;
 	
 	}
 
@@ -168,6 +168,8 @@
 		list-style-type: none;
 	}
 
+	
+
 	.friend-button{
 		border: none;
 		color: white;
@@ -178,7 +180,7 @@
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba,
 		0 0 80px #dd0aba;
-		text-align: center;
+		text-align: left;
 		background: transparent;
 		cursor: pointer;
 		transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
@@ -188,14 +190,32 @@
 	.friend-button:hover{
 		text-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
+		0 0 20px #fbff22;
+	
 	}
 
-	.friend-avatar{
+	.avatar_button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: none;
+		background: url();
+		border-radius: 50%;
+		width: 2rem;
+		height: 2rem;
+		box-shadow: 
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba;
+		cursor: pointer;
+	}
+
+	.avatar_button:hover {
+		box-shadow: 
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+	}
+
+	.friend-avatar {
 		width: 2rem;
 		height: 2rem;
 		border-radius: 50%;
@@ -204,12 +224,34 @@
 	.delete-button{
 		display:block;
 		background-color: transparent;
-		
 		border: none;
+		cursor: pointer;
+	}
+	.delete-button :hover{
+		box-shadow: 
+		0 0 10px #fbff22,
+		0 0 20px #fbff22,
+		0 0 40px #fbff22,
+		0 0 80px #fbff22;
+	
 	}
 
 	.delete-button > img{
 		width: 1.2rem;
 		height: 1.6rem;
 	}
+
+	.delete-button > img:nth-child(2){
+		display: none;
+	}
+	.delete-button:hover > img:nth-child(1){
+		display: none;
+	}
+
+	.delete-button:hover > img:nth-child(2){
+		display: block;
+		background-color: rgba(251, 255, 34, 0.5);
+
+	}
+	
 </style>

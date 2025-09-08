@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineProps } from 'vue';
+import play_historic from "./play&historic_button.vue" 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
@@ -11,7 +12,7 @@ import { ref, onMounted } from 'vue';
 <template>
 	<div tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
-			<img src="../../images/default_avatar.png" alt="Avatar" class="avatar">
+			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
 			<div tittle="login" class="login">
 				<div>Login</div>
 			</div>
@@ -28,14 +29,7 @@ import { ref, onMounted } from 'vue';
 			<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div tittle="rank_stat" class="stat">1</div>
 		</div>
-		<div tittle="button container" class="button-container">
-			<button tittle="play-button" class="play-button">
-				<div data-i18n="home_player_button.play"></div>
-			</button>
-			<button tittle="historic-button" class="historic-button">
-				<div data-i18n="home_player_button.historic"></div>
-			</button>
-		</div>
+		<play_historic></play_historic>
 	</div>
 </template>
 
@@ -72,10 +66,10 @@ import { ref, onMounted } from 'vue';
 		width: 6.5rem;
 		height: 6.5rem;
 		border-radius: 50%;
-		border:2px solid #ffffff;
+		border:3px solid #ffffff;
 		box-shadow: 
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba;
 	}
 
 	.login{
@@ -108,8 +102,8 @@ import { ref, onMounted } from 'vue';
 		color: white;
 		font-weight: bold;
 		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
+		0 0 10px #18c3cf, 
+		0 0 20px #18c3cf;
 		font-size: 1.5rem;
 		font-family: netron;
 		color: white;
@@ -136,87 +130,5 @@ import { ref, onMounted } from 'vue';
 		0 0 10px #dd0aba;
 	}
 
-	.button-container{
-		display: grid;
-		grid-template-rows: 1fr 0.5fr;
-		grid-template-columns: min-content;
-		width: auto;
-		height: auto;
-		margin-left: 2rem;
-		gap: 1rem;
-	}
-
-	.play-button{
-		width: auto;
-		height: auto;
-		font-family: netron;
-		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 3rem;
-		color: white;
-		border: 2px solid #e251ca;
-		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 30px #dd0aba;
-		box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba;
-		padding: 1rem 2rem;
-		border-radius: 20px;
-		cursor: pointer;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-	}
-
-	.historic-button{
-		width: auto;
-		height: auto;
-		font-family: netron;
-		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 1.5rem;
-		color: white;
-		border: 2px solid #e251ca;
-		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 30px #dd0aba;
 	
-		box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba;
-		padding: 1rem 2rem;
-		border-radius: 20px;
-		cursor: pointer;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-	}
-
-	.play-button > div {
-		margin-top: 0.3rem;
-	}
-	.play-button:hover{
-		background-color: rgba(251, 255, 34, 0.5);
-		border: 2px solid #fbff22;
-		box-shadow:
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
-
-		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
-	}
-
-	.historic-button:hover{
-		background-color: rgba(251, 255, 34, 0.5);
-		border: 2px solid #fbff22;
-		box-shadow:
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
-
-		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
-	}
 </style>
