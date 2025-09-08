@@ -15,8 +15,8 @@
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
 			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
-				<div v-show="isConnect" data-i18n="header.signUp"></div>
-				<div v-show="!isConnect" data-i18n="header.signOut"></div>
+				<div v-show="!isConnect" data-i18n="header.signUp"></div>
+				<div v-show="isConnect" data-i18n="header.signOut"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 		</div>

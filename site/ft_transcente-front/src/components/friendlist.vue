@@ -58,12 +58,13 @@
 
 <style>
 	.friend-list-container{
+
 		display: grid;
 		grid-template-rows: min-content;
+		height: 26rem;
 		grid-template-columns: 1fr;
 		align-content: flex-start;
 		width: auto;
-		height: auto;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
 		box-shadow: 

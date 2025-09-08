@@ -72,12 +72,10 @@ import { ref, onMounted } from 'vue';
 		width: 6.5rem;
 		height: 6.5rem;
 		border-radius: 50%;
-		border: 4px solid #ffffff;
+		border:2px solid #ffffff;
 		box-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22;
+		0 0 20px #fbff22;
 	}
 
 	.login{
@@ -111,11 +109,7 @@ import { ref, onMounted } from 'vue';
 		font-weight: bold;
 		text-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
+		0 0 20px #fbff22;
 		font-size: 1.5rem;
 		font-family: netron;
 		color: white;
@@ -136,9 +130,7 @@ import { ref, onMounted } from 'vue';
 		color: white;
 		box-shadow: 
 		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
+		0 0 30px #dd0aba;
 		text-shadow: 
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba;
@@ -164,16 +156,11 @@ import { ref, onMounted } from 'vue';
 		border: 2px solid #e251ca;
 		text-shadow: 
 		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
+		0 0 30px #dd0aba;
 		box-shadow: 
 		0 0 5px #dd0aba,
 		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
+		0 0 20px #dd0aba;
 		padding: 1rem 2rem;
 		border-radius: 20px;
 		cursor: pointer;
@@ -190,16 +177,12 @@ import { ref, onMounted } from 'vue';
 		border: 2px solid #e251ca;
 		text-shadow: 
 		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
+		0 0 30px #dd0aba;
+	
 		box-shadow: 
 		0 0 5px #dd0aba,
 		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
+		0 0 20px #dd0aba;
 		padding: 1rem 2rem;
 		border-radius: 20px;
 		cursor: pointer;
@@ -215,16 +198,25 @@ import { ref, onMounted } from 'vue';
 		box-shadow:
 		0 0 5px #fbff22,
 		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 20px #fbff22;
 
 		text-shadow: 
 		0 0 10px #fbff22,
 		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
+		0 0 20px #fbff22;
+	}
+
+	.historic-button:hover{
+		background-color: rgba(251, 255, 34, 0.5);
+		border: 2px solid #fbff22;
+		box-shadow:
+		0 0 5px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+
+		text-shadow: 
+		0 0 10px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
 	}
 </style>

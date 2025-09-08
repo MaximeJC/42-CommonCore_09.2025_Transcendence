@@ -22,12 +22,16 @@ import { ref } from 'vue';
 		<form @submit.prevent="handleConnection">
 			<label class="c-subTittle">Email</label>
 			<input class="c-input" type="email" id="email" v-model="email" required>
-			<div v-show=" !error_email" title="mail-error" class="c-error" data-i18n="Signup.mail_error" ></div>
+			<div class="c-error"  title="mail-error">
+				<div v-show=" !error_email"  data-i18n="Signup.mail_error"></div>
+			</div>
 			<label class="c-subTittle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="c-input" type="password" id="password" v-model="password" required>
-			<div v-show=" !error_password" title="pasword-error" class="c-error" data-i18n="Signup.password_error" ></div>
+			<div  title="pasword-error" class="c-error"  >
+				<div v-show=" !error_password" data-i18n="Signup.mail_error"></div>
+			</div>
 		</form>
 		<div tittle="c-line_button" class="c-line-button">
 			<div class="c-icon-button">
@@ -46,7 +50,7 @@ import { ref } from 'vue';
 	src: url("../../fonts/netron.regular.otf") format("opentype");
 	}
 	.frame-connection{
-		width: 40rem;
+		width: 25rem;
 
 		display: flexbox;
 		grid-template-columns: 1fr;
@@ -79,7 +83,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 3rem;
+		font-size: 2.5rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -102,7 +106,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 1.5rem;
+		font-size: 1.2rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -115,9 +119,11 @@ import { ref } from 'vue';
 	}
 
 	.c-input{
-		width: 40rem;
-		font-size: 1.5rem;
+		width: 25rem;
+		font-size: 1.2rem;
 		margin-bottom: 0.5rem;
+		border-radius: 20px;
+		border: none;
 	}
 
 	.c-error{
@@ -131,29 +137,24 @@ import { ref } from 'vue';
 		0 0 80px #fd2d49,
 		0 0 120px #fd2d49;
 		font-size: 1rem;
-		margin-bottom: 0.5rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.c-Submit-button{
-		margin-top: 1rem;
 		font-family: netron;
-		background-color: rgba(251, 255, 34, 0.502);
-		font-size: 3rem;
+		background-color: rgba(251, 255, 34, 0.5);
+		font-size: 2rem;
 		color: white;
 		border: 2px solid #caece8;
 		text-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
+		0 0 10px #fbff22;
+
 		box-shadow: 
 		0 0 5px #fbff22,
 		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22;
-		padding: 0.5rem 2rem;
+		0 0 20px #fbff22;
+		padding: 0.5rem 1.3rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
@@ -187,10 +188,8 @@ import { ref } from 'vue';
 		box-shadow: 
 			0 0 10px #fbff22,
 			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22;
+			0 0 20px #fbff22;
 		cursor: pointer;
-		margin-top: 1rem;
 		transition: background-color 0.6s ease, box-shadow 0.3 ease-in-out;
 
 	}
@@ -208,6 +207,7 @@ import { ref } from 'vue';
 
 	.c-Submit-button > div{
 		margin-top:  1rem;
+		margin-bottom:  0.5rem;
 	}
 
 	.c-Submit-button:hover{

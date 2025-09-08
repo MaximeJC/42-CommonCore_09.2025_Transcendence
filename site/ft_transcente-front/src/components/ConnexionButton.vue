@@ -36,7 +36,7 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		font-size: 6rem;
+		font-size: 4rem;
 		padding: 1rem 4rem;
 		border-radius: 20px;
 		cursor: pointer;

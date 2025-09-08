@@ -39,16 +39,16 @@
 	<div ref="rootElement" title="leaderbord frame" class="leaderboard-container">
 		<div class="tittle-leaderbord" data-i18n="home_player_button.Leaderbord"></div>
 		<div tittle="leaderbord-header" class="grid-header">
-			<div data-i18n="player_stat.rank"></div>
-			<div>Login</div>
-			<div data-i18n="player_stat.nbr_games"></div>
-			<div data-i18n="player_stat.nbr_victory"></div>
+			<div class="sub1" data-i18n="player_stat.rank"></div>
+			<div class="sub1">Login</div>
+			<div class="sub1" data-i18n="player_stat.nbr_games"></div>
+			<div class="sub2" data-i18n="player_stat.nbr_victory"></div>
 		</div>
 		<div v-for="player in players" :key="player.rank" class="grid-row">
-			<div>{{ player.rank}}</div>
-			<div>{{ player.name }}</div>
-			<div>{{ player.games }}</div>
-			<div>{{ player.victory }}</div>
+			<div class="stat1">{{ player.rank}}</div>
+			<button class="name-button">{{ player.name }}</button>
+			<div class="stat2">{{ player.games }}</div>
+			<div class="stat2">{{ player.victory }}</div>
 		</div>
 	</div>
 </template>
@@ -60,7 +60,7 @@
 		grid-template-rows: min-content;
 		grid-template-columns: 1fr;
 		width: auto;
-		height: auto;
+		height: 26rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
 		box-shadow: 
@@ -104,19 +104,56 @@
 
 	.grid-row, .grid-header{
 		display: grid;
-		grid-template-columns: 0.5fr 1fr 0.5fr 0.5fr;
+		grid-template-columns: 0.1fr 1fr 0.2fr 0.3fr;
 		padding: 3px;
 		border-bottom: 1px solid #ddd;
-		justify-content: space-between;
+		/*justify-content: ;*/
 	}	
 	.grid-header > div{
 		color: white;
 		font-size: 1rem;
 		text-shadow: 
 		0 0 10px #fbff22,
+		0 0 20px #fbff22,
+		0 0 40px #fbff22;
+	}
+
+	.sub1{
+		text-align: start;
+		margin-right: 2rem;
+	}
+	.sub2{
+		text-align: end;
+	}
+	.stat1{
+		text-align: center;
+	}
+
+	.stat2{
+		text-align: end;
+	}
+
+	.name-button{
+		border: none;
+		color: white;
+		font-size: 1.5rem;
+		text-align: start;
+		text-shadow: 
+		0 0 10px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
+		background: transparent;
+		cursor: pointer;
+		margin-left: 2.5rem;
+		transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
+	}
+
+	.name-button:hover{
+		text-shadow: 
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 40px #fbff22;
 	}
 </style>

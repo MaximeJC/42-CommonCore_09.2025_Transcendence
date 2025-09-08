@@ -14,9 +14,14 @@
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
-		showSignup.value = !showSignup.value;
-		if (showConnection.value)
-		showConnection.value = !showConnection.value;
+		if(isConnect.value == false){
+			showSignup.value = !showSignup.value;
+			if (showConnection.value)
+				showConnection.value = !showConnection.value;
+		}
+		else if (isConnect.value == true){
+			isConnect.value = !isConnect.value;
+		}
 	}
 
 	const showConnection = ref(false);
@@ -26,6 +31,7 @@
 
 	const toggleisconnected = () => {
 		isConnect.value = !isConnect.value;
+		
 	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
@@ -77,7 +83,7 @@
 		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
 		</div>
 		<div>
-			<div v-show="isConnect" tittle="home_disconnect" class="home_disconnect" >
+			<div v-show="!isConnect" tittle="home_disconnect" class="home_disconnect" >
 				<div>
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
@@ -88,9 +94,9 @@
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
-			<div v-show="!isConnect" tittle="home_connect" class="home_connect" >
+			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
 				<div>
-					<con_home_view :setLanguage="props.setLanguage"></con_home_view>
+					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
 		</div>

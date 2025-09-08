@@ -20,25 +20,35 @@ import { ref } from 'vue';
 <template>
 	<div class="frame-signup" title="sign-up_frame">
 		<div class="signUpTitle" tittle="signup_tittle" data-i18n="header.signUp"></div>
-		<form @submit.prevent="handleSubmit">
+		<form class="form_signup" @submit.prevent="handleSubmit">
 			<label class="subTittle">
 					<div data-i18n="Signup.login"></div>
 			</label>
 			<input class="input" type="login" id="login" v-model="login" required>
-			<div v-show=" !error_login" title="login-error" class="error" data-i18n="Signup.login_error" ></div>
+			<div  title="login-error" class="error"  >
+					<div v-show="!error_login" data-i18n="Signup.login_error"></div>
+			</div>
 			<label class="subTittle">Email</label>
 			<input class="input" type="email" id="email" v-model="email" required>
-			<div v-show=" !error_email" title="mail-error" class="error" data-i18n="Signup.mail_error" ></div>
+			<div  title="mail-error" class="error" >
+				<div v-show=" !error_email" data-i18n="Signup.mail_error"></div>
+			</div>
 			<label class="subTittle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="input" type="password" id="password" v-model="password" required>
-			<div v-show=" !error_password" title="pasword-error" class="error" data-i18n="Signup.password_error" ></div>
+			<div title="pasword-error" class="error"  >
+				<div v-show=" !error_password" data-i18n="Signup.password_error"></div>
+
+			</div>
 			<label class="subTittle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
 			<input class="input" type="conf_password" id="conf_password" v-model="conf_password" required>
-			<div v-show=" !error_conf_password" title="conf_password-error" class="error" data-i18n="Signup.conf_password_error" ></div>
+			<div  title="conf_password-error" class="error" >
+				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
+
+			</div>
 		</form>
 		<div tittle="line_button" class="line-button">
 			<div class="icon-button">
@@ -58,7 +68,7 @@ import { ref } from 'vue';
 	}
 
 	.frame-signup{
-		width: 60rem;
+		width: 25rem;
 
 		display: grid;
 		grid-template-columns: 1fr;
@@ -93,7 +103,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 3rem;
+		font-size: 2.5rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -106,6 +116,10 @@ import { ref } from 'vue';
 		margin-bottom: 1rem;
 	}
 
+	.form_signup{
+		display: block;
+	}
+
 	.subTittle{
 		font-family: netron;
 		color: white;
@@ -116,7 +130,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 1.5rem;
+		font-size: 1.2rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -129,9 +143,11 @@ import { ref } from 'vue';
 	}
 
 	.input{
-		width: 60rem;
-		font-size: 1.5em;
+		width: 25rem;
+		font-size: 1.2em;
 		margin-bottom: 0.5rem;
+		border-radius: 20px;
+		border: none;
 	}
 
 	.error{
@@ -145,15 +161,13 @@ import { ref } from 'vue';
 		0 0 80px #fd2d49,
 		0 0 120px #fd2d49;
 		font-size: 1rem;
-		margin-bottom: 0.5rem;
+		margin-bottom: 1.5rem;
 	}
 
-	.line-button{
+		.line-button{
 		display: flex;
-		margin-top: 1rem;
 		justify-content: space-between;
 		align-items: center;
-		align-items:flex-start
 	}
 
 	.icon-button{
@@ -168,17 +182,14 @@ import { ref } from 'vue';
 		background-position: center;
 		background-repeat: no-repeat;
 		background-color: #fbff22cc ;
-		height: 7rem;
-		width: 7rem;
+		height: 5rem;
+		width: 5rem;
 		border-radius: 50%;
-		border: 1px solid rgb(255, 255, 255);
+		border: 2px solid rgb(255, 255, 255);
 		box-shadow: 
 			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22;
+			0 0 20px #fbff22;
 		cursor: pointer;
-		margin-top: 0.5rem;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 
 	}
@@ -197,25 +208,20 @@ import { ref } from 'vue';
 
 
 	.Submit-button{
-		margin-top: 1rem;
 		font-family: netron;
 		background-color: rgba(251, 255, 34, 0.502);
-		font-size: 4rem;
+		font-size: 2rem;
+		text-align: center;
 		color: white;
 		border: 2px solid #caece8;
 		text-shadow: 
 		0 0 10px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22,
-		0 0 120px #fbff22;
+		0 0 20px #fbff22;
 		box-shadow: 
 		0 0 5px #fbff22,
 		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22;
-		padding: 0.5rem 2rem;
+		0 0 20px #fbff22;
+		padding: 0.2rem 1.3rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
@@ -223,6 +229,7 @@ import { ref } from 'vue';
 
 	.Submit-button > div{
 		margin-top:  1rem;
+		margin-bottom:  0.5rem;
 	}
 
 	.Submit-button:hover{
