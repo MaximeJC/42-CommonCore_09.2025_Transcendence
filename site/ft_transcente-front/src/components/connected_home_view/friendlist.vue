@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, onMounted, defineExpose } from 'vue';
+	import { ref, onMounted } from 'vue';
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
@@ -9,6 +9,8 @@
 	defineExpose({
 		rootElement
 	});
+
+	const emit = defineEmits(['show-other_player']);
 
 	const search_friends = ref("")
 
@@ -45,11 +47,15 @@
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<button class="avatar_button">
+					<button @click="emit('show-other_player')" class="avatar_button">
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
-					<button class="friend-button">{{ friend.name }}</button>
-					<button class="delete-button">
+					<button @click="emit('show-other_player')" tittle="friend-button" class="friend-button">{{ friend.name }}</button>
+					<button tittle="inv-play-button" class="inv-play-button">
+						<img src="../../../images/pink-play-button.png" alt="play button">
+						<img src="../../../images/yelow-play-button.png" alt="play button">
+					</button>
+					<button title="delete-button" class="delete-button">
 						<img src="../../../images/trash_can.png" alt="trash can">
 						<img src="../../../images/trash_can_yellow.png" alt="trash can">
 					</button>
@@ -147,7 +153,7 @@
 	.friend{
 		display: grid;
 		grid-template-rows: min-content;
-		grid-template-columns:  0.1fr 1fr 0.1fr;
+		grid-template-columns:  0.1fr 1fr 0.1fr 0.1fr;
 		border: 2px solid #dd0aba;
 		padding: 0.3rem 0.6rem;
 		margin-bottom: 1rem;
@@ -199,7 +205,6 @@
 		justify-content: center;
 		align-items: center;
 		border: none;
-		background: url();
 		border-radius: 50%;
 		width: 2rem;
 		height: 2rem;
@@ -219,6 +224,48 @@
 		width: 2rem;
 		height: 2rem;
 		border-radius: 50%;
+	}
+
+	.inv-play-button{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: none;
+		background: none;
+		border-radius: 50%;
+		width: 1.8rem;
+		height: 1.8rem;
+		cursor: pointer;
+		margin-right: 1rem;
+
+	}
+	.inv-play-button:hover{
+		box-shadow: 
+		0 0 10px #fbff22,
+		0 0 20px #fbff22,
+		0 0 40px #fbff22,
+		0 0 80px #fbff22;
+	
+	}
+
+	.inv-play-button > img{
+		width: 1.8rem;
+		height: 1.8rem;
+		border-radius: 50%;
+
+	}
+
+	.inv-play-button > img:nth-child(2){
+		display: none;
+	}
+	.inv-play-button:hover > img:nth-child(1){
+		display: none;
+	}
+
+	.inv-play-button:hover > img:nth-child(2){
+		display: block;
+		background-color: rgba(251, 255, 34, 0.5);
+
 	}
 
 	.delete-button{
