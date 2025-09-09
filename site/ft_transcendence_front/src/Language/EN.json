@@ -1,0 +1,48 @@
+{
+	"header": {
+	  "signUp": "Sign up",
+	  "signOut": "SIGN OUT",
+	  "language": "EN",
+	  "icon_lang": "../images/flag/united-kingdom.png"
+	},
+	"home": {
+	  "connection": "Login"
+	},
+	"Signup":{
+		"login": "Login",
+		"password": "Password",
+		"conf_password": "Password confirmation",
+		"login_error": "The username must be between 3 and 13 characters long.",
+		"mail_error": "Invalid email.",
+		"password_error": "Password conditions.",
+		"conf_password_error": "The two passwords are not identical.",
+		"submit": "SUBMIT"
+	},
+	"player_stat": {
+		"nbr_games": "Games",
+		"nbr_victory": "Victories",
+		"rank": "Rank"
+	},
+	"home_player_button": {
+		"play": "PLAY",
+		"leaderboard": "Leaderboard",
+		"historic": "History",
+		"social": "Social",
+		"return": "Return",
+		"account": "My Account",
+		"invit": "Invite"
+	},
+	"friendlist":{
+		"friendlist": "Friend list",
+		"addfriends": "Add friends"
+	},
+	"historic":{
+ 	   "historic": "History",
+ 	   "victory": "Victory",
+ 	   "login": "User",
+ 	   "my_score": "My score",
+ 	   "time": "Game time",
+ 	   "o_score": "Opponent score",
+ 	   "o_login": "Opponent"
+	}	
+}
