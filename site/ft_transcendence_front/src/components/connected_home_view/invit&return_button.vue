@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 
 const emit = defineEmits(['show-other_player']);
 
+const isconnect = ref(false);
 
 </script>
 
@@ -10,9 +13,12 @@ const emit = defineEmits(['show-other_player']);
 		<button tittle="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
-		<button @click="emit('show-other_player')" tittle="return-button" class="return-button">
-			<div data-i18n="home_player_button.return"></div>
-		</button>
+		<div class="i-button-container">
+			<button class="i-add-friends"></button>
+			<button @click="emit('show-other_player')" tittle="return-button" class="return-button">
+				<div data-i18n="home_player_button.return"></div>
+			</button>
+		</div>
 	</div>
 </template>
 
@@ -49,6 +55,34 @@ const emit = defineEmits(['show-other_player']);
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
+	.i-button-container{
+		display:flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		
+
+	}
+
+	.i-add-friends{
+		display: block;
+		background-image:  url("../../images/add_button.png");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		height: 2.5rem;
+		width: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid #fbff22;
+		box-shadow: 
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+		transition:background-image 0.3s ease-in-out background-color 0.3s ease-in-out, background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
+		cursor: pointer;
+		margin-bottom: 0.5rem;
+	}
+
+
 	.return-button{
 		width: fit-content;
 		height: auto;
@@ -56,7 +90,7 @@ const emit = defineEmits(['show-other_player']);
 		align-self: center;
 		font-family: netron;
 		background-color: rgba(156, 50, 133, 0.5);
-		font-size: rem;
+		font-size: 1rem;
 		color: white;
 		border: 2px solid #e251ca;
 		text-shadow: 

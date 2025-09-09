@@ -19,19 +19,20 @@
 	interface Friend {
 		name: string;
 		avatar_src: string;
+		isconnected: boolean;
 	}
 
 	const friends: Friend[] = [
-		{ name: "Micka", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Louise", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Maxime", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Axel", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Nico", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Thomas", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Anas", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Arthur", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Dorina", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Wictor", avatar_src: "../../images/default_avatar.png"},
+		{ name: "Micka", avatar_src: "../../images/default_avatar.png", isconnected: true},
+		{ name: "Louise", avatar_src: "../../images/default_avatar.png", isconnected: false},
+		{ name: "Maxime", avatar_src: "../../images/default_avatar.png", isconnected: false},
+		{ name: "Axel", avatar_src: "../../images/default_avatar.png", isconnected: true},
+		{ name: "Nico", avatar_src: "../../images/default_avatar.png", isconnected: false},
+		{ name: "Thomas", avatar_src: "../../images/default_avatar.png", isconnected: true},
+		{ name: "Anas", avatar_src: "../../images/default_avatar.png", isconnected: true},
+		{ name: "Arthur", avatar_src: "../../images/default_avatar.png", isconnected: true},
+		{ name: "Dorina", avatar_src: "../../images/default_avatar.png", isconnected: false},
+		{ name: "Wictor", avatar_src: "../../images/default_avatar.png", isconnected: true},
 	]
 
 </script>
@@ -51,8 +52,9 @@
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
 					<button @click="emit('show-other_player')" tittle="friend-button" class="friend-button">{{ friend.name }}</button>
-					<button tittle="inv-play-button" class="inv-play-button">
-						<img src="../../../images/pink-play-button.png" alt="play button">
+					<button tittle="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
+						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
+						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
 						<img src="../../../images/yelow-play-button.png" alt="play button">
 					</button>
 					<button title="delete-button" class="delete-button">
@@ -235,37 +237,43 @@
 		border-radius: 50%;
 		width: 1.8rem;
 		height: 1.8rem;
-		cursor: pointer;
+		cursor: default;
 		margin-right: 1rem;
 
 	}
-	.inv-play-button:hover{
+
+	.inv-play-button.can-hover{
+		cursor: pointer;
+	}
+
+	.inv-play-button.can-hover:hover{
 		box-shadow: 
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
 		0 0 40px #fbff22,
 		0 0 80px #fbff22;
-	
 	}
 
 	.inv-play-button > img{
 		width: 1.8rem;
 		height: 1.8rem;
 		border-radius: 50%;
-
 	}
 
-	.inv-play-button > img:nth-child(2){
+	.inv-play-button > img:nth-child(3){
 		display: none;
 	}
-	.inv-play-button:hover > img:nth-child(1){
+	.can-hover:hover > img:nth-child(1){
 		display: none;
 	}
 
-	.inv-play-button:hover > img:nth-child(2){
+	.can-hover:hover > img:nth-child(1){
+		display: none;
+	}
+
+	.can-hover:hover > img:nth-child(3){
 		display: block;
 		background-color: rgba(251, 255, 34, 0.5);
-
 	}
 
 	.delete-button{
