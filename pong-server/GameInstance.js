@@ -196,7 +196,7 @@ export class GameInstance {
 		}, 1000 / TICK_RATE);
 	}
 
-	update() {
+	async update() {
 		if (!this.gameState.isGameStarted)
 			return;
 		
@@ -209,7 +209,7 @@ export class GameInstance {
 		const deltaTimeInMs = 1000 / TICK_RATE;
 		this.aiCooldown += deltaTimeInMs;
 		if (this.aiCooldown >= this.iaResponseTime) {
-			GameLogic.updateAIMovement(this.gameState);
+			await GameLogic.updateAIMovement(this.gameState);
 			this.aiCooldown = 0;
 		}
 

@@ -23,3 +23,5 @@ export const racketHeight2v2 = 15; // Hauteur d'une raquette en 2v2
 export const ballRadius = 2; // Rayon de la balle pour les calculs de collision
 
 export const iaResponseTime = 1000;
+
+export const iaApiUrl = "http://localhost:3001";
