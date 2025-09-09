@@ -10,7 +10,10 @@ const isconnect = ref(false);
 
 <template>
 	<div tittle="button container" class="button-container">
-		<button tittle="invit-button" class="invit-button">
+		<button v-show="isconnect" tittle="invit-button" class="invit-button">
+			<div data-i18n="home_player_button.invit"></div>
+		</button>
+		<button v-show="!isconnect" tittle="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">
@@ -60,7 +63,7 @@ const isconnect = ref(false);
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		
+		padding: 0 1rem;
 
 	}
 
@@ -80,8 +83,20 @@ const isconnect = ref(false);
 		transition:background-image 0.3s ease-in-out background-color 0.3s ease-in-out, background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
 		cursor: pointer;
 		margin-bottom: 0.5rem;
+		margin-right: 1rem;
 	}
 
+	.i-add-friends:hover{
+		background-image:  url("../../../images/add_button_alt.png");
+
+		border: 1px solid #dd0aba;
+		box-shadow: 
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 120px #dd0aba;
+	}
 
 	.return-button{
 		width: fit-content;
@@ -123,6 +138,30 @@ const isconnect = ref(false);
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba;
+	}
+	
+	.d-invit-button{
+		width: auto;
+		height: auto;
+		font-family: netron;
+		background-color: rgba(90, 90, 90, 0.5);
+		font-size: 2rem;
+		color: rgb(160, 154, 154);
+		border: 2px solid #aaaaaa;
+		text-shadow: 
+		0 0 10px #8f8f8f,
+		0 0 30px #8f8f8f;
+		box-shadow: 
+		0 0 5px #8f8f8f,
+		0 0 10px #8f8f8f;
+		padding: 0.5rem 2rem;
+		border-radius: 20px;
+		cursor: default;
+		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+	}
+
+	.d-invit-button > div {
+		margin-top: 0.3rem;
 	}
 
 	.return-button:hover{
