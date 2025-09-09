@@ -87,12 +87,23 @@ fastify.get('/users', async (request, reply)=>{
 
 // verifier les identifiants:
 fastify.post('/login', async (request, reply)=>{
-	const { login, email, password } = request.body;
+	const { email, password } = request.body;
+	if (DEBUG_MODE)
+		console.log(request.body);
+
 	const user = await getUserByEmail(email);
-	if (user && user.password == password && user.login == login) {
-		return { success: true, user: { login: user.login, email: user.email, password: user.password } };
+	if (DEBUG_MODE)
+		console.log("Utilisateur trouve: ", user);
+	if (user) {
+		if (user.password === password) { //! revoir apres hachage
+			if (DEBUG_MODE)
+				console.log("User Ok");
+			return reply.send({ success: true, user: { login: user.login, email: user.email } });
+		}
 	} else {
-		return { success: false, message: "Wrong email, login and/or password" };
+		if (DEBUG_MODE)
+			console.log("Wrong user");
+		return reply.send({ success: false, message: "Wrong email and/or password" });
 	}
 });
 
