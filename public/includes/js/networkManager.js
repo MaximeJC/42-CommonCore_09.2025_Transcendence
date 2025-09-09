@@ -148,7 +148,13 @@ class NetworkManager {
 					if (gameState.ball) {
 						gameState.ball.isVisible = false;
 					}
+					const endData = message.data;
 					const finalMessage = message.data.end_message;
+					// On peut maintenant afficher ou utiliser les autres donnees
+					console.log("Partie terminee. Stats :");
+					console.log("- Vainqueur:", endData.winner);
+					console.log("- Perdant:", endData.loser);
+					console.log("- Duree:", endData.duration, "secondes");
 					endGame(gameState, finalMessage);
 					break;
 				

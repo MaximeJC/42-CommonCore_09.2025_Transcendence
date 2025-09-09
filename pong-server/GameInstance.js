@@ -9,6 +9,9 @@ const TICK_RATE = 60;
 
 export class GameInstance {
 	constructor(clientInfos, gameMode) { // On recoit des 'infos' { socket, pseudo }
+		// --- SUIVI DU TEMPS DE JEU ---
+		this.startTime = null; // Le moment ou le jeu commence reellement
+		this.gameDurationInSeconds = 0; // La duree totale du jeu
 		this.gameId = uuidv4();
 		this.sockets = {};
 		this.gameState = createInitialGameState();
@@ -171,6 +174,9 @@ export class GameInstance {
 		// On donne l'ordre a tous les clients de demarrer leur decompte visuel.
 		this.broadcast('start_countdown', {});
 
+		// On lance le chrono
+		this.startTime = Date.now();
+
 		let initialDirection;
 		if (Math.random() < 0.5) {
 			initialDirection = 1;
@@ -191,8 +197,15 @@ export class GameInstance {
 	}
 
 	update() {
-		if (!this.gameState.isGameStarted) return;
+		if (!this.gameState.isGameStarted)
+			return;
 		
+		// MISE A JOUR DU CHRONOMETRE 
+		// On calcule le temps ecoule depuis le debut de la partie.
+		if (this.startTime) {
+			this.gameDurationInSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+		}
+
 		const deltaTimeInMs = 1000 / TICK_RATE;
 		this.aiCooldown += deltaTimeInMs;
 		if (this.aiCooldown >= this.iaResponseTime) {
@@ -253,16 +266,38 @@ export class GameInstance {
 	}
 
 	endGame(winnerPseudo) {
-		if (!this.gameState.isGameStarted)
+		if (!this.gameState.isGameStarted) {
 			return;
+		}
 		clearInterval(this.gameLoop);
+		
+		// On sauvegarde les scores avant de reinitialiser l'etat
+		let score_left = this.gameState.scoreLeft;
+		let score_right = this.gameState.scoreRight;
 		this.gameState.isGameStarted = false;
+
+		// IDENTIFICATION DU PERDANT
+		let loserPseudo = "N/A";
+		// On cherche un joueur dont le pseudo n'est PAS celui du gagnant.
+		// On s'assure de ne chercher que parmi les joueurs humains si c'est pertinent.
+		const loser = this.gameState.activePlayers.find(p => p.pseudo !== winnerPseudo);
+		if (loser) {
+			loserPseudo = loser.pseudo;
+		}
+
+		// MISE A JOUR FINALE DE LA DUREE DU JEU 
+		// On recalcule une derniere fois pour avoir la valeur la plus precise.
+		if (this.startTime) {
+			this.gameDurationInSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+		}
+
+		// ENVOI DES STATISTIQUES A CHAQUE JOUEUR DANS SA LANGUE
 		this.gameState.activePlayers.forEach(player => {
 			if (player.controlType.includes('HUMAN')) {
 				const socket = this.sockets[player.id.split('_')[0]];
 				if (socket) {
 					let winMessage;
-					const lang = player.language;
+					const lang = player.language || 'en';
 					
 					if (lang === 'fr') {
 						winMessage = `${winnerPseudo} a gagne !`;
@@ -272,15 +307,27 @@ export class GameInstance {
 						winMessage = `${winnerPseudo} Wins!`;
 					}
 					
+					// On envoie l'objet de donnees complet
 					socket.send(JSON.stringify({
 						type: 'game_over',
-						data: { end_message: winMessage }
+						data: {
+							end_message: winMessage,
+							winner: winnerPseudo,
+							loser: loserPseudo,
+							duration: this.gameDurationInSeconds,
+							score_left: score_left,
+							score_right: score_right
+						}
 					}));
 				}
 			}
 		});
 
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
+		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);
+		console.log(`[Jeu ${this.gameId}] Score final: ${score_left} - ${score_right}`);
+		console.log(`[Jeu ${this.gameId}] Duree: ${this.gameDurationInSeconds} secondes.`);
+		// TODO : Logique pour enregistrer les scores finaux dans une base de donnees.
 	}
 
 	broadcast(type, data) {
