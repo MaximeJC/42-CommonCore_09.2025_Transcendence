@@ -97,20 +97,20 @@ import { ref } from 'vue';
 			<label class="subTittle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
-			<input class="input" type="conf_password" id="conf_password" v-model="conf_password" required>
+			<input class="input" type="password" id="conf_password" v-model="conf_password" required>
 			<div  title="conf_password-error" class="error" >
 				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
 
 			</div>
-		</form>
-		<div tittle="line_button" class="line-button">
-			<div class="icon-button">
-				<button tittle="ft-signup" class="ft-button"></button>
+			<div tittle="line_button" class="line-button">
+				<div class="icon-button">
+					<button tittle="ft-signup" class="ft-button"></button>
+				</div>
+				<button tittle="Submit-button" class="Submit-button">
+					<div data-i18n="Signup.submit"></div>
+				</button>
 			</div>
-			<button tittle="Submit-button" class="Submit-button">
-				<div data-i18n="Signup.submit"></div>
-			</button>
-		</div>
+		</form>
 	</div>
 </template>
 

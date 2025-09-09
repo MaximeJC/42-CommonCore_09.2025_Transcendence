@@ -30,22 +30,39 @@ fastify.get('/', async (request, reply)=>{
 // ajouter un utilisateur:
 fastify.post('/users', async (request, reply)=>{
 	const {login, email, password} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!login || !email || !password) {
+		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing" });
+	}
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO users (login, email, password) VALUES (?, ?, ?)`,
 				[login, email, password],
 				function (err) {
-					if (err) reject(err);
-					else resolve(this);
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
 				}
 			);
 		});
-		reply.send();
+		if (DEBUG_MODE)
+			console.log("New user successfully added. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New user successfully added.", userId: result.lastID });
 	} catch (err) {
 		if (DEBUG_MODE)
-			console.log("Erreur d'ajout d'un utilisateur.\n");
+			console.log("Erreur d'ajout d'un utilisateur:", err.stack);
 		reply.status(500).send({error: err.message});
+		if (err.code === 'SQLITE_CONSTRAINT') {
+			if (err.message.includes('UNIQUE constraint failed: user.email'))
+				return reply.status(409).send({ success: false, message: "Email already used." });
+			else if (err.message.includes('UNIQUE constraint failed: users.login'))
+				return reply.status(409).send({ success: false, message: "Login already used." });
+		}
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
 	}
 });
 

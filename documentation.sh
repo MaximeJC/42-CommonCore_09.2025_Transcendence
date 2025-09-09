@@ -14,50 +14,50 @@ node db_server.js
 # Dans un autre terminal:
 
 	# ajouter un user:
-	curl -X POST http://localhost:3001/users \
+	curl -X POST http://localhost:3000/users \
 		-H "Content-Type: application/json" \
 		-d '{"login": "Louise", "email": "louise@example.com", "password": "bimo"}' \
 
-	curl -X POST http://localhost:3001/users \
+	curl -X POST http://localhost:3000/users \
 		-H "Content-Type: application/json" \
 		-d '{"login": "Alice", "email": "alice@example.com", "password": "bimo"}' \
 
-	curl -X POST http://localhost:3001/users \
+	curl -X POST http://localhost:3000/users \
 		-H "Content-Type: application/json" \
 		-d '{"login": "Cocotte", "email": "cocotte@example.com", "password": "zoom"}'
 
 	# afficher tous les users:
-	curl http://localhost:3001/users
+	curl http://localhost:3000/users
 
 	# ajouter une partie:
-	curl -X POST http://localhost:3001/games \
+	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
 		-d '{"login_winner": "Louise", "login_loser": "Alice", "score_winner": "6", "score_loser": "4"}' \
 
-	curl -X POST http://localhost:3001/games \
+	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
 		-d '{"login_winner": "Cocotte", "login_loser": "Alice", "score_winner": "3", "score_loser": "0"}' \
 
-	curl -X POST http://localhost:3001/games \
+	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
 		-d '{"login_winner": "Cocotte", "login_loser": "Louise", "score_winner": "5", "score_loser": "4"}'
 
 	# afficher toutes les parties:
-	curl http://localhost:3001/games
+	curl http://localhost:3000/games
 
 	# afficher les amis:
-	curl http://localhost:3001/friends
+	curl http://localhost:3000/friends
 
 	# ajouter un ami a qqn:
-	curl -X POST http://localhost:3001/friends \
+	curl -X POST http://localhost:3000/friends \
 		-H "Content-Type: application/json" \
 		-d '{"login1": "Alice", "login2": "Cocotte"}' \
 
-	curl -X POST http://localhost:3001/friends \
+	curl -X POST http://localhost:3000/friends \
 		-H "Content-Type: application/json" \
 		-d '{"login1": "Cocotte", "login2": "Louise"}'
 
 	# supprimer une amitie:
-	curl -X POST http://localhost:3001/friends/delete \
+	curl -X POST http://localhost:3000/friends/delete \
 		-H "Content-Type: application/json" \
 		-d '{"login1": "Cocotte", "login2": "Louise"}'

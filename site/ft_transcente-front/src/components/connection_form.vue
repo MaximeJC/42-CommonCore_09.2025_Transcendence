@@ -1,16 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+
+	interface ServerResponse {
+		success: boolean;
+		message?: string;
+		users?: {
+			login: string;
+		};
+		errors?: {
+			email?: string;
+			password?: string;
+		};
+}
 	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-		}>();
+		setLanguage: (lang: string) => void;
+	}>();
 
 	const login = ref("");
 	const email = ref("");
 	const password = ref("");
 
-	let error_login = ref(false);
-	let error_email = ref(false);
-	let error_password = ref(false);
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_password = ref(false);
 	const message = ref("");
 
 	async function handleConnection() {
@@ -19,63 +31,60 @@ import { ref } from 'vue';
 		error_password.value = false;
 		message.value = "";
 
-		const result = await fetch("http://localhost:3000/login", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				login: login.value,
-				email: email.value,
-				password: password.value,
-			}),
-		});
-
-		const data = await result.json();
-
-		if (data.success) {
-			message.value = `Welcome ${data.users.login}!` //todo langues
-		} else {
-			message.value = data.message || "Connexion error"; //todo langues
-			error_login.value = true;
+		try {
+			const result = await fetch("http://localhost:3000/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					login: login.value,
+					email: email.value,
+					password: password.value,
+				}),
+			});
+			const data = await result.json();
+	
+			if (data.success) {
+				message.value = `Welcome ${data.users.login}!` //todo langues
+				const emit = defineEmits(['isconnected']);
+			} else {
+				message.value = data.message || "Connexion error"; //todo langues
+				error_login.value = true;
+				error_email.value = true;
+				error_password.value = true;
+			}
+		} catch (err) {
+			message.value = "Cannot contact server";
 			error_email.value = true;
 			error_password.value = true;
 		}
 	}
-	// const handleConnection = () => {
-	// 	//preparation envoie serveur
-	// }
-	const emit = defineEmits(['isconnected']);
-
-
-	error_email = ref(true);
-	error_password = ref(true);
-
 </script>
 
 <template>
 	<div class="frame-connection" title="connection_frame">
-		<div class="connectionTittle" tittle="connection_tittle" data-i18n="home.connection"></div>
+		<div class="connectionTitle" title="connection_title" data-i18n="home.connection"></div>
 		<form @submit.prevent="handleConnection">
-			<label class="c-subTittle">Email</label>
+			<label class="c-subTitle">Email</label>
 			<input class="c-input" type="email" id="email" v-model="email" required>
 			<div class="c-error"  title="mail-error">
-				<div v-show=" !error_email"  data-i18n="Signup.mail_error"></div>
+				<div v-show="error_email"  data-i18n="Signup.mail_error"></div>
 			</div>
-			<label class="c-subTittle">
+			<label class="c-subTitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="c-input" type="password" id="password" v-model="password" required>
 			<div  title="pasword-error" class="c-error"  >
 				<div v-show=" !error_password" data-i18n="Signup.mail_error"></div>
 			</div>
-		</form>
-		<div tittle="c-line_button" class="c-line-button">
-			<div class="c-icon-button">
-				<button tittle="c-ft-signup" class="c-ft-button"></button>
+			<div title="c-line_button" class="c-line-button">
+				<div class="c-icon-button">
+					<button title="c-ft-signup" class="c-ft-button"></button>
+				</div>
+				<button type="submit" title="Submit-button" class="c-Submit-button">
+					<div data-i18n="Signup.submit"></div>
+				</button>
 			</div>
-			<button @click="emit('isconnected')" tittle="Submit-button" class="c-Submit-button">
-				<div data-i18n="Signup.submit"></div>
-			</button>
-		</div>
+		</form>
 	</div>
 </template>
 
@@ -87,7 +96,7 @@ import { ref } from 'vue';
 	.frame-connection{
 		width: 25rem;
 
-		display: flexbox;
+		display: flex;
 		grid-template-columns: 1fr;
 		grid-auto-rows: min-content;
 		justify-content: center;
@@ -105,7 +114,7 @@ import { ref } from 'vue';
 		margin-top: 3rem
 	}
 
-	.connectionTittle{
+	.connectionTitle{
 		display: flex;
 		align-self: center;
 		justify-content: center;
@@ -131,7 +140,7 @@ import { ref } from 'vue';
 		margin-bottom: 1rem;
 	}
 
-	.c-subTittle{
+	.c-subTitle{
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -267,7 +276,7 @@ import { ref } from 'vue';
 			width: 35rem;
 			padding: 1.5rem 2rem;
 		}
-		.connectionTittle{
+		.connectionTitle{
 			font-size: 2.5rem;
 			margin-bottom: 0.6rem;
 		}
