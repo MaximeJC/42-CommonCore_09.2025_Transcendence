@@ -4,6 +4,7 @@
 	import leaderbord from '../components/connected_home_view/leaderbord.vue';
 	import friendlist from '../components/connected_home_view/friendlist.vue';
 	import histo from '@/components/connected_home_view/historic.vue';
+	import histo_other from '@/components/connected_home_view/historic_other.vue'
 
 	const historic = ref(false)
 	const other_player = ref(false)
@@ -35,8 +36,9 @@
 			<leaderbord @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
 			<friendlist @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
 		</div>
-		<div v-show="historic" tittle="historic" class="histo-container">
-			<histo :setLanguage="props.setLanguage"></histo>
+		<div v-show="historic || other_player" tittle="historic" class="histo-container">
+			<histo v-show="historic" :setLanguage="props.setLanguage"></histo>
+			<histo_other v-show="other_player" :setLanguage="props.setLanguage"></histo_other>
 		</div>
 	</div>
 </template>
