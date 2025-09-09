@@ -4,6 +4,7 @@
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
+		isConnect: boolean;
 	}>();
 	const emit = defineEmits(['show-form']);
 
@@ -14,7 +15,8 @@
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
 			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
-				<div data-i18n="header.signUp"></div>
+				<div v-show="!isConnect" data-i18n="header.signUp"></div>
+				<div v-show="isConnect" data-i18n="header.signOut"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 		</div>
@@ -123,4 +125,50 @@
 		bottom: 0;
 		left: 0;
 	}
+
+	@media (max-width: 1600px) {
+		.end-button{
+			margin-top: 1.5rem;
+			margin-right: 2rem;
+			gap: 1.5rem;
+		}
+
+		.my-button{
+			font-size: 1.5rem;
+			padding: 1rem 2rem;
+		}
+		.my-button > div {
+			margin-top: 0.5rem;
+		}
+		.logo {
+			font-size: 4rem; /* Ajustez la taille de la police */
+			margin-left: 1.2rem;
+			margin-top: 0.8rem;
+
+		}
+		.logo::after {
+			width: 32rem; /* Réduisez la longueur de la ligne */
+		}
+	}
+
+	@media (max-width: 992px) {
+    	.logo {
+    	    font-size: 3rem;
+    	    margin-left: 1rem;
+			
+    	}
+    	.logo::after {
+    	    width: 24rem; /* Réduire la longueur de la ligne */
+		}
+	}
+	@media (max-width: 576px) {
+    	.logo {
+    	    font-size: 2.5rem;
+    	    margin-left: 0.5rem;
+    	}
+    	.logo::after {
+    	    width: 100%;
+    	}
+	}
+	
 </style>

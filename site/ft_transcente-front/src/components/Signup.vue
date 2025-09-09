@@ -17,25 +17,51 @@ import { ref } from 'vue';
 
 	async function handleSubmit() {
 		message.value = "";
+
+		// reinitialiser les variables:
+		error_login.value = false;
+		error_email.value = false;
+		error_password.value = false;
+		error_conf_password.value = false;
+
+		// verifier que mdp est correctement repete:
+		if (password.value !== conf_password.value) {
+			error_conf_password.value = true;
+			message.value = "Passwords are not the same"; //todo langue
+			return;
+		}
+
 		try {
 			const result = await fetch("http://localhost:3000/users", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ login: login.value, email: email.value, password: password.value }),
+				body: JSON.stringify({
+					login: login.value, 
+					email: email.value, 
+					password: password.value,
+				}),
 			});
+			if (!result.ok) {
+				throw new Error(`HTTP error! status: ${result.status}`);
+			}
 			
-			const data = await result.json();
+			interface ServerResponse { // interface
+				success: boolean;
+				message?: string;
+			}
+			const data: ServerResponse = await result.json();
 			
 			if (data.success) {
 				message.value = "Account successfully created"; //todo langue
 				login.value = "";
 				email.value = "";
 				password.value = "";
+				conf_password.value = "";
 			} else {
-				error_login.value = true;
-				error_email.value = true;
-				error_password.value = true;
-				error_conf_password.value = true;
+				if (data.message?.includes("login"))
+					error_login.value = true;
+				if (data.message?.includes("email"))
+					error_email.value = true;
 				message.value = data.message || "Subscription error"; //todo langue
 			}
 		} catch (err) {
@@ -47,29 +73,38 @@ import { ref } from 'vue';
 <template>
 	<div class="frame-signup" title="sign-up_frame">
 		<div class="signUpTitle" tittle="signup_tittle" data-i18n="header.signUp"></div>
-		<form @submit.prevent="handleSubmit">
+		<form class="form_signup" @submit.prevent="handleSubmit">
 			<label class="subTittle">
 					<div data-i18n="Signup.login"></div>
 			</label>
 			<input class="input" type="login" id="login" v-model="login" required>
-			<div v-show=" !error_login" title="login-error" class="error" data-i18n="Signup.login_error" ></div>
+			<div  title="login-error" class="error"  >
+					<div v-show="!error_login" data-i18n="Signup.login_error"></div>
+			</div>
 			<label class="subTittle">Email</label>
 			<input class="input" type="email" id="email" v-model="email" required>
-			<div v-show=" !error_email" title="mail-error" class="error" data-i18n="Signup.mail_error" ></div>
+			<div  title="mail-error" class="error" >
+				<div v-show=" !error_email" data-i18n="Signup.mail_error"></div>
+			</div>
 			<label class="subTittle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="input" type="password" id="password" v-model="password" required>
-			<div v-show=" !error_password" title="pasword-error" class="error" data-i18n="Signup.password_error" ></div>
+			<div title="pasword-error" class="error"  >
+				<div v-show=" !error_password" data-i18n="Signup.password_error"></div>
+
+			</div>
 			<label class="subTittle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
 			<input class="input" type="conf_password" id="conf_password" v-model="conf_password" required>
-			<div v-show=" !error_conf_password" title="conf_password-error" class="error" data-i18n="Signup.conf_password_error" ></div>
+			<div  title="conf_password-error" class="error" >
+				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
+
+			</div>
 		</form>
 		<div tittle="line_button" class="line-button">
 			<div class="icon-button">
-				<button tittle="google-signup" class="google-button"></button>
 				<button tittle="ft-signup" class="ft-button"></button>
 			</div>
 			<button tittle="Submit-button" class="Submit-button">
@@ -86,7 +121,7 @@ import { ref } from 'vue';
 	}
 
 	.frame-signup{
-		width: 60rem;
+		width: 25rem;
 
 		display: grid;
 		grid-template-columns: 1fr;
@@ -121,7 +156,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 4rem;
+		font-size: 2.5rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -134,6 +169,10 @@ import { ref } from 'vue';
 		margin-bottom: 1rem;
 	}
 
+	.form_signup{
+		display: block;
+	}
+
 	.subTittle{
 		font-family: netron;
 		color: white;
@@ -144,7 +183,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 1.5rem;
+		font-size: 1.2rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -157,9 +196,11 @@ import { ref } from 'vue';
 	}
 
 	.input{
-		width: 60rem;
-		font-size: 1rem;
+		width: 25rem;
+		font-size: 1.2em;
 		margin-bottom: 0.5rem;
+		border-radius: 20px;
+		border: none;
 	}
 
 	.error{
@@ -173,54 +214,18 @@ import { ref } from 'vue';
 		0 0 80px #fd2d49,
 		0 0 120px #fd2d49;
 		font-size: 1rem;
-		margin-bottom: 0.5rem;
+		margin-bottom: 1.5rem;
 	}
 
-	.line-button{
+		.line-button{
 		display: flex;
-		margin-top: 1rem;
 		justify-content: space-between;
 		align-items: center;
-		align-items:flex-start
 	}
 
 	.icon-button{
 		display: flex;
 		justify-content: end;
-	}
-
-	.google-button{
-		display:block;
-		background: url("../../images/google.png");
-		background-size: contain;
-		background-color: rgba(116, 240, 157, 0.8) ;
-
-		height: 7rem;
-		width: 7rem;
-		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
-		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d,
-			0 0 120px #74f09d;
-		cursor: pointer;
-		margin-top: 0.5rem;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-
-	}
-
-	.google-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
-
-		border: 1px solid #fafd4e;
-		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
 	}
 
 	.ft-button{
@@ -229,56 +234,47 @@ import { ref } from 'vue';
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
-		background-color: rgba(116, 240, 157, 0.8) ;
-		height: 7rem;
-		width: 7rem;
+		background-color: #fbff22cc ;
+		height: 5rem;
+		width: 5rem;
 		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
+		border: 2px solid rgb(255, 255, 255);
 		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d;
+			0 0 10px #fbff22,
+			0 0 20px #fbff22;
 		cursor: pointer;
-		margin-left: 3rem;
-		margin-top: 0.5rem;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 
 	}
 
 	.ft-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
+		background-color: #dd0abacc ;
 
-		border: 1px solid #fafd4e;
+		border: 1px solid #ffffff;
 		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 120px #dd0aba;
 	}
 
 
 	.Submit-button{
-		margin-top: 1rem;
 		font-family: netron;
-		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 4rem;
+		background-color: rgba(251, 255, 34, 0.502);
+		font-size: 2rem;
+		text-align: center;
 		color: white;
 		border: 2px solid #caece8;
 		text-shadow: 
-		0 0 10px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d,
-		0 0 80px #74f09d,
-		0 0 120px #74f09d;
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
 		box-shadow: 
-		0 0 5px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d;
-		padding: 0.5rem 2rem;
+		0 0 5px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+		padding: 0.2rem 1.3rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
@@ -286,22 +282,67 @@ import { ref } from 'vue';
 
 	.Submit-button > div{
 		margin-top:  1rem;
+		margin-bottom:  0.5rem;
 	}
 
 	.Submit-button:hover{
-		background-color: rgba(251, 255, 34, 0.5);
-		border: 2px solid #fbff22;
+		background-color: #dd0abacc ;
+
+		border: 2px solid #dd0aba;
 		box-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
 		text-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
+	}
+	@media (max-width: 1600px) {
+		.frame-signup{
+			width: 40rem;
+			padding: 2rem 3rem;
+			margin-top: 3rem
+		}
+		.signUpTitle{
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+		}
+		.input{
+		width: 40rem;
+		font-size: 1.2em;
+		}
+		.error{
+			font-size: 0.8rem;
+		}
+		.line-button{
+			margin-top: 0.1rem;
+		}
+		.ft-button{
+			height: 4.5rem;
+			width: 4.5rem;
+			margin-top: 0.2rem;
+		}
+		.Submit-button{
+			margin-top: 0.4rem;
+
+			font-size: 2rem;
+			padding: 0.5rem 2rem;
+		}
+		.Submit-button > div{
+			margin-top:  0.5rem;
+		}
+
+	}
+
+	@media (max-width: 992px) {
+    	
+	}
+	@media (max-width: 576px) {
+    	
 	}
 </style>

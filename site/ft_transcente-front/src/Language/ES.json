@@ -1,6 +1,7 @@
 {
 	"header": {
 	  "signUp": "Registro",
+	  "signOut": "CERRAR SESIÓN",
 	  "language": "ES",
 	  "icon_lang": "../images/flag/Espana.png"
 	},
@@ -16,5 +17,21 @@
 		"password_error": "Condiciones de la contraseña.",
 		"conf_password_error": "Las dos contraseñas no son idénticas.",
 		"submit": "ENVIAR"
+	},
+	"player_stat": {
+ 	   "nbr_games": "Partidas",
+ 	   "nbr_victory": "Victorias",
+ 	   "rank": "rango"
+	},
+	"home_player_button": {
+		"play": "JUGAR",
+		"leaderboard": "Clasificación",
+		"historic": "Historial",
+		"social": "Social",
+		"account": "Mi Cuenta"
+	},
+	"friendlist":{
+		"friendlist": "Lista de amigos",
+		"addfriends": "Añadir amigos"
 	}
 }

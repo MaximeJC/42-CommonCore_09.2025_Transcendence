@@ -1,6 +1,7 @@
 {
 	"header": {
 	  "signUp": "INSCRIPTION",
+	  "signOut": "DÉCONNEXION",
 	  "language": "FR",
 	  "icon_lang": "../images/flag/france.png"
 	},
@@ -16,5 +17,22 @@
 		"password_error": "Condition du mot de passe.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
 		"submit": "VALIDER"
+	},
+	"player_stat": {
+		"nbr_games": "Parties",
+		"nbr_victory": "Victoires",
+		"rank": "Rang"
+	},
+	"home_player_button": {
+		"play": "JOUER",
+		"Leaderbord": "Classement",
+		"historic": "Historique",
+		"social": "Social",
+		"account": "Mon Compte"
+	},
+	"friendlist":{
+		"friendlist": "Liste d'Amis",
+		"addfriends": "Ajouter un amis"
 	}
+
 }

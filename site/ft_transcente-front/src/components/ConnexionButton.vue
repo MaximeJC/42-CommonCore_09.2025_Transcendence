@@ -36,7 +36,7 @@
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba;
-		font-size: 6rem;
+		font-size: 4rem;
 		padding: 1rem 4rem;
 		border-radius: 20px;
 		cursor: pointer;
@@ -65,6 +65,23 @@
 		0 0 80px #fbff22,
 		0 0 120px #fbff22;
 
+	}
+
+	@media (max-width: 1600px) {
+		.connexion-button{
+			font-size: 4.5rem;
+			padding: 0.6rem 3rem;
+		}
+		.connexion-button > div {
+			margin-top: 1rem;
+		}
+	}
+
+	@media (max-width: 992px) {
+    	
+	}
+	@media (max-width: 576px) {
+    	
 	}
 	
 </style>

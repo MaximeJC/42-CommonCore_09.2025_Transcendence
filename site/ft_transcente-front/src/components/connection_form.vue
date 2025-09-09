@@ -8,9 +8,9 @@ import { ref } from 'vue';
 	const email = ref("");
 	const password = ref("");
 
-	const error_login = ref(false);
-	const error_email = ref(false);
-	const error_password = ref(false);
+	let error_login = ref(false);
+	let error_email = ref(false);
+	let error_password = ref(false);
 	const message = ref("");
 
 	async function handleConnection() {
@@ -40,6 +40,15 @@ import { ref } from 'vue';
 			error_password.value = true;
 		}
 	}
+	// const handleConnection = () => {
+	// 	//preparation envoie serveur
+	// }
+	const emit = defineEmits(['isconnected']);
+
+
+	error_email = ref(true);
+	error_password = ref(true);
+
 </script>
 
 <template>
@@ -48,20 +57,22 @@ import { ref } from 'vue';
 		<form @submit.prevent="handleConnection">
 			<label class="c-subTittle">Email</label>
 			<input class="c-input" type="email" id="email" v-model="email" required>
-			<div v-show=" !error_email" title="mail-error" class="c-error" data-i18n="Signup.mail_error" ></div>
-			<div v-show=" !error_email" title="mail-error" class="c-error" data-i18n="Signup.mail_error" ></div>
+			<div class="c-error"  title="mail-error">
+				<div v-show=" !error_email"  data-i18n="Signup.mail_error"></div>
+			</div>
 			<label class="c-subTittle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="c-input" type="password" id="password" v-model="password" required>
-			<div v-show=" !error_password" title="pasword-error" class="c-error" data-i18n="Signup.password_error" ></div>
+			<div  title="pasword-error" class="c-error"  >
+				<div v-show=" !error_password" data-i18n="Signup.mail_error"></div>
+			</div>
 		</form>
 		<div tittle="c-line_button" class="c-line-button">
 			<div class="c-icon-button">
-				<button tittle="c-google-signup" class="c-google-button"></button>
 				<button tittle="c-ft-signup" class="c-ft-button"></button>
 			</div>
-			<button tittle="Submit-button" class="c-Submit-button">
+			<button @click="emit('isconnected')" tittle="Submit-button" class="c-Submit-button">
 				<div data-i18n="Signup.submit"></div>
 			</button>
 		</div>
@@ -74,7 +85,7 @@ import { ref } from 'vue';
 	src: url("../../fonts/netron.regular.otf") format("opentype");
 	}
 	.frame-connection{
-		width: 40rem;
+		width: 25rem;
 
 		display: flexbox;
 		grid-template-columns: 1fr;
@@ -107,7 +118,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 3rem;
+		font-size: 2.5rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -130,7 +141,7 @@ import { ref } from 'vue';
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 2rem;
+		font-size: 1.2rem;
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -143,9 +154,11 @@ import { ref } from 'vue';
 	}
 
 	.c-input{
-		width: 40rem;
-		font-size: 1.5rem;
+		width: 25rem;
+		font-size: 1.2rem;
 		margin-bottom: 0.5rem;
+		border-radius: 20px;
+		border: none;
 	}
 
 	.c-error{
@@ -159,29 +172,24 @@ import { ref } from 'vue';
 		0 0 80px #fd2d49,
 		0 0 120px #fd2d49;
 		font-size: 1rem;
-		margin-bottom: 0.5rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.c-Submit-button{
-		margin-top: 1rem;
 		font-family: netron;
-		background-color: rgba(156, 50, 133, 0.5);
-		font-size: 3rem;
+		background-color: rgba(251, 255, 34, 0.5);
+		font-size: 2rem;
 		color: white;
 		border: 2px solid #caece8;
 		text-shadow: 
-		0 0 10px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d,
-		0 0 80px #74f09d,
-		0 0 120px #74f09d;
+		0 0 10px #fbff22,
+		0 0 10px #fbff22;
+
 		box-shadow: 
-		0 0 5px #74f09d,
-		0 0 10px #74f09d,
-		0 0 20px #74f09d,
-		0 0 40px #74f09d;
-		padding: 0.5rem 2rem;
+		0 0 5px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+		padding: 0.5rem 1.3rem;
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
@@ -200,90 +208,97 @@ import { ref } from 'vue';
 		justify-content: end;
 	}
 
-	.c-google-button{
-		display:block;
-		background: url("../../images/google.png");
-		background-size: contain;
-		background-color: rgba(116, 240, 157, 0.8) ;
-
-		height: 5rem;
-		width: 5rem;
-		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
-		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d;
-		cursor: pointer;
-		margin-top: 1rem;
-	}
-
-	.c-google-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
-
-		border: 1px solid #fafd4e;
-		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
-	}
-
 	.c-ft-button{
 		display:block;
 		background: url("../../images/42logo.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
-		background-color: rgba(116, 240, 157, 0.8) ;
+		background-color: rgba(251, 255, 34, 0.8) ;
 
 		height: 5rem;
 		width: 5rem;
 		border-radius: 50%;
-		border: 1px solid rgb(173, 250, 199);
+		border: 2px solid rgb(255, 255, 255);
 		box-shadow: 
-			0 0 10px #74f09d,
-			0 0 10px #74f09d,
-			0 0 20px #74f09d,
-			0 0 40px #74f09d;
+			0 0 10px #fbff22,
+			0 0 10px #fbff22,
+			0 0 20px #fbff22;
 		cursor: pointer;
-		margin-left: 3rem;
-		margin-top: 1rem;
+		transition: background-color 0.6s ease, box-shadow 0.3 ease-in-out;
 
 	}
 
 	.c-ft-button:hover{
-		background-color: rgba(251, 255, 0, 0.8) ;
+		background-color: rgba(221, 10, 186, 0.8);
 
-		border: 1px solid #fafd4e;
 		box-shadow: 
-			0 0 10px #fbff22,
-			0 0 10px #fbff22,
-			0 0 20px #fbff22,
-			0 0 40px #fbff22,
-			0 0 120px #fbff22;
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 120px #dd0aba;
 	}
 
 	.c-Submit-button > div{
 		margin-top:  1rem;
+		margin-bottom:  0.5rem;
 	}
 
 	.c-Submit-button:hover{
-		background-color: rgba(251, 255, 34, 0.5);
-		border: 2px solid #fbff22;
+		background-color: rgba(221, 10, 186, 0.5);
+		border: 2px solid #ffffff;
 		box-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px rgb(221, 10, 186),
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
 		text-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22,
-		0 0 40px #fbff22,
-		0 0 80px #fbff22;
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba,
+		0 0 80px #dd0aba;
+	}
+
+	@media (max-width: 1600px) {
+		.frame-connection{
+			width: 35rem;
+			padding: 1.5rem 2rem;
+		}
+		.connectionTittle{
+			font-size: 2.5rem;
+			margin-bottom: 0.6rem;
+		}
+		.c-input{
+			width: 34.5rem;
+			font-size: 1.2rem;
+		}
+		.c-error{
+			font-size: 0.8rem;
+		}
+		.c-line-button{
+			margin-top: 0.5rem
+		}
+		.c-ft-button{
+			height: 4rem;
+			width: 4rem;
+		}
+		.c-Submit-button{
+			font-size: 2.5rem;
+			margin-top: 0.5rem;
+			padding: 0.5rem 1rem;
+		}
+		.c-Submit-button > div{
+			margin-top:  0.5rem;
+		}
+	}
+
+	@media (max-width: 992px) {
+    	
+	}
+	@media (max-width: 576px) {
+    	
 	}
 </style>
