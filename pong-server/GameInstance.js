@@ -223,6 +223,17 @@ export class GameInstance {
 			},
 			(winnerPseudo) => { this.endGame(winnerPseudo); }
 		);
+
+		//TODO : Si besoin pour recuperer position balle et joueurs
+		// // Position de la balle
+		// const ballPos = this.gameState.ball.position;
+		// console.log(`Balle: { y: ${ballPos.y.toFixed(2)}, z: ${ballPos.z.toFixed(2)} }`);
+
+		// // Position des joueurs
+		// this.gameState.activePlayers.forEach((player, index) => {
+		// 	console.log(`Joueur ${index + 1} (${player.pseudo}): { y: ${player.y.toFixed(2)}, movement: ${player.movement} }`);
+		// });
+
 		this.broadcastState();
 	}
 		
