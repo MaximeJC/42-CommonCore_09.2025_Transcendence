@@ -4,11 +4,16 @@
 			setLanguage: (lang: string) => void;
 	}>();
 
+	const emit = defineEmits(['show-other_player']);
+
+
 	const rootElement = ref<HTMLElement | null>(null);
 
 	defineExpose({
 		rootElement
 	});
+
+	
 
 	interface Player {
 		rank: number;
@@ -46,7 +51,7 @@
 		</div>
 		<div v-for="player in players" :key="player.rank" class="grid-row">
 			<div class="stat1">{{ player.rank}}</div>
-			<button class="name-button">{{ player.name }}</button>
+			<button @click="emit('show-other_player')" class="name-button">{{ player.name }}</button>
 			<div class="stat2">{{ player.games }}</div>
 			<div class="stat2">{{ player.victory }}</div>
 		</div>

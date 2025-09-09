@@ -2,12 +2,14 @@
 import { ref, onMounted, defineProps } from 'vue';
 import play_historic from "./play&historic_button.vue" 
 import play_return from "./play&return_button.vue" 
+import invit_return from "./invit&return_button.vue" 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 			historic: boolean;
+			other_player: boolean;
 	}>();
 
-	const emit = defineEmits(['show-historic']);
+	const emit = defineEmits(['show-other_player', 'show-historic']);
 
 </script>
 
@@ -31,8 +33,9 @@ import play_return from "./play&return_button.vue"
 			<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div tittle="rank_stat" class="stat">1</div>
 		</div>
-		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic"></play_historic>
-		<play_return @show-historic="emit('show-historic')" v-show="historic"></play_return>
+		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
+		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
+		<invit_return @show-other_player="emit('show-other_player')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
 </template>
 
@@ -46,7 +49,7 @@ import play_return from "./play&return_button.vue"
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		width:min-content;
+		width: 51rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
 		box-shadow: 

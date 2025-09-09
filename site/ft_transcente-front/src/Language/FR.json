@@ -29,7 +29,8 @@
 		"historic": "Historique",
 		"social": "Social",
 		"return": "Retour",
-		"account": "Mon Compte"
+		"account": "Mon Compte",
+		"invit": "Inviter"
 	},
 	"friendlist":{
 		"friendlist": "Liste d'Amis",
@@ -37,6 +38,13 @@
 	},
 
 	"historic":{
-		"historic": "Historique"
+		"historic": "Historique",
+		"victory": "Victoire",
+		"login": "Utilisateur",
+		"my_score": "Mon score",
+		"time": "Temps de jeu",
+		"o_score": "Score adv.",
+		"o_login": "Adversaire"
+
 	}
 }

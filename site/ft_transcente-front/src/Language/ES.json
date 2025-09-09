@@ -29,10 +29,21 @@
 		"historic": "Historial",
 		"social": "Social",
 		"return": "Volver",
-		"account": "Mi Cuenta"
+		"account": "Mi Cuenta",
+		"invit": "Invitar"
 	},
 	"friendlist":{
 		"friendlist": "Lista de amigos",
 		"addfriends": "Añadir amigos"
+	},
+	"historic":{
+	    "historic": "Historial",
+	    "victory": "Victoria",
+	    "login": "Usuario",
+	    "my_score": "Mi puntuación",
+	    "time": "Tiempo de juego",
+	    "o_score": "Puntuación adv. ",
+	    "o_login": "Adversario"
 	}
+	
 }
