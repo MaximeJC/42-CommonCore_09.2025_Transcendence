@@ -37,6 +37,10 @@ export function resetBall(gameState, directionZ) {
 	// Normalisation manuelle pour obtenir un vecteur de direction de longueur 1
 	const length = Math.sqrt(yDir * yDir + zDir * zDir);
 	gameState.ballDirection = { y: yDir / length, z: zDir / length };
+
+	// On met a jour les composantes de vitesse
+	gameState.ball.vx = gameState.ballDirection.z * gameState.speedBall;
+	gameState.ball.vy = gameState.ballDirection.y * gameState.speedBall;
 }
 
 //Fonction pour terminer la partie (non utilisee directement ici, mais gardee pour la structure)
@@ -153,6 +157,10 @@ export function updateBall(deltaTime, gameState, onGoal, onEnd) {
 	ball.position.z += gameState.ballDirection.z * gameState.speedBall * deltaTime;
 	ball.position.y += gameState.ballDirection.y * gameState.speedBall * deltaTime;
 
+	// On met a jour les composantes de vitesse a chaque frame
+	ball.vx = gameState.ballDirection.z * gameState.speedBall;
+	ball.vy = gameState.ballDirection.y * gameState.speedBall;
+
 	// Collision avec les murs haut/bas
 	if (ball.position.y > wallLimit || ball.position.y < -wallLimit) {
 		ball.position.y = Math.max(-wallLimit, Math.min(wallLimit, ball.position.y));
@@ -244,6 +252,10 @@ function handleRacketCollision(ball, player, gameState) {
 	if (gameState.speedBall < 500) { // Limite de vitesse
 		gameState.speedBall *= speedMultiplicator;
 	}
+
+	// On met a jour les composantes de vitesse apres le rebond
+	gameState.ball.vx = gameState.ballDirection.z * gameState.speedBall;
+	gameState.ball.vy = gameState.ballDirection.y * gameState.speedBall;
 		
 	ball.position.z += gameState.ballDirection.z * 1.5;
 }

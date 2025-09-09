@@ -9,6 +9,7 @@ import { initialSpeedBall } from './config.js';
  */
 export function createInitialGameState() {
 	return {
+		ballDirection: { y: 0, z: 0 },
 		// --- Donnees de vitesse ---
 		speedBall: initialSpeedBall,
 
@@ -29,7 +30,10 @@ export function createInitialGameState() {
 
 		// References aux objets physiques
 		ball: {
-			position: { y: 0, z: 0 }
+			position: { y: 0, z: 0 },
+			// --- AJOUT DES VITESSES ---
+			vx: 0, // Vitesse sur l'axe Z
+			vy: 0  // Vitesse sur l'axe Y
 		},
 		activePlayers: [], // Sera rempli avec des objets comme { id, y, movement, controlType, ... }
 	};

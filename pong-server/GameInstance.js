@@ -225,9 +225,9 @@ export class GameInstance {
 		);
 
 		//TODO : Si besoin pour recuperer position balle et joueurs
-		// // Position de la balle
-		// const ballPos = this.gameState.ball.position;
-		// console.log(`Balle: { y: ${ballPos.y.toFixed(2)}, z: ${ballPos.z.toFixed(2)} }`);
+		// Position et vitesse de la balle
+		// const ball = this.gameState.ball;
+		// console.log(`Balle: { y: ${ball.position.y.toFixed(2)}, z: ${ball.position.z.toFixed(2)} } | Vitesse: { vy: ${ball.vy.toFixed(2)}, vz: ${ball.vx.toFixed(2)} }`);
 
 		// // Position des joueurs
 		// this.gameState.activePlayers.forEach((player, index) => {
