@@ -71,53 +71,59 @@ export async function updateAIMovement(gameState) {
 	}
 
 	for (const aiPlayer of aiPlayers) {
-		// --- ETAT DE JEU ENRICHI POUR L'IA ---
-		// On envoie le monde tel qu'il est, avec des informations contextuelles.
+		
+		// --- FONCTION DE TRADUCTION DE COORDONNEES ---
+		// Convertit le Y du jeu (-38 a +38) en Y de l'IA (200 a 0)
+		const convertGameYToIA_Y = (gameY) => {
+			const gameRange = 38 - (-38); // 76
+			const iaRange = 200 - 0; // 200
+			// (valeur - min_ancien) / plage_ancienne = (resultat - min_nouveau) / plage_nouvelle
+			// On inverse l'axe en faisant commencer la plage de l'IA a 200.
+			const normalizedValue = (gameY - (-38)) / gameRange; // Valeur de 0 a 1
+			return 200 - (normalizedValue * iaRange); // On applique a la nouvelle plage inversee
+		};
+
 		const stateForIA = {
 			ball: {
-				x: gameState.ball.position.z, // Coordonnee Z du jeu
-				y: -gameState.ball.position.y, // Y est inverse pour correspondre au referentiel de l'IA
+				x: gameState.ball.position.z,
+				y: convertGameYToIA_Y(gameState.ball.position.y),
 				speedX: gameState.ball.vx,
-				speedY: -gameState.ball.vy
+				// La vitesse en Y doit aussi etre inversee
+				speedY: -gameState.ball.vy 
 			},
 			paddles: {
-				// On envoie la description complete de la raquette que l'IA doit controler.
 				me: {
 					name: aiPlayer.name,
-					y: -aiPlayer.y
+					y: convertGameYToIA_Y(aiPlayer.y)
 				},
-				// On envoie la liste de TOUTES les raquettes presentes sur le terrain.
 				all: gameState.activePlayers.map(p => {
-					return { name: p.name, y: -p.y };
+					return { name: p.name, y: convertGameYToIA_Y(p.y) };
 				})
 			}
 		};
 
 		try {
-			// On envoie cet etat enrichi au serveur d'IA.
 			await fetch(`${iaApiUrl}/update`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(stateForIA)
 			});
 
-			// On demande une decision.
 			const response = await fetch(`${iaApiUrl}/action`);
 			const data = await response.json();
-			const action = data.action; // "UP", "DOWN", ou "NONE"
+			const action = data.action;
 
-			// On traduit la reponse en 'movement' pour notre jeu.
 			if (action === "UP") {
-				aiPlayer.movement = 1; // Monter dans notre systeme (Y positif)
+				aiPlayer.movement = 1;
 			} else if (action === "DOWN") {
-				aiPlayer.movement = -1; // Descendre dans notre systeme (Y negatif)
+				aiPlayer.movement = -1;
 			} else {
 				aiPlayer.movement = 0;
 			}
 
 		} catch (error) {
 			console.error(`[IA Externe] Erreur de communication pour le joueur ${aiPlayer.pseudo}: ${error.message}`);
-			aiPlayer.movement = 0; // Securite en cas d'echec
+			aiPlayer.movement = 0;
 		}
 	}
 }
