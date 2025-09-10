@@ -13,8 +13,6 @@ const __dirname = path.dirname(__filename);
 const app = fastify({ logger: true });
 const PORT = 3000;
 
-export let serverLanguage = 'es'; // 'en', 'fr', 'es'
-
 app.register(fastifyStatic, {
 	root: path.join(__dirname, '..', 'public'),
 	prefix: '/', // Servir depuis la racine (ex: /index.html)
@@ -33,14 +31,18 @@ app.register(async function (fastify) {
 	fastify.get('/', { websocket: true }, (connection) => {
 		const socket = connection;
 		socket.id = uuidv4();
-		clients.set(socket.id, { socket, gameId: null });
+		clients.set(socket.id, { 
+			socket: socket,
+			gameId: null,
+			pseudo: 'Anonymous',
+			language: 'en',
+			avatarUrl: '' });
 		console.log("[Serveur] Client connecte: ${socket.id}");
 
 		const welcomeMessage = {
 			type: 'connection_established',
 			data: {
-				clientId: socket.id,
-				server_language: serverLanguage
+				clientId: socket.id
 			}
 		};
 		socket.send(JSON.stringify(welcomeMessage));
@@ -48,20 +50,25 @@ app.register(async function (fastify) {
 		socket.on('message', (message) => {
 			try {
 				const parsed = JSON.parse(message.toString());
-				if (parsed.data && parsed.data.language) {
-					serverLanguage = parsed.data.language;
-					console.log(`[Serveur] Langue changee en: ${serverLanguage}`);
-				}
 				const clientInfo = clients.get(socket.id);
+				
+				// On met a jour les infos du client si le message est 'client_hello'
+				if (parsed.type === 'client_hello') {
+					if (clientInfo) {
+						clientInfo.pseudo = parsed.data.pseudo;
+						clientInfo.language = parsed.data.language;
+						clientInfo.avatarUrl = parsed.data.avatarUrl;
+						console.log(`[Serveur] Client ${socket.id} identifie: ${JSON.stringify({ pseudo: clientInfo.pseudo, lang: clientInfo.language, avatar: clientInfo.avatarUrl })}`);
+					}
+				}
 
 				switch(parsed.type) {
 					case 'find_match':
-						// On passe le socket et le pseudo a la fonction de matchmaking
-						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo, parsed.data.language, parsed.data.avatarUrl);
+						handleMatchmaking(clientInfo, parsed.data.mode);
 						break;
 					// Pour partie privee
 					case 'create_private_match':
-						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode, parsed.data.language, parsed.data.avatarUrl);
+						handlePrivateMatchmaking(clientInfo, parsed.data.opponent_pseudo, parsed.data.mode);
 						break;
 					case 'player_input':
 						if (clientInfo?.gameId) {
@@ -135,12 +142,13 @@ app.register(async function (fastify) {
 	});
 });
 
-function handleMatchmaking(socket, gameMode, pseudo, language, avatarUrl) {
-	const playerInfo = { socket, pseudo, language: language || 'en', avatarUrl: avatarUrl }; // On cree l'objet info
+function handleMatchmaking(playerInfo, gameMode) {
+	// const playerInfo = { socket, pseudo, language: language || 'en', avatarUrl: avatarUrl }; // On cree l'objet info
 
-	const isInQueue = matchmaking_1v1.some(p => p.socket.id === socket.id) || matchmaking_4p.some(p => p.socket.id === socket.id);
+	// const isInQueue = matchmaking_1v1.some(p => p.socket.id === socket.id) || matchmaking_4p.some(p => p.socket.id === socket.id);
+	const isInQueue = matchmaking_1v1.some(p => p.socket.id === playerInfo.socket.id) || matchmaking_4p.some(p => p.socket.id === playerInfo.socket.id);
 	if (isInQueue) {
-		console.log("[Matchmaking] Le joueur ${socket.id} est deja en file d'attente.");
+		console.log("[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.");
 		return;
 	}
 
@@ -178,8 +186,8 @@ function handleMatchmaking(socket, gameMode, pseudo, language, avatarUrl) {
 /**
  * Pour gerer le matchmaking prive.
  */
-function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode, language, avatarUrl) {
-	const playerInfo = { socket, pseudo: myPseudo, language: language || 'en', avatarUrl: avatarUrl };
+function handlePrivateMatchmaking(playerInfo, opponentPseudo, gameMode) {
+	// const playerInfo = { socket, pseudo: myPseudo, language: language || 'en', avatarUrl: avatarUrl };
 
 	// La cle de la salle est basee sur les pseudos tries, pour que "A vs B" et "B vs A" soient identiques.
 	const roomKey = [myPseudo, opponentPseudo].sort().join('_vs_');

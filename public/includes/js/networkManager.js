@@ -47,6 +47,11 @@ class NetworkManager {
 
 			this.socket.onopen = () => {
 				console.log("Connecte au serveur de jeu !");
+				this.sendMessage('client_hello', {
+					pseudo: gameState.pseudo,
+					language: gameState.language,
+					avatarUrl: gameState.avatarUrl
+					});
 				gameState.isConnected = true;
 				resolve();
 			};
@@ -128,9 +133,8 @@ class NetworkManager {
 			// Pour les messages moins frequents qui gerent les evenements du jeu.
 			switch (message.type) {
 				case 'connection_established':
-					console.log("Connexion etablie avec le serveur. Ma langue est:", message.data.server_language);
+					console.log("Connexion etablie avec le serveur.");
 					// On stocke la langue dans notre etat de jeu global.
-					gameState.language = message.data.server_language;
 					gameState.myClientId = message.data.clientId;
 					break;
 				case 'start_countdown':

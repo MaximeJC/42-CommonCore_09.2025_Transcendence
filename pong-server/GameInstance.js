@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { createInitialGameState } from './game/gameState.js';
 import * as GameLogic from './game/gameLogic.js';
 import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4, iaResponseTime } from './game/config.js';
-import { serverLanguage } from './server.js';
 
 const TICK_RATE = 60;
 
