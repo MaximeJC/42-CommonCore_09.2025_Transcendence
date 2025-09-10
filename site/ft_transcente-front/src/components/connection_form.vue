@@ -1,32 +1,21 @@
 <script setup lang="ts"> // Vue 3, Typescript
 import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 
-	interface ServerResponse { // creation d'une interface qui definit la structure des donnees attendues par le serveur
-		success: boolean; // reussite de la requete
-		message?: string; // message optionnel
-		users?: { // objet optionnel contenant le login de l'utilisateur
-			login: string;
-		};
-		errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
-			email?: string;
-			password?: string;
-		};
-	}
 
-	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
-		setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
-	}>();
+const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
+	setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
+}>();
 
-	const emit = defineEmits(['isconnected']);
+const emit = defineEmits(['isconnected']);
 
-	// references reactives:
-	const email = ref("");
-	const password = ref("");
-	const error_email = ref(false);
-	const error_password = ref(false);
-	const message = ref("");
+// references reactives:
+const email = ref("");
+const password = ref("");
+const error_email = ref(false);
+const error_password = ref(false);
+const message = ref("");
 
-	async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
+async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
 		// reinitialiser les variables d'erreur et de message:
 		error_email.value = false;
 		error_password.value = false;
@@ -41,6 +30,18 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 					password: password.value,
 				}),
 			});
+
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+				users?: { // objet optionnel contenant le login de l'utilisateur
+					login: string;
+				};
+				errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
+					email?: string;
+					password?: string;
+				};
+			}
 			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
 	
 			if (data.success && data.users) {

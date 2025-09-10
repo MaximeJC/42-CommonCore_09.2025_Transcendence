@@ -1,29 +1,29 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
+<script setup lang="ts"> // Vue 3, Typescript
+import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
+
+	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
+			setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 		}>();
 
+	// references reactives:
 	const login = ref("");
 	const email = ref("");
 	const password = ref("");
 	const conf_password = ref("");
 	const message = ref("");
-	
 	const error_login = ref(false);
 	const error_email = ref(false);
 	const error_password = ref(false);
 	const error_conf_password = ref(false);
 
-	async function handleSubmit() {
-		message.value = "";
-
-		// reinitialiser les variables:
+	async function handleSubmit() { // fonction asynchrone appelee lors de la tentative de creation d'un nouvel utilisateur
+		// reinitialiser les variables d'erreur et de message:
 		error_login.value = false;
 		error_email.value = false;
 		error_password.value = false;
 		error_conf_password.value = false;
-
+		message.value = "";
+	
 		// verifier que mdp est correctement repete:
 		if (password.value !== conf_password.value) {
 			error_conf_password.value = true;
@@ -32,7 +32,7 @@ import { ref } from 'vue';
 		}
 
 		try {
-			const result = await fetch("http://localhost:3000/users", {
+			const result = await fetch("http://localhost:3000/users", { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -41,17 +41,16 @@ import { ref } from 'vue';
 					password: password.value,
 				}),
 			});
-			if (!result.ok) {
+			if (!result.ok)
 				throw new Error(`HTTP error! status: ${result.status}`);
-			}
 			
-			interface ServerResponse { // interface
-				success: boolean;
-				message?: string;
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
 			}
 			const data: ServerResponse = await result.json();
 			
-			if (data.success) {
+			if (data.success) { // afficher un message et reinitialiser les variables
 				message.value = "Account successfully created"; //todo langue
 				login.value = "";
 				email.value = "";
