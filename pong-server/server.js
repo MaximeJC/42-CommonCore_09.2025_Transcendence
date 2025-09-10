@@ -57,11 +57,11 @@ app.register(async function (fastify) {
 				switch(parsed.type) {
 					case 'find_match':
 						// On passe le socket et le pseudo a la fonction de matchmaking
-						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo, parsed.data.language);
+						handleMatchmaking(socket, parsed.data.mode, parsed.data.pseudo, parsed.data.language, parsed.data.avatarUrl);
 						break;
 					// Pour partie privee
 					case 'create_private_match':
-						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode, parsed.data.language);
+						handlePrivateMatchmaking(socket, parsed.data.my_pseudo, parsed.data.opponent_pseudo, parsed.data.mode, parsed.data.language, parsed.data.avatarUrl);
 						break;
 					case 'player_input':
 						if (clientInfo?.gameId) {
@@ -135,8 +135,8 @@ app.register(async function (fastify) {
 	});
 });
 
-function handleMatchmaking(socket, gameMode, pseudo, language) {
-	const playerInfo = { socket, pseudo, language: language || 'en'}; // On cree l'objet info
+function handleMatchmaking(socket, gameMode, pseudo, language, avatarUrl) {
+	const playerInfo = { socket, pseudo, language: language || 'en', avatarUrl: avatarUrl }; // On cree l'objet info
 
 	const isInQueue = matchmaking_1v1.some(p => p.socket.id === socket.id) || matchmaking_4p.some(p => p.socket.id === socket.id);
 	if (isInQueue) {
@@ -178,8 +178,8 @@ function handleMatchmaking(socket, gameMode, pseudo, language) {
 /**
  * Pour gerer le matchmaking prive.
  */
-function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode, language) {
-	const playerInfo = { socket, pseudo: myPseudo, language: language || 'en' };
+function handlePrivateMatchmaking(socket, myPseudo, opponentPseudo, gameMode, language, avatarUrl) {
+	const playerInfo = { socket, pseudo: myPseudo, language: language || 'en', avatarUrl: avatarUrl };
 
 	// La cle de la salle est basee sur les pseudos tries, pour que "A vs B" et "B vs A" soient identiques.
 	const roomKey = [myPseudo, opponentPseudo].sort().join('_vs_');

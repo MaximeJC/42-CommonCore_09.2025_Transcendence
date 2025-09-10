@@ -42,10 +42,11 @@ export class GameInstance {
 		const players = this.gameState.activePlayers;
 		let humanPlayerIndex = 0;
 
-		const createPlayer = (defaultPseudo, name, controlType) => {
+		const createPlayer = (defaultPseudo, name, controlType, defaultAvatar) => {
 			let id;
 			let pseudo = defaultPseudo; // On garde un pseudo par defaut pour les IA
 			let language = 'en';
+			let avatarUrl = defaultAvatar || 'includes/img/default_avatar.png';
 
 			// Logique d'assignation d'ID adaptee a tous les cas
 			if (controlType.includes('HUMAN')) {
@@ -55,6 +56,7 @@ export class GameInstance {
 					pseudo = info.pseudo; // On utilise le pseudo fourni par le client
 					// On stocke le socket pour pouvoir communiquer avec ce joueur
 					language = info.language;
+					avatarUrl = info.avatarUrl || 'includes/img/default_avatar.png';
 					this.sockets[id] = info.socket;
 				} else {
 					id = "human_${humanPlayerIndex}";
@@ -62,19 +64,20 @@ export class GameInstance {
 				humanPlayerIndex++;
 			} else {
 				id = "AI_${uuidv4()}";
+				avatarUrl = 'includes/img/lapin.png';
 			}
-			return { id, pseudo, name, y: 0, movement: 0, controlType, language };
+			return { id, pseudo, name, y: 0, movement: 0, controlType, language, avatarUrl };
 		};
 
 		switch (gameMode) {
 			case 'AI_VS_AI':
-				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png'));
 				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
 				break;
 			
 			case '1P_VS_AI':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Bimo IA", 'player_right_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_right_top', 'AI', 'includes/img/lapin.png'));
 				break;
 
 			case '2P_LOCAL':
@@ -92,7 +95,7 @@ export class GameInstance {
 				break;
 
 			case '2AI_VS_2AI':
-				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png'));
 				players.push(createPlayer("Spiderman", 'player_left_bottom', 'AI'));
 				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
 				players.push(createPlayer("Roger", 'player_right_bottom', 'AI'));
@@ -127,7 +130,7 @@ export class GameInstance {
 					type: 'game_start',
 					data: {
 						your_player_name: 'both', // Signal special pour le client
-						all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo }))
+						all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo, avatarUrl: p.avatarUrl }))
 					}
 				};
 				clientSocket.send(JSON.stringify(message));
@@ -141,7 +144,7 @@ export class GameInstance {
 						type: 'game_start',
 						data: {
 							your_player_name: player.name,
-							all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo }))
+							all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo, avatarUrl: p.avatarUrl }))
 						}
 					};
 					socket.send(JSON.stringify(message));

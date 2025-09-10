@@ -135,8 +135,7 @@ async function playCinematic(scene, camera) {
 				const colorHex = config.color.toHexString();
 				slot.pseudoText.color = colorHex;
 				slot.avatarContainer.color = colorHex;
-				if (playerInfo.avatarUrl)
-					slot.avatarImage.source = playerInfo.avatarUrl;
+				slot.avatarImage.source = playerInfo.avatarUrl || "includes/img/default_avatar.png";
 			}
 		});
 
@@ -350,6 +349,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const lobby = document.getElementById('lobby');
     const startButton = document.getElementById('start-game-button');
     const pseudoInput = document.getElementById('pseudo-input');
+    const avatarInput = document.getElementById('avatar-input');
     const gamemodeSelect = document.getElementById('gamemode-select');
     const canvas = document.getElementById('renderCanvas');
 	const languageSelect = document.getElementById('language-select');
@@ -366,6 +366,7 @@ window.addEventListener('DOMContentLoaded', () => {
         gameState.pseudo = pseudo;
         gameState.gameMode = gamemodeSelect.value;
 		gameState.language = languageSelect.value;
+		gameState.avatarUrl = avatarInput.value.trim(); //"includes/img/avatar1.jpg";
 		
         lobby.style.display = 'none';
 		canvas.style.display = 'block';
@@ -393,7 +394,8 @@ window.addEventListener('DOMContentLoaded', () => {
 					my_pseudo: gameState.pseudo,
 					opponent_pseudo: opponentPseudo,
 					mode: gameState.gameMode, // On envoie aussi le mode de jeu
-					language: gameState.language
+					language: gameState.language,
+					avatarUrl: gameState.avatarUrl
 				});
 			} else {
 				// Sinon, on rejoint le matchmaking public
@@ -401,7 +403,8 @@ window.addEventListener('DOMContentLoaded', () => {
 				networkManager.sendMessage('find_match', {
 					mode: gameState.gameMode,
 					pseudo: gameState.pseudo,
-					language: gameState.language
+					language: gameState.language,
+					avatarUrl: gameState.avatarUrl
 				});
 			}
 
