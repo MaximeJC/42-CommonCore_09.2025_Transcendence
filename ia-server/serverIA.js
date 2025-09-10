@@ -203,8 +203,10 @@ function predictBallLandingY(state) {
 	let predictedY = lastPos.y + (speedY * timeToReach);
 
 	while (predictedY < 0 || predictedY > 200) {
-		if (predictedY < 0) predictedY = -predictedY;
-		if (predictedY > 200) predictedY = 400 - predictedY;
+		if (predictedY < 0)
+			predictedY = -predictedY;
+		if (predictedY > 200)
+			predictedY = 400 - predictedY;
 	}
 	
 	if (DEBUG_MODE)
