@@ -1,5 +1,0 @@
-- ajouter couleur sur joueur dans le VS correspondant a sa raquette et permettre d'afficher dans un cercle son avatar recuperer depuis le serveur ou un placeholder le cas echeant
-- remettre IA vs IA
-
-- check le mode dois prevaloir sur le pseudo adversaire
-- modifier le nom du gagnant en 2v2 (nom equipe?)
