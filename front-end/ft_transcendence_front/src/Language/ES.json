@@ -1,0 +1,49 @@
+{
+	"header": {
+	  "signUp": "Registro",
+	  "signOut": "CERRAR SESIÓN",
+	  "language": "ES",
+	  "icon_lang": "../images/flag/Espana.png"
+	},
+	"home": {
+	  "connection": "conexión"
+	},
+	"Signup":{
+		"login": "Usuario",
+		"password": "Contraseña",
+		"conf_password": "Confirmación de la contraseña",
+		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
+		"mail_error": "Correo electrónico no válido.",
+		"password_error": "Condiciones de la contraseña.",
+		"conf_password_error": "Las dos contraseñas no son idénticas.",
+		"submit": "ENVIAR"
+	},
+	"player_stat": {
+ 	   "nbr_games": "Partidas",
+ 	   "nbr_victory": "Victorias",
+ 	   "rank": "rango"
+	},
+	"home_player_button": {
+		"play": "JUGAR",
+		"leaderboard": "Clasificación",
+		"historic": "Historial",
+		"social": "Social",
+		"return": "Volver",
+		"account": "Mi Cuenta",
+		"invit": "Invitar"
+	},
+	"friendlist":{
+		"friendlist": "Lista de amigos",
+		"addfriends": "Añadir amigos"
+	},
+	"historic":{
+	    "historic": "Historial",
+	    "victory": "Victoria",
+	    "login": "Usuario",
+	    "my_score": "Mi puntuación",
+	    "time": "Tiempo de juego",
+	    "o_score": "Puntuación adv. ",
+	    "o_login": "Adversario"
+	}
+	
+}
