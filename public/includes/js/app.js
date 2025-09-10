@@ -101,48 +101,46 @@ async function playCinematic(scene, camera) {
 	const totalFrames = frameRate * durationInSeconds;
 	// On definit le moment ou la camera doit passer par le point intermediaire
 	const middleFrame = totalFrames / 2;
+	const fadeOutDelay = (durationInSeconds - 2) * 1000;
 
 	// LOGIQUE DE LA MODALE "VS" 
 	const vsModal = gameState.ui.vsModal;
 	if (vsModal && gameState.allPlayersInfo) {
 		const playerCount = gameState.allPlayersInfo.length;
-		const isTwoPlayerGame = playerCount <= 2;
 
-		// On reinitialise tous les textes des emplacements
-		Object.values(vsModal.playerSlots).forEach(textBlock => {
-			textBlock.text = "";
-			textBlock.isVisible = true; // On s'assure que tout est visible au depart
-		});
-		// On s'assure que le "VS" est aussi visible
-		if (vsModal.vsText) {
-			vsModal.vsText.isVisible = true;
+		let activeLayout;
+		let inactiveLayout;
+
+		if (playerCount <= 2) {
+			activeLayout = vsModal.layout1v1;
+			inactiveLayout = vsModal.layout2v2;
+			vsModal.container.height = "400px";
+		} else {
+			activeLayout = vsModal.layout2v2;
+			inactiveLayout = vsModal.layout1v1;
+			vsModal.container.height = "600px";
 		}
 
-
-		if (isTwoPlayerGame) {
-			// Si c'est un jeu a 2 joueurs, on cache les emplacements du bas qui ne seront pas utilises.
-			vsModal.playerSlots.player_left_bottom.isVisible = false;
-			vsModal.playerSlots.player_right_bottom.isVisible = false;
-			vsModal.vsText = "VS";
-			
-			// Et on deplace les pseudos du haut vers la ligne du milieu (ligne 1).
-			vsModal.grid.removeControl(vsModal.playerSlots.player_left_top);
-			vsModal.grid.addControl(vsModal.playerSlots.player_left_top, 1, 0);
-			vsModal.grid.removeControl(vsModal.playerSlots.player_right_top);
-			vsModal.grid.addControl(vsModal.playerSlots.player_right_top, 1, 2);
-		}
+		// On s'assure que la mauvaise mise en page est cachee et la bonne visible
+		inactiveLayout.grid.isVisible = false;
+		activeLayout.grid.isVisible = true;
 		
 		// On parcourt les informations des joueurs recues du serveur
 		gameState.allPlayersInfo.forEach(playerInfo => {
-			// On cherche le TextBlock correspondant au nom du joueur (ex: "player_left_top")
-			const textBlock = vsModal.playerSlots[playerInfo.name];
-			if (textBlock) {
-				// On lui assigne le bon pseudo
-				textBlock.text = playerInfo.pseudo;
+			const slot = activeLayout.playerSlots[playerInfo.name];
+			const config = gameState.activePlayers.find(p => p.config.name === playerInfo.name)?.config;
+
+			if (slot && config) {
+				slot.pseudoText.text = playerInfo.pseudo;
+				const colorHex = config.color.toHexString();
+				slot.pseudoText.color = colorHex;
+				slot.avatarContainer.color = colorHex;
+				if (playerInfo.avatarUrl)
+					slot.avatarImage.source = playerInfo.avatarUrl;
 			}
 		});
 
-		// On rend le conteneur visible et on lance l'animation de fondu
+		// On rend le conteneur principal visible et on lance l'animation de fondu
 		vsModal.container.isVisible = true;
 		const fadeIn = new BABYLON.Animation("fadeIn", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 		fadeIn.setKeys([{ frame: 0, value: 0 }, { frame: 60, value: 1 }]);
@@ -196,13 +194,13 @@ async function playCinematic(scene, camera) {
 
 	// On attache les animations a la camera
 	camera.animations.push(positionAnimation, targetAnimation);
-
+	
 	// On desactive les controles manuels pendant la cinematique pour eviter les conflits.
 	const canvas = scene.getEngine().getRenderingCanvas();
 	camera.detachControl(canvas);
 
 	await scene.beginAnimation(camera, 0, totalFrames, false).waitAsync();
-	
+
 	//  DISPARITION EN FONDU DE LA MODALE 
 	if (vsModal) {
 		const fadeOut = new BABYLON.Animation("fadeOut", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -388,13 +386,14 @@ window.addEventListener('DOMContentLoaded', () => {
 		// On contacte le serveur.
 		try {
 			await networkManager.connect(JwtToken);
-			if (opponentPseudo) {
+			if (opponentPseudo && gameState.gameMode === "1V1_ONLINE") {
 				// Si un adversaire est specifie, on cree une partie privee
 				console.log("Demande de partie privee contre ${opponentPseudo}");
 				networkManager.sendMessage('create_private_match', {
 					my_pseudo: gameState.pseudo,
 					opponent_pseudo: opponentPseudo,
-					mode: gameState.gameMode // On envoie aussi le mode de jeu
+					mode: gameState.gameMode, // On envoie aussi le mode de jeu
+					language: gameState.language
 				});
 			} else {
 				// Sinon, on rejoint le matchmaking public
@@ -402,7 +401,7 @@ window.addEventListener('DOMContentLoaded', () => {
 				networkManager.sendMessage('find_match', {
 					mode: gameState.gameMode,
 					pseudo: gameState.pseudo,
-					language: gameState.language	
+					language: gameState.language
 				});
 			}
 

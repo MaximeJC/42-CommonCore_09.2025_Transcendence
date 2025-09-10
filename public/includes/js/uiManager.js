@@ -1,11 +1,7 @@
 // js/uiManager.js
 
-// import { resetBall } from './gameLogic.js';
 import { create3DButton, createTextBox } from './gameObjects.js';
 import { returnToLobby } from './app.js';
-// import { scene } from './sceneSetup.js';
-
-// import { networkManager } from './networkManager.js';
 
 /* Cree la modale "VS" mais la laisse cachee.
  * @param {BABYLON.GUI.AdvancedDynamicTexture} guiTexture - La texture sur laquelle dessiner.
@@ -15,82 +11,115 @@ function createVSModal(guiTexture, gameState) {
 
 	// Conteneur principal (le fond)
 	const vsContainer = new BABYLON.GUI.Rectangle("vsContainer");
-	vsContainer.width = "80%";
-	vsContainer.height = "300px"; // On definit une hauteur fixe en pixels
+	vsContainer.width = "55%";
+	vsContainer.adaptHeightToChildren = true;
 	vsContainer.cornerRadius = 20;
 	vsContainer.color = "#e251ca";
 	vsContainer.thickness = 4;
 	vsContainer.background = "rgba(10, 10, 20, 0.85)";
+	vsContainer.paddingTop = "20px";
+	vsContainer.paddingBottom = "20px";
 	
 	vsContainer.alpha = 0;
 	vsContainer.isVisible = false;
 	guiTexture.addControl(vsContainer);
 
-	// Grille de positionnement
-	const grid = new BABYLON.GUI.Grid("vsGrid");
-	// Par defaut, on configure la grille pour 4 joueurs
-	grid.addRowDefinition(0.33); // Ligne du haut
-	grid.addRowDefinition(0.34); // Ligne du milieu
-	grid.addRowDefinition(0.33); // Ligne du bas
-	grid.addColumnDefinition(0.40);
-	grid.addColumnDefinition(0.20);
-	grid.addColumnDefinition(0.40);
-	vsContainer.addControl(grid);
+	// FONCTION D'AIDE POUR CREER UN PANNEAU JOUEUR (AVATAR + PSEUDO) 
+	const createPlayerPanel = (name) => {
+		const panel = new BABYLON.GUI.StackPanel(name + "_panel");
+		panel.isVertical = true;
 
-	// Creation des 4 emplacements de pseudos + le "VS"
-	const playerLeftTopText = new BABYLON.GUI.TextBlock("vsP_LT", "");
-	playerLeftTopText.color = "white";
-	playerLeftTopText.fontSize = 40;
-	playerLeftTopText.fontWeight = "bold";
-	playerLeftTopText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-	playerLeftTopText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT; // Aligner a droite dans sa cellule
-	playerLeftTopText.paddingRight = "20px";
+		const avatarContainer = new BABYLON.GUI.Ellipse(name + "_avatar_container");
+		avatarContainer.width = "120px";
+		avatarContainer.height = "120px";
+		avatarContainer.thickness = 0;
+		avatarContainer.color = "white";
+		panel.addControl(avatarContainer);
 
-	const playerLeftBottomText = new BABYLON.GUI.TextBlock("vsP_LB", "");
-	playerLeftBottomText.color = "white";
-	playerLeftBottomText.fontSize = 40;
-	playerLeftBottomText.fontWeight = "bold";
-	playerLeftBottomText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-	playerLeftBottomText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-	playerLeftBottomText.paddingRight = "20px";
+		const avatarImage = new BABYLON.GUI.Image(name + "_avatar_img", "includes/img/default_avatar.png");
+		avatarContainer.addControl(avatarImage);
 
-	const vsText = new BABYLON.GUI.TextBlock("vsText", "VS");
-	vsText.color = "#e251ca";
-	vsText.fontSize = 60;
-	vsText.fontWeight = "bold";
+		const pseudoText = new BABYLON.GUI.TextBlock(name + "_pseudo", "");
+		pseudoText.color = "white";
+		pseudoText.fontSize = 40;
+		pseudoText.fontWeight = "bold";
+		pseudoText.paddingTop = "20px";
+		pseudoText.height = "80px";
+		panel.addControl(pseudoText);
 
-	const playerRightTopText = new BABYLON.GUI.TextBlock("vsP_RT", "");
-	playerRightTopText.color = "white";
-	playerRightTopText.fontSize = 40;
-	playerRightTopText.fontWeight = "bold";
-	playerRightTopText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-	playerRightTopText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT; // Aligner a gauche dans sa cellule
-	playerRightTopText.paddingLeft = "20px";
+		return { panel, avatarContainer, avatarImage, pseudoText };
+	};
 
-	const playerRightBottomText = new BABYLON.GUI.TextBlock("vsP_RB", "");
-	playerRightBottomText.color = "white";
-	playerRightBottomText.fontSize = 40;
-	playerRightBottomText.fontWeight = "bold";
-	playerRightBottomText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-	playerRightBottomText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-	playerRightBottomText.paddingLeft = "20px";
+	// ==========================================================
+	//  MISE EN PAGE 1 : GRILLE POUR LE 1v1
+	// ==========================================================
+	const grid1v1 = new BABYLON.GUI.Grid("vsGrid1v1");
+	grid1v1.addRowDefinition(1.0); // Une seule ligne pour un centrage vertical parfait
+	grid1v1.addColumnDefinition(0.45);
+	grid1v1.addColumnDefinition(0.20);
+	grid1v1.addColumnDefinition(0.45);
+	vsContainer.addControl(grid1v1);
+	grid1v1.isVisible = false; // Cachee par defaut
 
-	// Positionnement initial sur la grille (pour 4 joueurs)
-	grid.addControl(playerLeftTopText, 0, 0);
-	grid.addControl(playerLeftBottomText, 2, 0);
-	grid.addControl(vsText, 1, 1);
-	grid.addControl(playerRightTopText, 0, 2);
-	grid.addControl(playerRightBottomText, 2, 2);
+	const p1 = createPlayerPanel("vsP_1v1_L");
+	const p2 = createPlayerPanel("vsP_1v1_R");
+	const vsText1v1 = new BABYLON.GUI.TextBlock("vsText1v1", "VS");
+	vsText1v1.color = "#e251ca";
+	vsText1v1.fontSize = 40;
+	vsText1v1.fontWeight = "bold";
 
-	// On stocke les references dans le gameState
+	grid1v1.addControl(p1.panel, 0, 0);
+	grid1v1.addControl(vsText1v1, 0, 1);
+	grid1v1.addControl(p2.panel, 0, 2);
+
+	// ==========================================================
+	//  MISE EN PAGE 2 : GRILLE POUR LE 2v2 (HAUT/BAS)
+	// ==========================================================
+	const grid2v2 = new BABYLON.GUI.Grid("vsGrid2v2");
+	// On revient a une grille a 3 lignes pour un placement simple et fiable
+	grid2v2.addRowDefinition(0.45); // Ligne du haut
+	grid2v2.addRowDefinition(0.10); // Ligne du milieu pour le VS
+	grid2v2.addRowDefinition(0.45); // Ligne du bas
+	grid2v2.addColumnDefinition(0.45);
+	grid2v2.addColumnDefinition(0.20);
+	grid2v2.addColumnDefinition(0.45);
+	vsContainer.addControl(grid2v2);
+	grid2v2.isVisible = false; // Cachee par defaut
+
+	const p_lt = createPlayerPanel("vsP_2v2_LT");
+	const p_lb = createPlayerPanel("vsP_2v2_LB");
+	const p_rt = createPlayerPanel("vsP_2v2_RT");
+	const p_rb = createPlayerPanel("vsP_2v2_RB");
+	const vsText2v2 = new BABYLON.GUI.TextBlock("vsText2v2", "VS");
+	vsText2v2.color = "#e251ca";
+	vsText2v2.fontSize = 40;
+	vsText2v2.fontWeight = "bold";
+
+	// On place chaque element dans sa cellule designee, comme dans votre code original.
+	grid2v2.addControl(p_lt.panel, 0, 0);
+	grid2v2.addControl(p_lb.panel, 2, 0); // Ligne 2 pour le joueur du bas
+	grid2v2.addControl(vsText2v2, 1, 1); // Le "VS" va dans la ligne du milieu
+	grid2v2.addControl(p_rt.panel, 0, 2);
+	grid2v2.addControl(p_rb.panel, 2, 2); // Ligne 2 pour le joueur du bas
+	
+	// On stocke les references aux DEUX mises en page
 	gameState.ui.vsModal = {
 		container: vsContainer,
-		grid: grid, // On a besoin de la reference a la grille
-		playerSlots: {
-			player_left_top: playerLeftTopText,
-			player_left_bottom: playerLeftBottomText,
-			player_right_top: playerRightTopText,
-			player_right_bottom: playerRightBottomText,
+		layout1v1: {
+			grid: grid1v1,
+			playerSlots: {
+				player_left_top: p1,
+				player_right_top: p2
+			}
+		},
+		layout2v2: {
+			grid: grid2v2,
+			playerSlots: {
+				player_left_top: p_lt,
+				player_left_bottom: p_lb,
+				player_right_top: p_rt,
+				player_right_bottom: p_rb,
+			}
 		}
 	};
 }

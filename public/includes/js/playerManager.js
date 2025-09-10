@@ -107,7 +107,7 @@ export function setupPlayers(scene, gameState) {
 			});
 			playerSetups.push({
 				config: {
-					pseudo: "Bimo",
+					pseudo: "Bimo IA",
 					name: allPlayerConfigs.right_top.name,
 					color: allPlayerConfigs.right_top.color,
 					keys: allPlayerConfigs.right_top.keys,
@@ -139,7 +139,7 @@ export function setupPlayers(scene, gameState) {
 					keys: allPlayerConfigs.right_top.keys,
 					position: new BABYLON.Vector3(0, 0, 38)
 				},
-				controlType: 'KEYBOARD', // MODIFICATION CLE: Le 2e joueur est AUSSI controle au clavier.
+				controlType: 'KEYBOARD', // Le 2e joueur est AUSSI controle au clavier.
 				size: racketSize1v1
 			});
 			break;

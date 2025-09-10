@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = fastify({ logger: true });
 const PORT = 3000;
 
-export const serverLanguage = 'es'; // 'en', 'fr', 'es'
+export let serverLanguage = 'es'; // 'en', 'fr', 'es'
 
 app.register(fastifyStatic, {
 	root: path.join(__dirname, '..', 'public'),
@@ -48,6 +48,10 @@ app.register(async function (fastify) {
 		socket.on('message', (message) => {
 			try {
 				const parsed = JSON.parse(message.toString());
+				if (parsed.data && parsed.data.language) {
+					serverLanguage = parsed.data.language;
+					console.log(`[Serveur] Langue changee en: ${serverLanguage}`);
+				}
 				const clientInfo = clients.get(socket.id);
 
 				switch(parsed.type) {

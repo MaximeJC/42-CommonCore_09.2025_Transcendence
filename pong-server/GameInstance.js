@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createInitialGameState } from './game/gameState.js';
 import * as GameLogic from './game/gameLogic.js';
 import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4, iaResponseTime } from './game/config.js';
+import { serverLanguage } from './server.js';
 
 const TICK_RATE = 60;
 
@@ -30,7 +31,7 @@ export class GameInstance {
 		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
 		this.readyPlayers = new Set();
 		
-		console.log("[Jeu ${this.gameId}] Creation d'une partie en mode ${gameMode}.");
+		console.log("[Jeu " + this.gameId + " Creation d'une partie en mode " + gameMode + ".");
 		this.setupPlayers(clientInfos, gameMode);
 
 		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
@@ -44,7 +45,7 @@ export class GameInstance {
 		const createPlayer = (defaultPseudo, name, controlType) => {
 			let id;
 			let pseudo = defaultPseudo; // On garde un pseudo par defaut pour les IA
-			let language = 'en'
+			let language = 'en';
 
 			// Logique d'assignation d'ID adaptee a tous les cas
 			if (controlType.includes('HUMAN')) {
@@ -67,13 +68,13 @@ export class GameInstance {
 
 		switch (gameMode) {
 			case 'AI_VS_AI':
-				players.push(createPlayer("Bimo", 'player_left_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI'));
 				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
 				break;
 			
 			case '1P_VS_AI':
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Bimo", 'player_right_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_right_top', 'AI'));
 				break;
 
 			case '2P_LOCAL':
@@ -91,7 +92,7 @@ export class GameInstance {
 				break;
 
 			case '2AI_VS_2AI':
-				players.push(createPlayer("Bimo", 'player_left_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI'));
 				players.push(createPlayer("Spiderman", 'player_left_bottom', 'AI'));
 				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
 				players.push(createPlayer("Roger", 'player_right_bottom', 'AI'));
