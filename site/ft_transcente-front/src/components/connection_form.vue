@@ -1,35 +1,39 @@
-<script setup lang="ts">
-import { ref } from 'vue';
+<script setup lang="ts"> // Vue 3, Typescript
+import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 
-	interface ServerResponse {
-		success: boolean;
-		message?: string;
-		users?: {
+	interface ServerResponse { // creation d'une interface qui definit la structure des donnees attendues par le serveur
+		success: boolean; // reussite de la requete
+		message?: string; // message optionnel
+		users?: { // objet optionnel contenant le login de l'utilisateur
 			login: string;
 		};
-		errors?: {
+		errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
 			email?: string;
 			password?: string;
 		};
 	}
-	const props = defineProps<{
-		setLanguage: (lang: string) => void;
+
+	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
+		setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 	}>();
 
+	const emit = defineEmits(['isconnected']);
+
+	// references reactives:
 	const email = ref("");
 	const password = ref("");
-
 	const error_email = ref(false);
 	const error_password = ref(false);
 	const message = ref("");
 
-	async function handleConnection() {
+	async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
+		// reinitialiser les variables d'erreur et de message:
 		error_email.value = false;
 		error_password.value = false;
 		message.value = "";
 
 		try {
-			const result = await fetch("http://localhost:3000/login", {
+			const result = await fetch("http://localhost:3000/login", { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -37,15 +41,20 @@ import { ref } from 'vue';
 					password: password.value,
 				}),
 			});
-			const data = await result.json();
+			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
 	
-			if (data.success) {
+			if (data.success && data.users) {
 				message.value = `Welcome ${data.users.login}!` //todo langues
-				const emit = defineEmits(['isconnected']);
+				emit('isconnected'); // emission de l'evenement de connexion reussie
 			} else {
 				message.value = data.message || "Connexion error"; //todo langues
-				error_email.value = true;
-				error_password.value = true;
+				if (data.errors) { // si erreurs specifiques
+					error_email.value = !!data.errors.email; // '!!' permet de convertir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
+					error_password.value = !!data.errors.password;
+				} else {
+					error_email.value = true;
+					error_password.value = true;
+				}
 			}
 		} catch (err) {
 			message.value = "Cannot contact server";
