@@ -309,21 +309,43 @@ export function updateBall(deltaTime, gameState, onGoal, onEnd) {
 	}
 
 	// Gestion des buts
-	if (ball.position.z > goalLimit) {
+	if (ball.position.z > goalLimit) { // But pour l'equipe de gauche
 		gameState.scoreLeft++;
-		onGoal(); // Notifier la GameInstance qu'un but a ete marque
+		onGoal();
 		if (gameState.scoreLeft >= maxScore) {
-			onEnd(gameState.activePlayers.find(p => p.name.includes('left')).pseudo); // Notifier la fin de partie
+			let winnerPseudo = "Left Team"; // Nom par defaut
+			// En 1v1, il n'y a qu'un joueur a gauche
+			if (gameState.activePlayers.length <= 2) {
+				const winner = gameState.activePlayers.find(p => p.name.includes('left'));
+				if (winner) winnerPseudo = winner.pseudo;
+			} else {
+				// En 2v2, on peut prendre les deux pseudos
+				const winners = gameState.activePlayers.filter(p => p.name.includes('left'));
+				if (winners.length > 0) {
+					winnerPseudo = `${winners[0].pseudo} & ${winners[1].pseudo}`;
+				}
+			}
+			onEnd(winnerPseudo); // On envoie le pseudo ou le nom de l'equipe
 		} else {
-			resetBall(gameState, 1); // La balle repart vers la droite
+			resetBall(gameState, 1);
 		}
-	} else if (ball.position.z < -goalLimit) {
+	} else if (ball.position.z < -goalLimit) { // But pour l'equipe de droite
 		gameState.scoreRight++;
 		onGoal();
 		if (gameState.scoreRight >= maxScore) {
-			onEnd(gameState.activePlayers.find(p => p.name.includes('right')).pseudo);
+			let winnerPseudo = "Right Team"; // Nom par defaut
+			if (gameState.activePlayers.length <= 2) {
+				const winner = gameState.activePlayers.find(p => p.name.includes('right'));
+				if (winner) winnerPseudo = winner.pseudo;
+			} else {
+				const winners = gameState.activePlayers.filter(p => p.name.includes('right'));
+				if (winners.length > 0) {
+					winnerPseudo = `${winners[0].pseudo} & ${winners[1].pseudo}`;
+				}
+			}
+			onEnd(winnerPseudo);
 		} else {
-			resetBall(gameState, -1); // La balle repart vers la gauche
+			resetBall(gameState, -1);
 		}
 	}
 }

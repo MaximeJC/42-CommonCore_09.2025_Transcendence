@@ -14,6 +14,7 @@ export class GameInstance {
 		this.gameDurationInSeconds = 0; // La duree totale du jeu
 		this.gameId = uuidv4();
 		this.sockets = {};
+		this.clientInfos = clientInfos;
 		this.gameState = createInitialGameState();
 		this.gameState.gameMode = gameMode;
 
@@ -40,8 +41,12 @@ export class GameInstance {
 	setupPlayers(clientInfos, gameMode) { // Le parametre est 'clientInfos'
 		const players = this.gameState.activePlayers;
 		let humanPlayerIndex = 0;
+		const { limitUp, limitDown } = this.gameState;
+		const midPointY = (limitUp + limitDown) / 2;
+		const topY = midPointY + (limitUp - midPointY) / 2;
+		const bottomY = midPointY - (midPointY - limitDown) / 2;
 
-		const createPlayer = (defaultPseudo, name, controlType, defaultAvatar) => {
+		const createPlayer = (defaultPseudo, name, controlType, defaultAvatar, initialY) => {
 			let id;
 			let pseudo = defaultPseudo; // On garde un pseudo par defaut pour les IA
 			let language = 'en';
@@ -63,25 +68,24 @@ export class GameInstance {
 				humanPlayerIndex++;
 			} else {
 				id = "AI_${uuidv4()}";
-				avatarUrl = 'includes/img/lapin.png';
 			}
-			return { id, pseudo, name, y: 0, movement: 0, controlType, language, avatarUrl };
+			return { id, pseudo, name, y: initialY, movement: 0, controlType, language, avatarUrl };
 		};
 
 		switch (gameMode) {
 			case 'AI_VS_AI':
-				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png'));
-				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png', 0));
+				players.push(createPlayer("Hecate", 'player_right_top', 'AI', 'includes/img/chat.png', 0));
 				break;
 			
 			case '1P_VS_AI':
-				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Bimo IA", 'player_right_top', 'AI', 'includes/img/lapin.png'));
+				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', 0));
+				players.push(createPlayer("Bimo IA", 'player_right_top', 'AI', 'includes/img/lapin.png', 0));
 				break;
 
 			case '2P_LOCAL':
-				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN_LOCAL'));
-				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN_LOCAL'));
+				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN_LOCAL', '', 0));
+				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN_LOCAL', '', 0));
 				// On s'assure que les deux joueurs partagent le meme ID de socket
 				if (players.length === 2) {
 					players[1].id = players[0].id;
@@ -89,28 +93,28 @@ export class GameInstance {
 				break;
 
 			case '1V1_ONLINE':
-				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
+				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', 0));
+				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN', '', 0));
 				break;
 
 			case '2AI_VS_2AI':
-				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png'));
-				players.push(createPlayer("Spiderman", 'player_left_bottom', 'AI'));
-				players.push(createPlayer("Hecate", 'player_right_top', 'AI'));
-				players.push(createPlayer("Roger", 'player_right_bottom', 'AI'));
+				players.push(createPlayer("Bimo IA", 'player_left_top', 'AI', 'includes/img/lapin.png', topY));
+				players.push(createPlayer("Spiderman", 'player_left_bottom',  'includes/img/spiderman.png', '', bottomY));
+				players.push(createPlayer("Hecate", 'player_right_top', 'AI', 'includes/img/chat.png', topY));
+				players.push(createPlayer("Roger", 'player_right_bottom', 'AI',  'includes/img/roger.png', bottomY));
 				break;
 			
 			case '4P_ONLINE':
-				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Player 2", 'player_left_bottom', 'HUMAN'));
-				players.push(createPlayer("Player 3", 'player_right_top', 'HUMAN'));
-				players.push(createPlayer("Player 4", 'player_right_bottom', 'HUMAN'));
+				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', topY));
+				players.push(createPlayer("Player 2", 'player_left_bottom', 'HUMAN', '', bottomY));
+				players.push(createPlayer("Player 3", 'player_right_top', 'HUMAN', '', topY));
+				players.push(createPlayer("Player 4", 'player_right_bottom', 'HUMAN', '', bottomY));
 				break;
 
 			default:
 				console.error("[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.");
-				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN'));
-				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN'));
+				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', 0));
+				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN', '', 0));
 				break;
 		}
 	}
@@ -150,20 +154,36 @@ export class GameInstance {
 				}
 			});
 		}
+
+		// S'il n'y a aucun joueur humain ET qu'il y a bien un client connecte a cette instance...
+		if (humanPlayers.length === 0 && this.clientInfos.length > 0) {
+			// ... on recupere le socket du premier client (le spectateur).
+			const spectatorSocket = this.clientInfos[0].socket;
+			if (spectatorSocket && spectatorSocket.readyState === 1) {
+				const message = {
+					type: 'game_start',
+					data: {
+						your_player_name: 'spectator', // On lui dit qu'il est spectateur
+						all_players: this.gameState.activePlayers.map(p => ({ name: p.name, pseudo: p.pseudo, avatarUrl: p.avatarUrl }))
+					}
+				};
+				spectatorSocket.send(JSON.stringify(message));
+			}
+		}
 	}
 
 	/**
 	 * appelee par le serveur quand un client envoie 'client_ready'.
 	 */
 	handlePlayerReady(playerId) {
-		console.log("[Jeu ${this.gameId}] Le joueur ${playerId} est pret.");
+		console.log('[Jeu ${this.gameId}] Le joueur ${playerId} est pret.');
 		this.readyPlayers.add(playerId);
 
-		const humanPlayerCount = Object.keys(this.sockets).length;
+		const totalClientCount = this.clientInfos.length;
 
-		// On verifie si TOUS les joueurs humains sont prets.
-		if (this.readyPlayers.size === humanPlayerCount) {
-			console.log("[Jeu ${this.gameId}] Tous les joueurs sont prets. Lancement du jeu !");
+		// On verifie si TOUS les clients connectes a cette partie (joueurs ou spectateurs) sont prets.
+		if (this.readyPlayers.size === totalClientCount) {
+			console.log('[Jeu ${this.gameId}] Tous les joueurs/spectateurs sont prets. Lancement du jeu !');
 			this.beginGame();
 		}
 	}
@@ -306,36 +326,34 @@ export class GameInstance {
 		}
 
 		// ENVOI DES STATISTIQUES A CHAQUE JOUEUR DANS SA LANGUE
-		this.gameState.activePlayers.forEach(player => {
-			if (player.controlType.includes('HUMAN')) {
-				const socket = this.sockets[player.id.split('_')[0]];
-				if (socket) {
-					let winMessage;
-					const lang = player.language || 'en';
-					
-					if (lang === 'fr') {
-						winMessage = `${winnerPseudo} a gagne !`;
-					} else if (lang === 'es') {
-						winMessage = `¡${winnerPseudo} ha ganado!`;
-					} else { // 'en' par defaut
-						winMessage = `${winnerPseudo} Wins!`;
-					}
-					
-					// On envoie l'objet de donnees complet
-					socket.send(JSON.stringify({
-						type: 'game_over',
-						data: {
-							end_message: winMessage,
-							winner: winnerPseudo,
-							loser: loserPseudo,
-							duration: this.gameDurationInSeconds,
-							score_left: score_left,
-							score_right: score_right
-						}
-					}));
+		this.clientInfos.forEach(info => {
+			const socket = info.socket;
+			if (socket && socket.readyState === 1) {
+				let winMessage;
+				const lang = info.language || 'en';
+				
+				if (lang === 'fr') {
+					winMessage = `${winnerPseudo} a gagne !`;
+				} else if (lang === 'es') {
+					winMessage = `¡${winnerPseudo} ha ganado!`;
+				} else {
+					winMessage = `${winnerPseudo} Wins!`;
 				}
+				
+				socket.send(JSON.stringify({
+					type: 'game_over',
+					data: {
+						end_message: winMessage,
+						winner: winnerPseudo,
+						loser: loserPseudo,
+						duration: this.gameDurationInSeconds,
+						score_left: score_left,
+						score_right: score_right
+					}
+				}));
 			}
 		});
+
 
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);
@@ -346,8 +364,9 @@ export class GameInstance {
 
 	broadcast(type, data) {
 		const message = JSON.stringify({ type, data });
-		Object.values(this.sockets).forEach(socket => {
-			if (socket.readyState === 1) {
+		this.clientInfos.forEach(info => {
+			const socket = info.socket;
+			if (socket && socket.readyState === 1) {
 				socket.send(message);
 			}
 		});
