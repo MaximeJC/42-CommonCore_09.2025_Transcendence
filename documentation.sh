@@ -45,6 +45,9 @@ node db_server.js
 	# afficher toutes les parties:
 	curl http://localhost:3000/games
 
+	# afficher le leaderboard:
+	curl http://localhost:3000/leaderboard
+
 	# afficher les amis:
 	curl http://localhost:3000/friends
 
