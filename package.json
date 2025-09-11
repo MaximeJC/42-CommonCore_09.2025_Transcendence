@@ -19,7 +19,11 @@
   "homepage": "https://github.com/MaximeJC/42-CommonCore_09.2025_Transcendence#readme",
   "dependencies": {
     "@fastify/cors": "^11.1.0",
+    "@fastify/secure-session": "^8.2.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
     "fastify": "^5.5.0",
+    "fastify-cookie": "^5.6.1",
     "fastify-plugin": "^5.0.1",
     "sqlite3": "^5.1.7"
   }

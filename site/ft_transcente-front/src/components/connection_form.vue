@@ -1,6 +1,8 @@
 <script setup lang="ts"> // Vue 3, Typescript
-import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
+import { ref, reactive, onMounted } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
+// import axios from 'axios';
 
+// axios.defaults.withCredentials = true;
 
 const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
 	setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
@@ -14,6 +16,7 @@ const password = ref("");
 const error_email = ref(false);
 const error_password = ref(false);
 const message = ref("");
+const profile = reactive({ email: '' })
 
 async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
 		// reinitialiser les variables d'erreur et de message:
@@ -25,6 +28,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			const result = await fetch("http://localhost:3000/login", { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				credentials: "include",
 				body: JSON.stringify({
 					email: email.value,
 					password: password.value,
@@ -57,12 +61,23 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 					error_password.value = true;
 				}
 			}
+			await fetchProfile();
 		} catch (err) {
 			message.value = "Cannot contact server";
 			error_email.value = true;
 			error_password.value = true;
 		}
 	}
+
+	async function fetchProfile() {
+		const res = await fetch(`http://localhost:3000/login`, {
+			credentials: 'include'
+		});
+	}
+
+	onMounted(() => {
+		fetchProfile()
+	})
 </script>
 
 <template>

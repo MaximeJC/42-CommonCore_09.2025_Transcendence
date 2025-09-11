@@ -24,12 +24,6 @@
 		{ name: "Louise", avatar_src: "../../images/default_avatar.png"},
 		{ name: "Maxime", avatar_src: "../../images/default_avatar.png"},
 		{ name: "Axel", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Nico", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Thomas", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Anas", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Arthur", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Dorina", avatar_src: "../../images/default_avatar.png"},
-		{ name: "Wictor", avatar_src: "../../images/default_avatar.png"},
 	]
 
 </script>
@@ -38,10 +32,10 @@
 	<div ref="rootElement" tittle="friend-list-container" class="friend-list-container">
 		<div class="tittle-leaderbord" data-i18n="friendlist.friendlist"></div>
 		<div class="add-friends" data-i18n="friendlist.addfriends"></div>
-		<div class="input-add-friends">
-			<input id="search_friends" v-model="search_friends" required></input>
-			<button></button>
-		</div>
+		<form class="input-add-friends">
+			<input id="search_friends" v-model="search_friends" required placeholder="search"></input>
+			<button type="submit"></button>
+		</form>
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
@@ -154,6 +148,7 @@
 		margin-right: 1rem;
 		align-content: center;
 		justify-content: space-between;
+		border-radius: 8px;
 	
 	}
 
