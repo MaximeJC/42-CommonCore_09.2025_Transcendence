@@ -8,7 +8,45 @@ import invit_return from "./invit&return_button.vue"
 			historic: boolean;
 			other_player: boolean;
 	}>();
+	const playerData = ref({
+		login: '',
+		nb_games: 0,
+		nb_won_games: 0,
+		rank: 0,
+	});
 
+	async function fetchPlayerData() {
+		try {
+			const response = await fetch('http://localhost:3000/users/current', {
+				method: 'GET',
+			})
+			if (!response.ok) {
+				// Donnees brutes pour tester a la place de data 
+				// car comme on n'a pas encore l'info de l'utilisateur 
+				// connecte, fetch ne fonctionne pas:
+				playerData.value = {
+					login: 'Louise',
+					nb_games: 3,
+					nb_won_games: 2,
+					rank: 2,
+				};
+				// fin de la partie brute
+				throw new Error('Player data fetch error');
+			}
+			const data = await response.json();
+			playerData.value = {
+				login: data.login,
+				nb_games: data.nb_games,
+				nb_won_games: data.nb_won_games,
+				rank: data.rank,
+			};
+		} catch (error) {
+			console.log("Error:", error);
+		}
+	}
+
+	onMounted(()=>{ fetchPlayerData(); });
+	
 	const emit = defineEmits(['show-other_player', 'show-historic']);
 
 </script>
@@ -18,20 +56,20 @@ import invit_return from "./invit&return_button.vue"
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
 			<div tittle="login" class="login">
-				<div>Login</div>
+				<div>{{ playerData.login }}</div>
 			</div>
 		</div>
 		<div class="stat-container">
 			<div tittle="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
-			<div tittle="nbr_game_stat" class="stat">20</div>
+			<div tittle="nbr_game_stat" class="stat">{{ playerData.nb_games }}</div>
 		</div>
 		<div class="stat-container">
 			<div tittle="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
-			<div tittle="nbr-victory_stat" class="stat">10</div>
+			<div tittle="nbr-victory_stat" class="stat">{{ playerData.nb_won_games }}</div>
 		</div>
 		<div class="stat-container">
 			<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
-			<div tittle="rank_stat" class="stat">1</div>
+			<div tittle="rank_stat" class="stat">{{ playerData.rank }}</div>
 		</div>
 		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>

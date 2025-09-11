@@ -41,10 +41,10 @@
 	<div ref="rootElement" tittle="friend-list-container" class="friend-list-container">
 		<div class="tittle-leaderbord" data-i18n="friendlist.friendlist"></div>
 		<div class="add-friends" data-i18n="friendlist.addfriends"></div>
-		<div class="input-add-friends">
-			<input id="search_friends" v-model="search_friends" required></input>
-			<button></button>
-		</div>
+		<form class="input-add-friends">
+			<input id="search_friends" v-model="search_friends" required placeholder="search"></input>
+			<button type="submit"></button>
+		</form>
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
