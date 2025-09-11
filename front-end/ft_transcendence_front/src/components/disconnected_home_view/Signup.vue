@@ -1,20 +1,72 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
+<script setup lang="ts"> // Vue 3, Typescript
+import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
+
+	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
+			setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 		}>();
+
+	// references reactives:
 	const login = ref("");
 	const email = ref("");
 	const password = ref("");
 	const conf_password = ref("");
-	const handleSubmit = () => {
-		//preparation envoie serveur
-	}
+	const message = ref("");
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
 
-	const error_login = ref(true);
-	const error_email = ref(true);
-	const error_password = ref(true);
-	const error_conf_password = ref(true);
+	async function handleSubmit() { // fonction asynchrone appelee lors de la tentative de creation d'un nouvel utilisateur
+		// reinitialiser les variables d'erreur et de message:
+		error_login.value = false;
+		error_email.value = false;
+		error_password.value = false;
+		error_conf_password.value = false;
+		message.value = "";
+	
+		// verifier que mdp est correctement repete:
+		if (password.value !== conf_password.value) {
+			error_conf_password.value = true;
+			message.value = "Passwords are not the same"; //todo langue
+			return;
+		}
+
+		try {
+			const result = await fetch("http://localhost:3000/users", { // envoie une requete HTTP via cet URL (au port 3000)
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					login: login.value, 
+					email: email.value, 
+					password: password.value,
+				}),
+			});
+			if (!result.ok)
+				throw new Error(`HTTP error! status: ${result.status}`);
+			
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+			}
+			const data: ServerResponse = await result.json();
+			
+			if (data.success) { // afficher un message et reinitialiser les variables
+				message.value = "Account successfully created"; //todo langue
+				login.value = "";
+				email.value = "";
+				password.value = "";
+				conf_password.value = "";
+			} else {
+				if (data.message?.includes("login"))
+					error_login.value = true;
+				if (data.message?.includes("email"))
+					error_email.value = true;
+				message.value = data.message || "Subscription error"; //todo langue
+			}
+		} catch (err) {
+			message.value = "Cannot contact server"; //todo langue
+		}
+	}
 </script>
 
 <template>
@@ -44,20 +96,20 @@ import { ref } from 'vue';
 			<label class="subTittle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
-			<input class="input" type="conf_password" id="conf_password" v-model="conf_password" required>
+			<input class="input" type="password" id="conf_password" v-model="conf_password" required>
 			<div  title="conf_password-error" class="error" >
 				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
 
 			</div>
-		</form>
-		<div tittle="line_button" class="line-button">
-			<div class="icon-button">
-				<button tittle="ft-signup" class="ft-button"></button>
+			<div tittle="line_button" class="line-button">
+				<div class="icon-button">
+					<button tittle="ft-signup" class="ft-button"></button>
+				</div>
+				<button tittle="Submit-button" class="Submit-button">
+					<div data-i18n="Signup.submit"></div>
+				</button>
 			</div>
-			<button tittle="Submit-button" class="Submit-button">
-				<div data-i18n="Signup.submit"></div>
-			</button>
-		</div>
+		</form>
 	</div>
 </template>
 

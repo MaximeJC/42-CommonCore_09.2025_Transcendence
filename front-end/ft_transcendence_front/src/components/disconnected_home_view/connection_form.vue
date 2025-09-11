@@ -1,46 +1,95 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-		}>();
-	const email = ref("");
-	const password = ref("");
-	const handleConnection = () => {
-		//preparation envoie serveur
+<script setup lang="ts"> // Vue 3, Typescript
+import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
+
+
+const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
+	setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
+}>();
+
+const emit = defineEmits(['isconnected']);
+
+// references reactives:
+const email = ref("");
+const password = ref("");
+const error_email = ref(false);
+const error_password = ref(false);
+const message = ref("");
+
+async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
+		// reinitialiser les variables d'erreur et de message:
+		error_email.value = false;
+		error_password.value = false;
+		message.value = "";
+
+		try {
+			const result = await fetch("http://localhost:3000/login", { // envoie une requete HTTP via cet URL (au port 3000)
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: email.value,
+					password: password.value,
+				}),
+			});
+
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+				users?: { // objet optionnel contenant le login de l'utilisateur
+					login: string;
+				};
+				errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
+					email?: string;
+					password?: string;
+				};
+			}
+			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
+	
+			if (data.success && data.users) {
+				message.value = `Welcome ${data.users.login}!` //todo langues
+				emit('isconnected'); // emission de l'evenement de connexion reussie
+			} else {
+				message.value = data.message || "Connexion error"; //todo langues
+				if (data.errors) { // si erreurs specifiques
+					error_email.value = !!data.errors.email; // '!!' permet de convertir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
+					error_password.value = !!data.errors.password;
+				} else {
+					error_email.value = true;
+					error_password.value = true;
+				}
+			}
+		} catch (err) {
+			message.value = "Cannot contact server";
+			error_email.value = true;
+			error_password.value = true;
+		}
 	}
-	const emit = defineEmits(['isconnected']);
-
-
-	const error_email = ref(true);
-	const error_password = ref(true);
-
 </script>
 
 <template>
 	<div class="frame-connection" title="connection_frame">
-		<div class="connectionTittle" tittle="connection_tittle" data-i18n="home.connection"></div>
+		<div class="connectionTitle" title="connection_title" data-i18n="home.connection"></div>
 		<form @submit.prevent="handleConnection">
-			<label class="c-subTittle">Email</label>
+			<label class="c-subTitle">Email</label>
 			<input class="c-input" type="email" id="email" v-model="email" required>
 			<div class="c-error"  title="mail-error">
-				<div v-show=" !error_email"  data-i18n="Signup.mail_error"></div>
+				<div v-show="error_email"  data-i18n="Signup.mail_error"></div>
 			</div>
-			<label class="c-subTittle">
+			<label class="c-subTitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="c-input" type="password" id="password" v-model="password" required>
 			<div  title="pasword-error" class="c-error"  >
 				<div v-show=" !error_password" data-i18n="Signup.mail_error"></div>
 			</div>
-		</form>
-		<div tittle="c-line_button" class="c-line-button">
-			<div class="c-icon-button">
-				<button tittle="c-ft-signup" class="c-ft-button"></button>
+			<div title="c-line_button" class="c-line-button">
+				<div class="c-icon-button">
+					<button title="c-ft-signup" class="c-ft-button"></button>
+				</div>
+				<button type="submit" title="Submit-button" class="c-Submit-button">
+					<div data-i18n="Signup.submit"></div>
+				</button>
 			</div>
-			<button @click="emit('isconnected')" tittle="Submit-button" class="c-Submit-button">
-				<div data-i18n="Signup.submit"></div>
-			</button>
-		</div>
+		</form>
 	</div>
 </template>
 
@@ -52,7 +101,7 @@ import { ref } from 'vue';
 	.frame-connection{
 		width: 25rem;
 
-		display: flexbox;
+		display: flex;
 		grid-template-columns: 1fr;
 		grid-auto-rows: min-content;
 		justify-content: center;
@@ -70,7 +119,7 @@ import { ref } from 'vue';
 		margin-top: 3rem
 	}
 
-	.connectionTittle{
+	.connectionTitle{
 		display: flex;
 		align-self: center;
 		justify-content: center;
@@ -96,7 +145,7 @@ import { ref } from 'vue';
 		margin-bottom: 1rem;
 	}
 
-	.c-subTittle{
+	.c-subTitle{
 		font-family: netron;
 		color: white;
 		text-shadow: 
@@ -232,7 +281,7 @@ import { ref } from 'vue';
 			width: 35rem;
 			padding: 1.5rem 2rem;
 		}
-		.connectionTittle{
+		.connectionTitle{
 			font-size: 2.5rem;
 			margin-bottom: 0.6rem;
 		}
