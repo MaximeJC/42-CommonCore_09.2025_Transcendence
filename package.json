@@ -1,5 +1,6 @@
 {
-  "name": "transcendance_github",
+  "type": "module",
+	"name": "transcendance_github",
   "version": "1.0.0",
   "description": "",
   "main": "db.js",
