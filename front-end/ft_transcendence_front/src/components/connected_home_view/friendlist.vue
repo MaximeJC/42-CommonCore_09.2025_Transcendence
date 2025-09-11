@@ -38,8 +38,8 @@
 </script>
 
 <template>
-	<div ref="rootElement" tittle="friend-list-container" class="friend-list-container">
-		<div class="tittle-leaderbord" data-i18n="friendlist.friendlist"></div>
+	<div ref="rootElement" title="friend-list-container" class="friend-list-container">
+		<div class="title-leaderbord" data-i18n="friendlist.friendlist"></div>
 		<div class="add-friends" data-i18n="friendlist.addfriends"></div>
 		<form class="input-add-friends">
 			<input id="search_friends" v-model="search_friends" required placeholder="search"></input>
@@ -51,8 +51,8 @@
 					<button @click="emit('show-other_player')" class="avatar_button">
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
-					<button @click="emit('show-other_player')" tittle="friend-button" class="friend-button">{{ friend.name }}</button>
-					<button tittle="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
+					<button @click="emit('show-other_player')" title="friend-button" class="friend-button">{{ friend.name }}</button>
+					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
 						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
 						<img src="../../../images/yelow-play-button.png" alt="play button">

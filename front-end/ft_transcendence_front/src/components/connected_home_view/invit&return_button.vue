@@ -9,16 +9,16 @@ const isconnect = ref(false);
 </script>
 
 <template>
-	<div tittle="button container" class="button-container">
-		<button v-show="isconnect" tittle="invit-button" class="invit-button">
+	<div title="button container" class="button-container">
+		<button v-show="isconnect" title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
-		<button v-show="!isconnect" tittle="invit-button" class="d-invit-button">
+		<button v-show="!isconnect" title="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">
 			<button class="i-add-friends"></button>
-			<button @click="emit('show-other_player')" tittle="return-button" class="return-button">
+			<button @click="emit('show-other_player')" title="return-button" class="return-button">
 				<div data-i18n="home_player_button.return"></div>
 			</button>
 		</div>

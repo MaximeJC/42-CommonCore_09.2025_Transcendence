@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import con_home_view from './connected_home_view.vue'
-	import Head from '../components/Header.vue';
+	import Head from '../components/Header/Header.vue';
 	import Connexion from '../components/disconnected_home_view/ConnexionButton.vue';
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
@@ -10,7 +10,7 @@
 			setLanguage: (lang: string) => void;
 		}>();
 
-	const isConnect = ref(false)
+	const isConnect = ref(true)
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
@@ -83,7 +83,7 @@
 		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
 		</div>
 		<div>
-			<div v-show="!isConnect" tittle="home_disconnect" class="home_disconnect" >
+			<div v-show="!isConnect" title="home_disconnect" class="home_disconnect" >
 				<div>
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
@@ -94,7 +94,7 @@
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
-			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
+			<div v-show="isConnect" title="home_connect" class="home_connect" >
 				<div>
 					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>

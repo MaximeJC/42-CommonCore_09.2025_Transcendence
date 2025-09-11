@@ -11,11 +11,11 @@ const props = defineProps<{
 </script>
 
 <template>
-	<div tittle="button container" class="button-container">
-		<button tittle="play-button" class="play-button">
+	<div title="button container" class="button-container">
+		<button title="play-button" class="play-button">
 			<div data-i18n="home_player_button.play"></div>
 		</button>
-		<button @click="emit('show-historic')" tittle="historic-button" class="historic-button">
+		<button @click="emit('show-historic')" title="historic-button" class="historic-button">
 			<div data-i18n="home_player_button.historic"></div>
 		</button>
 	</div>

@@ -30,8 +30,8 @@
 
 <template>
 	<div class="historic-container">
-		<div class="tittle" data-i18n="historic.historic"></div>
-		<div tittle="historic_header" class="h-grid-header">
+		<div class="title" data-i18n="historic.historic"></div>
+		<div title="historic_header" class="h-grid-header">
 			<div data-i18n="historic.victory"></div>
 			<div data-i18n="historic.login"></div>
 			<div data-i18n="historic.my_score"></div>
@@ -73,7 +73,7 @@
 		border-radius: 20px;
 	}
 
-	.tittle{
+	.title{
 		display: block;
 		font-family: netron;
 		font-weight: bold;
@@ -91,7 +91,7 @@
 		text-align: center;
 	}
 
-	.historic-container > div:not(.tittle) {
+	.historic-container > div:not(.title) {
 		color: white;
 		font-size: 1.5rem;
 		text-shadow: 
