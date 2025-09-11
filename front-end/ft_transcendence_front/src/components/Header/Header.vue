@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
-
+	import setting from './setting_button.vue'
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		isConnect: boolean;
@@ -14,6 +14,7 @@
 	<header class="header">
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
+			<setting v-show="isConnect" :setLanguage="props.setLanguage"></setting>
 			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
 				<div v-show="!isConnect" data-i18n="header.signUp"></div>
 				<div v-show="isConnect" data-i18n="header.signOut"></div>
