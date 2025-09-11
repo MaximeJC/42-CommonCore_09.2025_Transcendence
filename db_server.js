@@ -358,3 +358,30 @@ fastify.post('/friends/delete', async (request, reply)=>{
 		reply.status(500).send({error: err.message});
 	}
 });
+
+//!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS CONNECTES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Informations sur l'utilisateur actuellement connecte, pour l'affichage par connected_player_frame.vue
+fastify.get('/users/current', async (request, reply)=>{
+	const login = request.query.login;
+	if (!login)
+		return reply.status(400).send({ error: "Missing login" });
+	try {
+		const user = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT login, nb_games, nb_won_games, rank FROM users WHERE login = ?`,
+				[login],
+				(err, row)=>{
+					if (err) reject(err);
+					else resolve(row);
+				}
+			);
+		});
+		if (!user)
+			return reply.status(404).send({ error: "User not found" });
+		reply.send(user);
+	} catch (err) {
+		console.error("Error:", err);
+		reply.status(500).send({ error: err.message });
+	}
+});
