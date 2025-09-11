@@ -65,11 +65,13 @@
 			<div class="sub1" data-i18n="player_stat.nbr_games"></div>
 			<div class="sub2" data-i18n="player_stat.nbr_victory"></div>
 		</div>
-		<div v-for="player in players" :key="player.rank" class="grid-row">
-			<div class="stat1">{{ player.rank}}</div>
-			<button @click="emit('show-other_player')" class="name-button">{{ player.name }}</button>
-			<div class="stat2">{{ player.games }}</div>
-			<div class="stat2">{{ player.victory }}</div>
+		<div class="lead-list-container">
+			<div v-for="player in players" :key="player.rank" class="grid-row">
+				<div class="stat1">{{ player.rank}}</div>
+				<button @click="emit('show-other_player')" class="name-button">{{ player.name }}</button>
+				<div class="stat2">{{ player.games }}</div>
+				<div class="stat2">{{ player.victory }}</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -81,6 +83,7 @@
 		grid-template-rows: min-content;
 		grid-template-columns: 1fr;
 		width: auto;
+		align-content: flex-start;
 		height: 26rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
@@ -91,6 +94,7 @@
 		0 0 40px #dd0aba;
 		padding: 1rem 2rem;
 		border-radius: 20px;
+
 	}
 
 	.tittle-leaderbord{
@@ -110,7 +114,18 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.leaderboard-container > div:not(.tittle-leaderbord) {
+	.lead-list-container{
+		margin-top: 1rem;
+		overflow: auto;
+		height: 100%;
+		scrollbar-color: #dd0aba transparent;
+	}
+
+	.grid-row{
+		display: grid;
+		grid-template-columns: 0.1fr 1fr 0.2fr 0.3fr;
+		padding: 3px;
+		border-bottom: 1px solid #ddd;
 		color: white;
 		font-size: 1.5rem;
 		text-shadow: 
@@ -121,9 +136,10 @@
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
 		border-bottom: 1px solid #ddd;
-	}
+		/*justify-content: ;*/
+	}	
 
-	.grid-row, .grid-header{
+	.grid-header{
 		display: grid;
 		grid-template-columns: 0.1fr 1fr 0.2fr 0.3fr;
 		padding: 3px;

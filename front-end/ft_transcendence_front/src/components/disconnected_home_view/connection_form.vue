@@ -115,8 +115,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	}
 	.frame-connection{
 		width: 25rem;
-
-		display: flex;
+		display: grid;
 		grid-template-columns: 1fr;
 		grid-auto-rows: min-content;
 		justify-content: center;
