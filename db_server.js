@@ -3,14 +3,32 @@ const DEBUG_MODE = true;
 import Fastify from 'fastify'; // importer fastify
 import cors from '@fastify/cors'; // permettra connexion au front
 import dbModule from './db.js' // importer cette fonction du fichier db.js
+import bcrypt from 'bcrypt';
+import fastifyCookie from '@fastify/cookie';
+import fastifySecureSession from '@fastify/secure-session';
 
 const { db, getUserByEmail } = dbModule;
 const fastify = Fastify({logger: true});
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SERVEUR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+await fastify.register(fastifyCookie);
+await fastify.register(fastifySecureSession, {
+  key: Buffer.from([
+    0x7a, 0x11, 0x3c, 0x45, 0xde, 0x8a, 0xb9, 0x31,
+    0x0f, 0x55, 0x99, 0x33, 0x24, 0xaf, 0xce, 0x1b,
+    0xe7, 0x62, 0x91, 0x48, 0xdc, 0xfe, 0x06, 0xa0,
+    0x1d, 0x3a, 0x84, 0x75, 0x2e, 0x6c, 0xbb, 0x10
+  ]), //generer une cle aleatoire
+  cookie: {
+    path: '/',
+    httpOnly: true,
+    secure: false
+  }
+});
+
 async function configure() {
-	await fastify.register(cors, { origin: "*", }); // autoriser n'importe qui a appeler l'API de ce serveur
+	await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
 
 	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
 
@@ -35,11 +53,13 @@ fastify.post('/users', async (request, reply)=>{
 	if (!login || !email || !password) {
 		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing" });
 	}
+	const	hashedPassword = await bcrypt.hash(password, 10);
+
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO users (login, email, password) VALUES (?, ?, ?)`,
-				[login, email, password],
+				[login, email, hashedPassword],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
@@ -88,17 +108,27 @@ fastify.get('/users', async (request, reply)=>{
 // verifier les identifiants:
 fastify.post('/login', async (request, reply)=>{
 	const { email, password } = request.body;
-	if (DEBUG_MODE)
+	if (DEBUG_MODE) {
+		console.log("****************************************");
 		console.log(request.body);
+		console.log("****************************************");
+	}
 
 	const user = await getUserByEmail(email);
 	if (DEBUG_MODE)
-		console.log("Utilisateur trouve: ", user);
+		console.log("Utilisateur trouve: ", user.login);
 	if (user) {
-		if (user.password === password) { //! revoir apres hachage
+		if (DEBUG_MODE) {
+			console.log("****************************************");
+			console.log('user', user);
+			console.log('user.password:', user.password);
+			console.log("****************************************");
+		}
+		if (bcrypt.compare(user.password, password)) { //! revoir apres hachage
 			if (DEBUG_MODE)
 				console.log("User Ok");
-			return reply.send({ success: true, user: { login: user.login, email: user.email } });
+			request.session.set('user', user.email);
+			return reply.send({ success: true, user: { login: user.login, email: user.email, level: user.level } });
 		}
 	} else {
 		if (DEBUG_MODE)
@@ -106,6 +136,32 @@ fastify.post('/login', async (request, reply)=>{
 		return reply.send({ success: false, message: "Wrong email and/or password" });
 	}
 });
+
+fastify.get('/login', async (req, rep) => {
+	const user = req.session.get('user');
+	if (!user) {
+		return rep.code(401).send({ error: 'Disconnected'});
+	}
+	// const userId = db.get('SELECT * FROM users WHERE email = ?', user);
+	return rep.send({ user });
+});
+// fastify.get('/login', async (request, reply)=>{
+// 	try {
+// 		const row = await new Promise((resolve, reject)=>{
+// 			db.all(
+// 				`SELECT * FROM users WHERE level = ?`, 1, (err, row)=>{
+// 					if (err) reject(err);
+// 					else resolve(row);
+// 				}
+// 			);
+// 		});
+// 		reply.send(row);
+// 	} catch (err) {
+// 		if (DEBUG_MODE)
+// 			console.log("Erreur d'affichage des utilisateurs.\n");
+// 		reply.status(500).send({error: err.message});
+// 	}
+// });
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARTIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
