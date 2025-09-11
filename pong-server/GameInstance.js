@@ -3,7 +3,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createInitialGameState } from './game/gameState.js';
 import * as GameLogic from './game/gameLogic.js';
-import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4, iaResponseTime } from './game/config.js';
+import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './game/config.js';
 
 const TICK_RATE = 60;
 
@@ -26,8 +26,6 @@ export class GameInstance {
             this.gameState.limitDown = limitDown2v2;
         }
 
-		this.aiCooldown = 0;
-		this.iaResponseTime = iaResponseTime;
 		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
 		this.readyPlayers = new Set();
 		
@@ -229,13 +227,9 @@ export class GameInstance {
 			this.gameDurationInSeconds = Math.floor((Date.now() - this.startTime) / 1000);
 		}
 
+		await GameLogic.updateAIMovement(this.gameState);
+		
 		const deltaTimeInMs = 1000 / TICK_RATE;
-		this.aiCooldown += deltaTimeInMs;
-		if (this.aiCooldown >= this.iaResponseTime) {
-			await GameLogic.updateAIMovement(this.gameState);
-			this.aiCooldown = 0;
-		}
-
 		const deltaTimeInSeconds = deltaTimeInMs / 1000;
 		GameLogic.updatePlayers(deltaTimeInSeconds, this.gameState);
 		GameLogic.updateBall(deltaTimeInSeconds, this.gameState,

@@ -66,51 +66,72 @@ export function endGame(gameState, message) {
  */
 export async function updateAIMovement(gameState) {
 	const aiPlayers = gameState.activePlayers.filter(p => p.controlType === 'AI');
+
 	if (aiPlayers.length === 0) {
 		return;
 	}
 
 	for (const aiPlayer of aiPlayers) {
-		
-		// --- FONCTION DE TRADUCTION DE COORDONNEES ---
-		// Convertit le Y du jeu (-38 a +38) en Y de l'IA (200 a 0)
-		const convertGameYToIA_Y = (gameY) => {
-			const gameRange = 38 - (-38); // 76
-			const iaRange = 200 - 0; // 200
-			// (valeur - min_ancien) / plage_ancienne = (resultat - min_nouveau) / plage_nouvelle
-			// On inverse l'axe en faisant commencer la plage de l'IA a 200.
-			const normalizedValue = (gameY - (-38)) / gameRange; // Valeur de 0 a 1
-			return 200 - (normalizedValue * iaRange); // On applique a la nouvelle plage inversee
-		};
 
+		// Déterminer la hauteur de la raquette
+		let racketHeight;
+		if (gameState.activePlayers.length > 2) {
+			racketHeight = 15; // 2v2
+		} else {
+			racketHeight = 30; // 1v1
+		}
+
+		// Déterminer la vitesse de la balle
+		let ballSpeedX;
+		let ballSpeedY;
+		if (gameState.isBallPaused) {
+			ballSpeedX = 0;
+			ballSpeedY = 0;
+		} else {
+			ballSpeedX = gameState.ball.vx;
+			ballSpeedY = gameState.ball.vy;
+		}
+
+		// Construire l'objet d'état à envoyer
 		const stateForIA = {
 			ball: {
 				x: gameState.ball.position.z,
-				y: convertGameYToIA_Y(gameState.ball.position.y),
-				speedX: gameState.ball.vx,
-				// La vitesse en Y doit aussi etre inversee
-				speedY: -gameState.ball.vy 
+				y: gameState.ball.position.y,
+				speedX: ballSpeedX,
+				speedY: ballSpeedY
 			},
 			paddles: {
 				me: {
 					name: aiPlayer.name,
-					y: convertGameYToIA_Y(aiPlayer.y)
+					y: aiPlayer.y,
+					height: racketHeight
 				},
-				all: gameState.activePlayers.map(p => {
-					return { name: p.name, y: convertGameYToIA_Y(p.y) };
-				})
+				all: gameState.activePlayers.map(p => ({
+					name: p.name,
+					y: p.y,
+					height: racketHeight
+				}))
+			},
+			gameBoundaries: {
+				wallTop: 38,
+				wallBottom: -38,
+				paddleHomeLeft: -38,
+				paddleHomeRight: 38
 			}
 		};
 
+		// Communiquer avec le serveur IA
 		try {
 			await fetch(`${iaApiUrl}/update`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify(stateForIA)
 			});
 
-			const response = await fetch(`${iaApiUrl}/action`);
-			const data = await response.json();
+			const actionResponse = await fetch(`${iaApiUrl}/action`);
+			const data = await actionResponse.json();
 			const action = data.action;
 
 			if (action === "UP") {
@@ -128,103 +149,6 @@ export async function updateAIMovement(gameState) {
 	}
 }
 // --- fin IA ---
-
-// /**
-//  * --- l'IA ---
-//  * Interroge un serveur d'IA externe pour determiner le mouvement de chaque joueur IA.
-//  * S'adapte pour que l'IA puisse controler n'importe quelle raquette.
-//  */
-// export async function updateAIMovement(gameState) {
-// 	const aiPlayers = gameState.activePlayers.filter(p => p.controlType === 'AI');
-// 	if (aiPlayers.length === 0) {
-// 		return;
-// 	}
-
-// 	for (const aiPlayer of aiPlayers)
-// 	{	
-// 		// Determiner si l'IA est a gauche ou a droite
-// 		const isAiOnLeftSide = aiPlayer.name.includes('left');
-
-// 		// Trouver l'adversaire le plus proche (pour un etat simplifie)
-// 		let opponent;
-// 		if (isAiOnLeftSide) {
-// 			opponent = gameState.activePlayers.find(p => !p.name.includes('left'));
-// 		} else {
-// 			opponent = gameState.activePlayers.find(p => !p.name.includes('right'));
-// 		}
-		
-// 		// Traduire les coordonnees pour l'API de l'IA.
-// 		// L'API de l'IA pense toujours qu'elle controle la raquette de DROITE.
-		
-// 		// La position de la balle est inversee si l'IA est a gauche.
-// 		let ballForIA_X;
-// 		if (isAiOnLeftSide) {
-// 			ballForIA_X = -gameState.ball.position.z;
-// 		} else {
-// 			ballForIA_X = gameState.ball.position.z;
-// 		}
-// 		const ballForIA_Y = -gameState.ball.position.y;
-
-// 		// La vitesse de la balle est inversee si l'IA est a gauche.
-// 		let ballSpeedForIA_X;
-// 		if (isAiOnLeftSide) {
-// 			ballSpeedForIA_X = -gameState.ball.vx;
-// 		} else {
-// 			ballSpeedForIA_X = gameState.ball.vx;
-// 		}
-// 		const ballSpeedForIA_Y = -gameState.ball.vy;
-
-// 		// La raquette de l'IA est toujours 'right', la raquette de l'adversaire est 'left'.
-// 		const paddleRightForIA = -aiPlayer.y;
-// 		let paddleLeftForIA;
-// 		if (opponent) {
-// 			paddleLeftForIA = -opponent.y;
-// 		} else {
-// 			paddleLeftForIA = 0;
-// 		}
-
-// 		const stateForIA = {
-// 			ball: {
-// 				x: ballForIA_X,
-// 				y: ballForIA_Y,
-// 				speedX: ballSpeedForIA_X,
-// 				speedY: ballSpeedForIA_Y
-// 			},
-// 			paddles: {
-// 				left: paddleLeftForIA,
-// 				right: paddleRightForIA
-// 			}
-// 		};
-
-// 		try {
-// 			// Communiquer avec l'API de l'IA
-// 			await fetch(`${iaApiUrl}/update`, {
-// 				method: 'POST',
-// 				headers: { 'Content-Type': 'application/json' },
-// 				body: JSON.stringify(stateForIA)
-// 			});
-
-// 			const response = await fetch(`${iaApiUrl}/action`);
-// 			const data = await response.json();
-// 			const action = data.action; // "UP", "DOWN", ou "NONE"
-
-// 			// Traduire la reponse en 'movement' pour notre jeu.
-// 			// La reponse de l'IA ("UP"/"DOWN") est toujours relative a son systeme de coordonnees (Y vers le bas).
-// 			if (action === "UP") {
-// 				aiPlayer.movement = 1; // Monter dans notre systeme (Y vers le haut)
-// 			} else if (action === "DOWN") {
-// 				aiPlayer.movement = -1; // Descendre dans notre systeme
-// 			} else {
-// 				aiPlayer.movement = 0;
-// 			}
-
-// 		} catch (error) {
-// 			console.error(`[IA Externe] Erreur de communication pour le joueur ${aiPlayer.pseudo}: ${error.message}`);
-// 			aiPlayer.movement = 0;
-// 		}
-// 	}
-// }
-// // --- fin IA ---
 
 /**
  * Met a jour la position des joueurs en se basant sur leur intention de mouvement.
