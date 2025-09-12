@@ -245,7 +245,7 @@ function updateUserRanks() {
 					`UPDATE users
 					SET scoring = CASE
 						WHEN nb_games = 0 THEN -1
-						ELSE (nb_won_games * 1.0) / CASE WHEN (nb_lost_games + 1) = 0 THEN 1 ELSE (nb_lost_games + 1) END * (nb_games + 1)
+						ELSE (nb_won_games * 1.0 + 2) / (nb_games * 1.0 + 4) * 100.0
 					END`,
 					(err)=>{
 						if (err) {
@@ -257,12 +257,11 @@ function updateUserRanks() {
 					}
 				);
 			});
-			const users = await new Promise((resolve, reject)=>{
+			const players = await new Promise((resolve, reject)=>{
 				db.all( // ordonner les utilisateurs par score croissant
 					`SELECT id, scoring
 					FROM users
-					WHERE nb_games > 0
-					ORDER BY scoring ASC`,
+					ORDER BY scoring DESC`,
 					(err, rows)=>{
 						if (err) {
 							console.error("Erreur de recuperation des utilisateurs dans updateUserRank:", err);
@@ -273,8 +272,8 @@ function updateUserRanks() {
 					}
 				);
 			});
-			for (let i = 0; i < users.length; i++) {
-				const user = users[i];
+			for (let i = 0; i < players.length; i++) {
+				const user = players[i];
 				await new Promise((resolve, reject) => {
 					db.run( // attribuer a chaque utilisateur son rang, qui est desormais son id + 1 (car id part de 0 et rank de 1)
 						`UPDATE users SET rank = ? WHERE id = ?`,
@@ -290,23 +289,6 @@ function updateUserRanks() {
 					);
 				});
 			}
-			const maxRank = users.length > 0 ? users.length : 0; // rang du dernier des utilisateurs actifs: est egal a la taille de la table ou 0 si elle est vide
-			await new Promise((resolve, reject) => {
-				db.run( // attribuer a chaque utilisateur inactif (ayant joue 0 parties) un rang max
-					`UPDATE users
-					SET rank = ?
-					WHERE nb_games = 0`,
-					[maxRank + 1],
-					(err) => {
-						if (err) {
-							console.log("Erreur de mise a jour de rank des utilisateurs n'ayant pas encore joue:", err);
-							reject(err);
-						} else {
-							resolve();
-						}
-					}
-				);
-			});
 		} catch (err) {
 			console.log("updateUserRank error:", err);
 		}
