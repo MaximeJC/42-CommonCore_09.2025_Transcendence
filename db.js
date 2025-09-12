@@ -18,6 +18,7 @@ db.serialize(()=>{
 				nb_won_games INTEGER DEFAULT 0 NOT NULL,
 				nb_lost_games INTEGER DEFAULT 0 NOT NULL,
 				winning_ratio FLOAT DEFAULT 0.0 NOT NULL,
+				scoring REAL DEFAULT 0 NOT NULL, 
 				rank INTEGER DEFAULT 0 NOT NULL,
 
 				avatar_url TEXT,

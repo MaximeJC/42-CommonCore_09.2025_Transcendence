@@ -24,7 +24,16 @@ node db_server.js
 
 	curl -X POST http://localhost:3000/users \
 		-H "Content-Type: application/json" \
-		-d '{"login": "Cocotte", "email": "cocotte@example.com", "password": "zoom"}'
+		-d '{"login": "Cocotte", "email": "cocotte@example.com", "password": "zoom"}' \
+
+
+	curl -X POST http://localhost:3000/users \
+		-H "Content-Type: application/json" \
+		-d '{"login": "Nul", "email": "nul@example.com", "password": "pourri"}' \
+
+	curl -X POST http://localhost:3000/users \
+		-H "Content-Type: application/json" \
+		-d '{"login": "Mauvais", "email": "mauvais@example.com", "password": "rate"}'
 
 	# afficher tous les users:
 	curl http://localhost:3000/users
@@ -75,3 +84,7 @@ node db_server.js
 		# puis dans un terminal:
 		node test.js
 
+	# tester /login avec POST:
+	curl -X POST http://localhost:3000/login \
+		-H "Content-Type: application/json" \
+		-d '{"email": "nul@example.com", "password": "pourri"}'
