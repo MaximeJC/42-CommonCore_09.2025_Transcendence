@@ -148,11 +148,6 @@ fastify.get('/me', async (req, rep) => {
 
 fastify.get('/logout', async (request, reply) => {
 	request.session.delete('user');
-// 	request.session.destroy((err) => {
-// 		if (err) {
-// 			console.error('Erreur de connexion:', err);
-// 			return (reply.status(500).send({ message: 'Erreur lors de la deconnexion'}));
-// 		}
 	reply.clearCookie('sessionId');
 	reply.send({ message: 'Deconnexion réussie'});
 // 	});

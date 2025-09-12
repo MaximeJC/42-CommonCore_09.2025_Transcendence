@@ -5,6 +5,7 @@
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
+import { channel } from 'diagnostics_channel';
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
@@ -12,7 +13,7 @@
 
 	let isConnect = ref(false);
 
-	const checksession = async function session() {
+	var checksession = async function session() {
 		try {
 			const response = await fetch('http://localhost:3000/me' , {
 				method :'GET',
@@ -21,19 +22,21 @@
 			const data = await response.json();
 			console.log("*****************************************");
 			console.log("Test data:");
-			console.log(data.login);
+			console.log(data.user.login);
 			console.log("*****************************************");
-			if (data.login) {
+			if (data.user.login) {
 				isConnect.value = true;
-				return isConnect;
+				// return isConnect;
 			} else {
 				isConnect.value = false;
-				return isConnect;
+				// return isConnect;
 			}
 		} catch (err) {
 				console.error("Erreur de session:", err);
 		}
 	};
+
+	checksession();
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
@@ -52,10 +55,9 @@
 		showConnection.value = !showConnection.value;
 	}
 
-	const toggleisconnected = () => {
-		isConnect.value = !isConnect.value;
-		
-	}
+	// const toggleisconnected = () => {
+	// 	isConnect.value = !isConnect.value;
+	// }
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
@@ -103,10 +105,10 @@
 <template>
 	<div>
 		<div>
-		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="checksession()"></Head>
+		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
 		</div>
 		<div>
-			<div v-show="!checksession()" tittle="home_disconnect" class="home_disconnect" >
+			<div v-show="!isConnect" tittle="home_disconnect" class="home_disconnect" >
 				<div>
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
@@ -114,12 +116,12 @@
 					<Signup :setLanguage="props.setLanguage" v-show="showSignup"></Signup>
 				</div>
 				<div ref="connectionBox">
-					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
+					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="checksession"></connection_form>
 				</div>
 			</div>
-			<div v-show="checksession()" tittle="home_connect" class="home_connect" >
+			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
 				<div>
-					<con_home_view :isConnect="checksession()" :setLanguage="props.setLanguage" ></con_home_view>
+					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
 		</div>
