@@ -1,6 +1,6 @@
 {
   "type": "module",
-	"name": "transcendance_github",
+  "name": "transcendance_github",
   "version": "1.0.0",
   "description": "",
   "main": "db.js",
@@ -23,7 +23,7 @@
     "@fastify/secure-session": "^8.2.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
-    "fastify": "^5.5.0",
+    "fastify": "^5.6.0",
     "fastify-cookie": "^5.6.1",
     "fastify-plugin": "^5.0.1",
     "node-fetch": "^3.3.2",

@@ -77,7 +77,6 @@ fastify.post('/users', async (request, reply)=>{
 	} catch (err) {
 		if (DEBUG_MODE)
 			console.log("Erreur d'ajout d'un utilisateur:", err.stack);
-		reply.status(500).send({error: err.message});
 		if (err.code === 'SQLITE_CONSTRAINT') {
 			if (err.message.includes('UNIQUE constraint failed: user.email'))
 				return reply.status(409).send({ success: false, message: "Email already used." });
@@ -107,6 +106,56 @@ fastify.get('/users', async (request, reply)=>{
 	}
 });
 
+fastify.post('/deleteuser', async (request, reply)=>{
+	const {login, email, password} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!login || !email || !password)
+		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing"});
+
+	try {
+		const userToDelete = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT password FROM users WHERE login = ? AND email = ?`,
+				[login, email],
+				(err, row)=>{
+					if (err) {
+						reject(err);
+					} else {
+						resolve(row);
+					}
+				}
+			);
+		});
+		if (!userToDelete)
+			return reply.status(404).send({ success: false, message: "User not found." });
+
+		const isPasswordValid = await bcrypt.compare(password, userToDelete.password);
+		if (!isPasswordValid)
+			return reply.status(401).send({ success: false, message: "Invalid password." });
+
+		await new Promise((resolve, reject)=>{
+			db.run(
+				`DELETE FROM users WHERE login = ? AND email = ?`,
+				[login, email],
+				function(err) {
+					if (err) {
+						reject(err);
+					} else {
+						resolve(this.changes);
+					}
+				}
+			);
+			updateUserRanks();
+			reply.status(200).send({ success: true, message: "User successfully deleted." });
+		});
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur d'ajout d'un utilisateur:", err.stack);
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});
+
 // verifier les identifiants:
 fastify.post('/login', async (request, reply)=>{
 	const { email, password } = request.body;
@@ -126,7 +175,7 @@ fastify.post('/login', async (request, reply)=>{
 			console.log('user.password:', user.password);
 			console.log("****************************************");
 		}
-		if (bcrypt.compare(user.password, password)) { //! revoir apres hachage
+		if (bcrypt.compare(user.password, password)) {
 			if (DEBUG_MODE)
 				console.log("User Ok");
 			request.session.set('user', user.email);
