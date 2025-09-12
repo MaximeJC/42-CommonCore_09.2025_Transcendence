@@ -1,12 +1,30 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
+	let UserCookie = ''; 
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		isConnect: boolean;
 	}>();
 	const emit = defineEmits(['show-form']);
+
+	const logout = async function logoutUser() {
+		try {
+			const response = await fetch('http://localhost:3000/logout' , {
+				method :'GET',
+				credentials: 'include'
+			});
+
+			if (response.ok)
+
+				console.log("Deconnexion");
+			else 
+				console.log("Erreur de connexion");
+		} catch (err) {
+				console.error("Erreur de deconnexion:", err);
+		}
+	};
 
 </script>
 
@@ -16,7 +34,7 @@
 		<div class="end-button">
 			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
 				<div v-show="!isConnect" data-i18n="header.signUp"></div>
-				<div v-show="isConnect" data-i18n="header.signOut"></div>
+				<div @click="logout" v-show="isConnect" data-i18n="header.signOut"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 		</div>

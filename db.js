@@ -1,10 +1,9 @@
 import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+
 const sqlite = sqlite3.verbose();
 
-const db = new sqlite.Database('./database.db', (err)=>{
-	if (err) console.error("Erreur d'ouverture de la base de donnees: ", err.message);
-	else console.log("Connexion a la base de donnees etablie.");
-});
+let db = new sqlite3.Database('./database.db');
 
 // creer table d'utilisateurs, table de parties et table d'amities
 db.serialize(()=>{
@@ -75,7 +74,19 @@ db.serialize(()=>{
 });
 
 export async function getUserByEmail(email) {
-	return db.get("SELECT * FROM users WHERE email = ?", [email]);
+	db = await open({
+			filename: './database.db',
+			driver: sqlite3.Database,
+		});
+		console.log('Base de données ouverte');
+	try {
+		const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
+		console.log('UserMail trouvé en base:', user);
+		return (user);
+	} catch (err) {
+		console.error('Erreur dans getUserByEmail:', err);
+		throw err;
+	}
 }
 
 // export async function getUsers() {

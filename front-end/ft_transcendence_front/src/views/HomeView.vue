@@ -5,12 +5,38 @@
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
+import { channel } from 'diagnostics_channel';
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 		}>();
 
-	const isConnect = ref(false)
+	let isConnect = ref(false);
+
+	var checksession = async function session() {
+		try {
+			const response = await fetch('http://localhost:3000/me' , {
+				method :'GET',
+				credentials: 'include'
+			});
+			const data = await response.json();
+			console.log("*****************************************");
+			console.log("Test data:");
+			console.log(data.user.login);
+			console.log("*****************************************");
+			if (data.user.login) {
+				isConnect.value = true;
+				// return isConnect;
+			} else {
+				isConnect.value = false;
+				// return isConnect;
+			}
+		} catch (err) {
+				console.error("Erreur de session:", err);
+		}
+	};
+
+	checksession();
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
@@ -29,10 +55,9 @@
 		showConnection.value = !showConnection.value;
 	}
 
-	const toggleisconnected = () => {
-		isConnect.value = !isConnect.value;
-		
-	}
+	// const toggleisconnected = () => {
+	// 	isConnect.value = !isConnect.value;
+	// }
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
@@ -91,7 +116,7 @@
 					<Signup :setLanguage="props.setLanguage" v-show="showSignup"></Signup>
 				</div>
 				<div ref="connectionBox">
-					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
+					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="checksession"></connection_form>
 				</div>
 			</div>
 			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
