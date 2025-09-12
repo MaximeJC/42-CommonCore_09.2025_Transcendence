@@ -34,11 +34,10 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 					password: password.value,
 				}),
 			});
-
 			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
 				success: boolean; // reussite de la requete
 				message?: string; // message optionnel
-				users?: { // objet optionnel contenant le login de l'utilisateur
+				user?: { // objet optionnel contenant le login de l'utilisateur
 					login: string;
 				};
 				errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
@@ -47,12 +46,18 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 				};
 			}
 			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
-	
-			if (data.success && data.users) {
-				message.value = `Welcome ${data.users.login}!` //todo langues
+			
+			console.log("*****************************************");
+			console.log("Test data:");
+			console.log(data.success, data);
+			console.log("*****************************************");
+			if (data.success && data.user?.login) {
+				message.value = `Welcome ${data.user?.login}!` //todo langues
+				console.log(message.value, "*******************");
 				emit('isconnected'); // emission de l'evenement de connexion reussie
 			} else {
 				message.value = data.message || "Connexion error"; //todo langues
+				console.log(message.value, "2*******************");
 				if (data.errors) { // si erreurs specifiques
 					error_email.value = !!data.errors.email; // '!!' permet de convertir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
 					error_password.value = !!data.errors.password;
@@ -70,7 +75,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	}
 
 	async function fetchProfile() {
-		const res = await fetch(`http://localhost:3000/login`, {
+		const res = await fetch(`http://localhost:3000/me`, {
 			credentials: 'include'
 		});
 	}
@@ -100,7 +105,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 				<div class="c-icon-button">
 					<button title="c-ft-signup" class="c-ft-button"></button>
 				</div>
-				<button type="submit" title="Submit-button" class="c-Submit-button">
+				<button @click="emit('isconnected')" type="submit" title="Submit-button" class="c-Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>
 			</div>

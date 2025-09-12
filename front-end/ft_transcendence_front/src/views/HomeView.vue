@@ -10,7 +10,30 @@
 			setLanguage: (lang: string) => void;
 		}>();
 
-	const isConnect = ref(false)
+	let isConnect = ref(false);
+
+	const checksession = async function session() {
+		try {
+			const response = await fetch('http://localhost:3000/me' , {
+				method :'GET',
+				credentials: 'include'
+			});
+			const data = await response.json();
+			console.log("*****************************************");
+			console.log("Test data:");
+			console.log(data.login);
+			console.log("*****************************************");
+			if (data.login) {
+				isConnect.value = true;
+				return isConnect;
+			} else {
+				isConnect.value = false;
+				return isConnect;
+			}
+		} catch (err) {
+				console.error("Erreur de session:", err);
+		}
+	};
 
 	const showSignup = ref(false);
 	const toggleSignup = () => {
@@ -80,10 +103,10 @@
 <template>
 	<div>
 		<div>
-		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
+		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="checksession()"></Head>
 		</div>
 		<div>
-			<div v-show="!isConnect" tittle="home_disconnect" class="home_disconnect" >
+			<div v-show="!checksession()" tittle="home_disconnect" class="home_disconnect" >
 				<div>
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
@@ -94,9 +117,9 @@
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
-			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
+			<div v-show="checksession()" tittle="home_connect" class="home_connect" >
 				<div>
-					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
+					<con_home_view :isConnect="checksession()" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
 		</div>

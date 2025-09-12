@@ -23,7 +23,9 @@ await fastify.register(fastifySecureSession, {
   cookie: {
     path: '/',
     httpOnly: true,
-    secure: false
+    secure: false,
+	sameSite: 'strict',
+	saveUninitialized: false
   }
 });
 
@@ -116,18 +118,17 @@ fastify.post('/login', async (request, reply)=>{
 
 	const user = await getUserByEmail(email);
 	if (DEBUG_MODE)
-		console.log("Utilisateur trouve: ", user.login);
+		console.log("Utilisateur trouve: ", user);
 	if (user) {
 		if (DEBUG_MODE) {
 			console.log("****************************************");
 			console.log('user', user);
-			console.log('user.password:', user.password);
 			console.log("****************************************");
 		}
-		if (bcrypt.compare(user.password, password)) { //! revoir apres hachage
+		if (bcrypt.compare(password, user.password)) { //! revoir apres hachage
 			if (DEBUG_MODE)
 				console.log("User Ok");
-			request.session.set('user', user.email);
+			request.session.set('user', user);
 			return reply.send({ success: true, user: { login: user.login, email: user.email, level: user.level } });
 		}
 	} else {
@@ -137,13 +138,24 @@ fastify.post('/login', async (request, reply)=>{
 	}
 });
 
-fastify.get('/login', async (req, rep) => {
+fastify.get('/me', async (req, rep) => {
 	const user = req.session.get('user');
 	if (!user) {
 		return rep.code(401).send({ error: 'Disconnected'});
 	}
-	// const userId = db.get('SELECT * FROM users WHERE email = ?', user);
 	return rep.send({ user });
+});
+
+fastify.get('/logout', async (request, reply) => {
+	request.session.delete('user');
+// 	request.session.destroy((err) => {
+// 		if (err) {
+// 			console.error('Erreur de connexion:', err);
+// 			return (reply.status(500).send({ message: 'Erreur lors de la deconnexion'}));
+// 		}
+	reply.clearCookie('sessionId');
+	reply.send({ message: 'Deconnexion réussie'});
+// 	});
 });
 // fastify.get('/login', async (request, reply)=>{
 // 	try {
