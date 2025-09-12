@@ -55,9 +55,9 @@ import { channel } from 'diagnostics_channel';
 		showConnection.value = !showConnection.value;
 	}
 
-	// const toggleisconnected = () => {
-	// 	isConnect.value = !isConnect.value;
-	// }
+	const toggleisconnected = () => {
+		isConnect.value = !isConnect.value;
+	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
@@ -116,7 +116,7 @@ import { channel } from 'diagnostics_channel';
 					<Signup :setLanguage="props.setLanguage" v-show="showSignup"></Signup>
 				</div>
 				<div ref="connectionBox">
-					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="checksession"></connection_form>
+					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
 			<div v-show="isConnect" tittle="home_connect" class="home_connect" >

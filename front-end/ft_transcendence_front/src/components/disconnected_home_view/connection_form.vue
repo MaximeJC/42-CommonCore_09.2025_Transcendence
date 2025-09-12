@@ -105,7 +105,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 				<div class="c-icon-button">
 					<button title="c-ft-signup" class="c-ft-button"></button>
 				</div>
-				<button @click="emit('isconnected')" type="submit" title="Submit-button" class="c-Submit-button">
+				<button  type="submit" title="Submit-button" class="c-Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>
 			</div>
