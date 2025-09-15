@@ -5,27 +5,49 @@
 	}>();
 
 
-	interface match{
-		win: boolean;
-		c_login: string;
-		c_score: number;
-		time : number;
-		o_score: number;
-		o_login: string;
+	interface Match{
+		date : number;
+		winner: string;
+		score_w: number;
+		loser: number;
+		score_l: string;
 	}
 
-	const matchs: match[] = [
-		{win: true, c_login: "Micka", c_score: 5, time: 2.50, o_score: 2, o_login: "nico"},
-		{win: true, c_login: "Micka", c_score: 5, time: 3.55, o_score: 3, o_login: "Louise"},
-		{win: true, c_login: "Micka", c_score: 5, time: 2.12, o_score: 4, o_login: "Maxime"},
-		{win: false, c_login: "Micka", c_score: 4, time: 2.37, o_score: 5, o_login: "Axel"},
-		{win: true, c_login: "Micka", c_score: 5, time: 2.10, o_score: 4, o_login: "Thomas"},
-		{win: true, c_login: "Micka", c_score: 5, time: 1.40, o_score: 0, o_login: "Anas"},
-		{win: true, c_login: "Micka", c_score: 5, time: 2.12, o_score: 3, o_login: "Arthur"},
-		{win: false, c_login: "Micka", c_score: 0, time: 2.43, o_score: 5, o_login: "Dorina"},
-		{win: true, c_login: "Micka", c_score: 5, time: 1.55, o_score: 2, o_login: "wictor"},
-		{win: false, c_login: "Micka", c_score: 1, time: 2.33, o_score: 5, o_login: "yichi"},
-	];
+	const matches = ref<Match[]>([]);
+
+	async function fetchGames() {
+		try {
+			const result = await fetch('http://localhost:3000/games');
+			if (!result.ok)
+				throw new Error(`Erreur http: ${result.status}`);
+			const games = await result.json();
+
+			matches.value = games.map((game: any)=>({
+				date: game.created_at,
+				winner: game.login_winner,
+				score_w: game.score_winner,
+				score_l: game.score_loser,
+				loser: game.login_loser,
+
+			}));
+		} catch (err) {
+			console.error("Erreur de recuperation des parties:", err);
+		}
+		onMounted(()=>{ fetchGames(); });
+	}
+
+	// const matchs: match[] = [
+	// 	{win: true, winner: "Micka", score_w: 5, date: 2.50, score_l: 2, loser: "nico"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 3.55, score_l: 3, loser: "Louise"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 2.12, score_l: 4, loser: "Maxime"},
+	// 	{win: false, winner: "Micka", score_w: 4, date: 2.37, score_l: 5, loser: "Axel"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 2.10, score_l: 4, loser: "Thomas"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 1.40, score_l: 0, loser: "Anas"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 2.12, score_l: 3, loser: "Arthur"},
+	// 	{win: false, winner: "Micka", score_w: 0, date: 2.43, score_l: 5, loser: "Dorina"},
+	// 	{win: true, winner: "Micka", score_w: 5, date: 1.55, score_l: 2, loser: "wictor"},
+	// 	{win: false, winner: "Micka", score_w: 1, date: 2.33, score_l: 5, loser: "yichi"},
+	// ];
 </script>
 
 <template>
@@ -35,21 +57,21 @@
 			<div data-i18n="historic.victory"></div>
 			<div data-i18n="historic.login"></div>
 			<div data-i18n="historic.my_score"></div>
-			<div data-i18n="historic.time"></div>
-			<div data-i18n="historic.o_score"></div>
-			<div data-i18n="historic.o_login"></div>
+			<div data-i18n="historic.date"></div>
+			<div data-i18n="historic.score_l"></div>
+			<div data-i18n="historic.loser"></div>
 		</div>
 		<div class="list-container">
-			<div v-for="match in matchs" :key="match.c_score" class="h-grid-row">
-				<div class="v-icon">
+			<div v-for="match in matches" :key="match.score_w" class="h-grid-row">
+				<!-- <div class="v-icon">
 					<img class="h-v-icon" v-show="match.win" src="../../../images/v-green.png"></img>
 					<img class="h-d-icon" v-show="!match.win" src="../../../images/cross-red.png"></img>
-				</div>
-				<div>{{ match.c_login }}</div>
-				<div>{{ match.c_score }}</div>
-				<div>{{ match.time }} min </div>
-				<div>{{ match.o_score }}</div>
-				<div>{{ match.o_login }}</div>
+				</div> -->
+				<div>{{ match.winner }}</div>
+				<div>{{ match.score_w }}</div>
+				<div>{{ match.date }} min </div>
+				<div>{{ match.score_l }}</div>
+				<div>{{ match.loser }}</div>
 			</div>
 		</div>
 	</div>
