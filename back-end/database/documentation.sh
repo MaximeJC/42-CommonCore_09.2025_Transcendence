@@ -67,6 +67,10 @@ node db_server.js
 
 	curl -X POST http://localhost:3000/friends \
 		-H "Content-Type: application/json" \
+		-d '{"login1": "Alice", "login2": "Louise"}' \
+
+	curl -X POST http://localhost:3000/friends \
+		-H "Content-Type: application/json" \
 		-d '{"login1": "Cocotte", "login2": "Louise"}'
 
 	# supprimer une amitie:

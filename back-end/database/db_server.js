@@ -46,7 +46,6 @@ fastify.get('/', async (request, reply)=>{
 });
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//todo supprimer utilisateur
 
 // ajouter un utilisateur:
 fastify.post('/users', async (request, reply)=>{
@@ -203,6 +202,7 @@ fastify.get('/logout', async (request, reply) => {
 	reply.send({ message: 'Deconnexion réussie'});
 // 	});
 });
+
 /* fastify.get('/login', async (request, reply)=>{
 	try {
 		const row = await new Promise((resolve, reject)=>{
@@ -485,7 +485,44 @@ fastify.post('/friends', async (request, reply)=>{
 	}
 });
 
-// afficher les amis:
+// afficher les amis d'un utilisateur en particulier:
+fastify.get('/friends/me', async (request, reply)=>{
+	try {
+		const {login_current} = request.query;
+			if (!login_current)
+		return reply.status(400).send({ error: "Missing login." });
+
+		const friends = await new Promise((resolve, reject)=>{
+			db.all(
+				`SELECT DISTINCT
+					u.login as name,
+					u.avatar_url as avatar_src
+				FROM friends f
+				JOIN users u ON (u.login = f.login2)
+				WHERE f.login1 = ?`, 
+				[login_current], 
+				(err, friends)=>{
+					if (err) reject(err);
+					else {
+						//todo a modifier pour que isconnected ne soit plus en dur
+						const friendsWithConnectionStatus = friends.map(friend=>({
+							...friend,
+							isconnected: true
+						}));
+						resolve(friendsWithConnectionStatus);
+					}
+				}
+			);
+		});
+		reply.send(friends);
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur d'affichage des amis.\n");
+		reply.status(500).send({error: err.message});
+	}
+});
+
+// afficher toutes les amities:
 fastify.get('/friends', async (request, reply)=>{
 	try {
 		const friends = await new Promise((resolve, reject)=>{

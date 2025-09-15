@@ -20,10 +20,11 @@
 		try {
 			//todo : remplacer ce currentUserLogin en dur par le fetch, qui actuellement ne fonctionne pas:
 			const currentUserLogin = "Alice";
-			// const current = await fetch('http://localhost/3000/me');
+			// const current = await fetch('http://localhost:3000/me');
 			// if (!current.ok)
 			// 	throw new Error(`Erreur http: ${current.status}`);
-			// const currentUserLogin = await current.json();
+			// const currentUser = await current.json();
+			// const currentUserLogin = currentUser.login;
 
 			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(currentUserLogin)}`);
 			if (!result.ok)

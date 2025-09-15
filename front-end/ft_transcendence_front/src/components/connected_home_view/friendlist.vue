@@ -22,20 +22,50 @@
 		isconnected: boolean;
 	}
 
-	const friends: Friend[] = [
-		{ name: "Micka", avatar_src: "../../images/default_avatar.png", isconnected: true},
-		{ name: "Louise", avatar_src: "../../images/default_avatar.png", isconnected: false},
-		{ name: "Maxime", avatar_src: "../../images/default_avatar.png", isconnected: false},
-		{ name: "Axel", avatar_src: "../../images/default_avatar.png", isconnected: true},
-		{ name: "Nico", avatar_src: "../../images/default_avatar.png", isconnected: false},
-		{ name: "Thomas", avatar_src: "../../images/default_avatar.png", isconnected: true},
-		{ name: "Anas", avatar_src: "../../images/default_avatar.png", isconnected: true},
-		{ name: "Arthur", avatar_src: "../../images/default_avatar.png", isconnected: true},
-		{ name: "Dorina", avatar_src: "../../images/default_avatar.png", isconnected: false},
-		{ name: "Wictor", avatar_src: "../../images/default_avatar.png", isconnected: true},
-	]
+	const friends = ref<Friend[]>([]);
 
+	async function fetchFriends() {
+		try {
+			//todo remplacer ce currentUserLogin code en dur par le login de l'utilisateur connecte:
+			const currentUserLogin = "Louise";
+			// const current = await fetch('http://localhost:3000/me');
+			// if (!current.ok)
+			// 	throw new Error(`Erreur http: ${current.status}`);
+			// const currentUser = await current.json();
+			// const currentUserLogin = currentUser.login;
+
+			const result = await fetch(`http://localhost:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
+			{
+				method: 'GET',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				}
+			});
+			if (!result.ok)
+				throw new Error(`Erreur http: ${result.status}`);
+			const friendList = await result.json();
+			friends.value = friendList;
+		} catch (err) {
+			console.error("Erreur de recuperation des amis:", err);
+		}
+	}
+	onMounted(()=>{ fetchFriends(); });
+	
 </script>
+
+// const friends: Friend[] = [
+// 	{ name: "Micka", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Louise", avatar_src: "../../images/default_avatar.png", isconnected: false},
+// 	{ name: "Maxime", avatar_src: "../../images/default_avatar.png", isconnected: false},
+// 	{ name: "Axel", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Nico", avatar_src: "../../images/default_avatar.png", isconnected: false},
+// 	{ name: "Thomas", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Anas", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Arthur", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Dorina", avatar_src: "../../images/default_avatar.png", isconnected: false},
+// 	{ name: "Wictor", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// ]
 
 <template>
 	<div ref="rootElement" tittle="friend-list-container" class="friend-list-container">
