@@ -50,11 +50,12 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	
 			if (data.success && data.users) {
 				message.value = `Welcome ${data.users.login}!` //todo langues
+				console.log("laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 				emit('isconnected'); // emission de l'evenement de connexion reussie
 			} else {
 				message.value = data.message || "Connexion error"; //todo langues
 				if (data.errors) { // si erreurs specifiques
-					error_email.value = !!data.errors.email; // '!!' permet de convertir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
+					error_email.value = !!data.errors.email; // '!!' permet de conve`rtir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
 					error_password.value = !!data.errors.password;
 				} else {
 					error_email.value = true;

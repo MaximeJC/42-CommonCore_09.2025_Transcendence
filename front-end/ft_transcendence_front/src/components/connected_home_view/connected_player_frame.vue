@@ -97,7 +97,6 @@ import invit_return from "./invit&return_button.vue"
 		0 0 40px #dd0aba;
 		padding: 1rem 2rem;
 		border-radius: 20px;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
 	.avatar\+login{

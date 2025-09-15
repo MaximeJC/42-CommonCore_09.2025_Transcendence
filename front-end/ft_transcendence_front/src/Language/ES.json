@@ -44,6 +44,17 @@
 	    "time": "Tiempo de juego",
 	    "o_score": "Puntuación adv. ",
 	    "o_login": "Adversario"
+	},
+
+	"setting":{
+		"profile": "Perfil",
+		"setting": "Ajustes",
+		"avatar": "Cambiar mi Avatar",
+		"login": "Cambiar mi Nombre de usuario",
+		"mail": "Cambiar mi Correo electrónico",
+		"password": "Cambiar mi Contraseña",
+		"about": "Acerca de",
+		"contact": "Contacto"
 	}
 	
 }
