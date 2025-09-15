@@ -3,57 +3,79 @@
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
+	const new_avatar_src = ref("");
+	const new_login = ref("");
+	const new_email = ref("");
+	const new_password = ref("");
+	const conf_new_password = ref("");
 
-	
-
+	interface player{
+		email: string;
+		login: string;
+	}
+		
+	const act: player = {email: "test@test.fr", login: "test"};
 </script>
 
 <template>
-	<div title="profil_container" class="profil_container">
-		<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
-		<div class="avatar_container" title="avatar_container"> 
-			<img src="./Url de l'avatar.png" tittle="Avatar" alt="Avatar" class="set_avatar" ></img>
-
-			<form class="set_form" title="form_avatar">
-				<label title="avatar_label" class="avatar_subtitle" data-i18n="setting.avatar" ></label>
-				<div >
-					<input title="avatar_input" class="set_input"></input>
-					<button type="submit" title="avatar_button" class="set_button" data-i18n="Signup.submit" ></button>
-					<!--<div>erorr</div>-->
+	<!--<div class="s_page_container">-->
+	
+		<div title="profil_container" class="profil_container">
+			<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
+			<div tittle="avatar container" class="info_container">
+				<img src="../../../images/default_avatar.png" tittle="Avatar"  class="set_avatar" ></img>
+				<div>
+					<div title="act-login" class="info_title">{{ act.email }}</div>
+					<div title="act-mail" class="info_title">{{ act.login }}</div>
 				</div>
-			</form>
+			</div>	
+			<div title="avatar_container" class="set_container" > 
+				<form title="form_avatar" class="set_form" >
+					<label title="avatar_label" class="set_subtitle" data-i18n="setting.avatar" ></label>
+					<div class="set_sub_inp">
+						<input title="avatar_input" class="set_input" type="avatar_src" id="avatar_src" v-model="new_avatar_src" required></input>
+						<button type="submit" title="avatar_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<!--<div>erorr</div>-->
+					</div>
+				</form>
+			</div>
+			<div title="mail_container" class="set_container" >
+				<form title="form_mail" class="set_form" >
+					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
+					<div class="set_sub_inp">
+						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
+						<button type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<!--<div>erorr</div>-->
+					</div>
+				</form>
+			</div>
+			<div class="set_container" title="login_container">
+				<form class="set_form" title="form_login">
+					<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
+					<div class="set_sub_inp">
+						<input title="login_input" class="set_input" type="login" id="login" v-model="new_login"></input>
+						<button type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<!--<div>erorr</div>-->
+					</div>
+				</form>
+			</div>
+			<div class="set_container" title="password_container">
+				<form class="set_form" title="form_password">
+					<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
+					<div class="set_sub_password">
+						<div>
+							<input title="password_input" class="set_input" type="password" v-model="new_password" />
+							<label class="conf_password" data-i18n="Signup.conf_password"></label>
+							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
+						</div>
+						<div class="pos_pass_button">
+							<button type="submit" class="set_button" data-i18n="Signup.submit"></button>
+						</div>
+					</div>
+				</form>
+			</div>
 		</div>
-		<div class="set_container" title="mail_container">
-			<form class="set_form" title="form_mail">
-				<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
-				<div class="set_sub_inp">
-					<input title="mail_input" class="set_input"></input>
-					<button type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
-					<!--<div>erorr</div>-->
-				</div>
-			</form>
-		</div>
-		<div class="set_container" title="login_container">
-			<form class="set_form" title="form_login">
-				<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
-				<div class="set_sub_inp">
-					<input title="login_input" class="set_input"></input>
-					<button type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
-					<!--<div>erorr</div>-->
-				</div>
-			</form>
-		</div>
-		<div class="set_container" title="password_container">
-			<form class="set_form" title="form_password">
-				<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
-				<div class="set_sub_inp">
-					<input title="password_input" class="set_input"></input>
-					<button type="submit" title="password_button" class="set_button" data-i18n="Signup.submit" ></button>
-					<!--<div>erorr</div>-->
-				</div>
-			</form>
-		</div>
-	</div>
+	<!--</div>-->
 </template>
 
 <style>
@@ -61,11 +83,55 @@
 	font-family: "netron";
 	src: url("../../fonts/netron.regular.otf") format("opentype");
 }
+
+.info_container{
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly; 
+}
+
+.info_container > div{
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: min-content;
+}
+
+.set_avatar{
+	display: block;
+	background-image: url(../../../images/default_avatar.png);
+	background-size: cover;
+	border-radius: 50%;
+	border:2px solid #e251ca;
+	box-shadow: 
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba,
+		0 0 40px #dd0aba;
+	width: 6rem;
+	height: 6rem;
+}
+
+.info_title{
+	justify-self: start;
+	font-family: netron;
+	color: white;
+	text-shadow: 
+	0 0 10px #dd0aba,
+	0 0 10px #dd0aba,
+	0 0 20px #dd0aba,
+	0 0 40px #dd0aba,
+	0 0 80px #ff69b4,
+	0 0 120px #dd0aba;
+	font-size: 1rem;
+	margin-top: 1rem;
+}
+
 .profil_container{
 	display: grid;
+
 	grid-template-rows: min-content;
 	grid-template-columns: 1fr;
-	width: 42rem;
+	width: 32rem;
 	background-color: rgba(156, 50, 133, 0.5);
 	border: 2px solid #e251ca;
 	box-shadow: 
@@ -91,44 +157,26 @@
 	0 0 120px #dd0aba;
 	font-size: 1.5rem;
 	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
-.avatar_container{
-	display: grid;
-	grid-template-columns: 0.35fr 1fr;
-	align-items: center;
-}
 .set_container{
 	display: grid;
 	grid-template-columns: 1fr;
-	align-items: center;
 }
 
-.set_avatar{
-	display: block;
-	background-image: url(../../../images/default_avatar.png);
-	background-size: cover;
-	border-radius: 50%;
-	border:2px solid #e251ca;
-	box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
-	width: 10rem;
-	height: 10rem;
-}
+
 
 .set_form{
 	display: grid;
-	grid-template-rows: 0.8fr 1fr ;
-	align-content: center;
-	margin-top: 2rem;
+	grid-template-columns: 1fr;
+	grid-template-rows: 0.8fr 1fr;
+	margin-top: 1rem;
 }
 
-.avatar_subtitle{
+.conf_password{
 	font-family: netron;
-	margin-left: 6rem;
+	margin-left: 1rem;
 	color: white;
 	text-shadow: 
 	0 0 10px #dd0aba,
@@ -137,21 +185,14 @@
 	0 0 40px #dd0aba,
 	0 0 80px #ff69b4,
 	0 0 120px #dd0aba;
-	font-size: 1.2rem;
+	font-size: 0.8rem;
 	font-family: netron;
 	color: white;
-	text-shadow: 
-	0 0 10px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba,
-	0 0 80px #ff69b4,
-	0 0 120px #dd0aba;
 }
 
 .set_subtitle{
 	font-family: netron;
-	margin-left: 6rem;
+	margin-left: 1rem;
 	color: white;
 	text-shadow: 
 	0 0 10px #dd0aba,
@@ -160,28 +201,31 @@
 	0 0 40px #dd0aba,
 	0 0 80px #ff69b4,
 	0 0 120px #dd0aba;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-family: netron;
 	color: white;
-	text-shadow: 
-	0 0 10px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba,
-	0 0 80px #ff69b4,
-	0 0 120px #dd0aba;
 }
 
 .set_sub_inp{
 	display: flex;
-	justify-content: end;}
+	/*justify-content: center;*/
+	align-items: first baseline;
+}
 
+.set_sub_password {
+	display: grid;
+	margin-top: -1.3rem;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr;
+}
+	
 .set_input{
 	width: 22rem;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	margin-bottom: 0.5rem;
 	margin-right: 1rem;
 	border-radius: 20px;
+	margin-left: 0.8rem;
 	border: none;
 	
 }
@@ -189,18 +233,16 @@
 .set_button{
 	font-family: netron;
 	background-color: rgba(251, 255, 34, 0.5);
-	font-size: 1rem;
+	font-size: 0.8rem;
 	color: white;
 	border: 2px solid #caece8;
 	text-shadow: 
 	0 0 10px #fbff22,
 	0 0 10px #fbff22;
-
 	box-shadow: 
 	0 0 5px #fbff22,
-	0 0 10px #fbff22,
-	0 0 20px #fbff22;
-	padding: 0.5rem 1rem;
+	0 0 10px #fbff22;
+	padding: 0.1rem 1rem;
 	border-radius: 20px;
 	cursor: pointer;
 	transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
@@ -222,5 +264,10 @@
 	0 0 20px #dd0aba,
 	0 0 40px #dd0aba,
 	0 0 80px #dd0aba;
+}
+
+.pos_pass_button{
+	align-self: last baseline;
+	margin-bottom: 0.5rem;
 }
 </style>
