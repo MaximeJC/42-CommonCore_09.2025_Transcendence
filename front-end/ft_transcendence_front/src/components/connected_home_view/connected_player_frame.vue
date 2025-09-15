@@ -2,7 +2,8 @@
 import { ref, onMounted, defineProps } from 'vue';
 import play_historic from "./play&historic_button.vue" 
 import play_return from "./play&return_button.vue" 
-import invit_return from "./invit&return_button.vue" 
+import invit_return from "./invit&return_button.vue"
+
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 			historic: boolean;
@@ -15,44 +16,55 @@ import invit_return from "./invit&return_button.vue"
 		rank: 0,
 	});
 
-	async function fetchPlayerData() {
-		try {
-			const response = await fetch('http://localhost:3000/users/current', {
-				method: 'GET',
-			})
-			if (!response.ok) {
-				// Donnees brutes pour tester a la place de data 
-				// car comme on n'a pas encore l'info de l'utilisateur 
-				// connecte, fetch ne fonctionne pas:
-				playerData.value = {
-					login: 'Louise',
-					nb_games: 3,
-					nb_won_games: 2,
-					rank: 2,
-				};
-				// fin de la partie brute
-				throw new Error('Player data fetch error');
-			}
-			const data = await response.json();
-			playerData.value = {
-				login: data.login,
-				nb_games: data.nb_games,
-				nb_won_games: data.nb_won_games,
-				rank: data.rank,
-			};
-		} catch (error) {
-			console.log("Error:", error);
-		}
-	}
 
-	onMounted(()=>{ fetchPlayerData(); });
+//TODO: optimiser le delai de response des fetch
+async function fetchPlayerData(retries = 5, delay = 1000) {
+	try {
+		for (let i = 0; i < retries; i++) {
+			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+
+				// Si user est présent, on peut sortir
+				if (data.user && data.user.login) {
+					playerData.value = {
+						login: data.user.login,
+						nb_games: data.user.nb_games,
+						nb_won_games: data.user.nb_won_games,
+						rank: data.user.rank
+					};
+					return;
+				}
+			}
+
+			// Attendre avant de réessayer
+			await new Promise(res => setTimeout(res, delay));
+		}
+
+		// console.warn("User non trouvé après plusieurs tentatives.");
+		// playerData.value = null;
+
+	} catch (error) {
+		console.error("Erreur dans fetchPlayerData:", error);
+		// playerData.value = null;
+	}
+}
+
+	onMounted(async()=>{
+
+		await fetchPlayerData();
+	});
 	
 	const emit = defineEmits(['show-other_player', 'show-historic']);
 
 </script>
 
 <template>
-	<div tittle="connected_player_frame" class="connected_player_frame">
+	<div v-if="playerData" tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
 			<div tittle="login" class="login">
@@ -75,6 +87,9 @@ import invit_return from "./invit&return_button.vue"
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
 		<invit_return @show-other_player="emit('show-other_player')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
+	<div v-else>
+    	Chargement des données...
+    </div>
 </template>
 
 <style>

@@ -5,7 +5,7 @@
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
-import { channel } from 'diagnostics_channel';
+// import { channel } from 'diagnostics_channel';
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
@@ -15,22 +15,25 @@ import { channel } from 'diagnostics_channel';
 
 	var checksession = async function session() {
 		try {
-			const response = await fetch('http://localhost:3000/me' , {
+			const response = await fetch(`http://${window.location.hostname}:3000/me` , {
 				method :'GET',
 				credentials: 'include'
 			});
 			const data = await response.json();
-			console.log("*****************************************");
-			console.log("Test data:");
-			console.log(data.user.login);
-			console.log("*****************************************");
-			if (data.user.login) {
+			// console.log("*****************************************");
+			// console.log("Test data:");
+			// console.log(data.user.login);
+			// console.log("*****************************************");
+			if (data.user?.login) {
 				isConnect.value = true;
 				// return isConnect;
 			} else {
 				isConnect.value = false;
 				// return isConnect;
 			}
+			console.log("*********isConnect*1**************");
+			console.log(isConnect.value);
+			console.log("************************");
 		} catch (err) {
 				console.error("Erreur de session:", err);
 		}

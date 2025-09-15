@@ -6,6 +6,7 @@ import dbModule from './db.js' // importer cette fonction du fichier db.js
 import bcrypt from 'bcrypt';
 import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
+import crypto from 'crypto';
 
 const { db, getUserByEmail } = dbModule;
 const fastify = Fastify({logger: true});
@@ -14,28 +15,36 @@ const fastify = Fastify({logger: true});
 
 await fastify.register(fastifyCookie);
 await fastify.register(fastifySecureSession, {
-  key: Buffer.from([
-    0x7a, 0x11, 0x3c, 0x45, 0xde, 0x8a, 0xb9, 0x31,
-    0x0f, 0x55, 0x99, 0x33, 0x24, 0xaf, 0xce, 0x1b,
-    0xe7, 0x62, 0x91, 0x48, 0xdc, 0xfe, 0x06, 0xa0,
-    0x1d, 0x3a, 0x84, 0x75, 0x2e, 0x6c, 0xbb, 0x10
-  ]), //generer une cle aleatoire
+  key: crypto.randomBytes(32), //generer une cle aleatoire
   cookie: {
     path: '/',
     httpOnly: true,
     secure: false,
-	sameSite: 'strict',
+	sameSite: 'lax',
 	saveUninitialized: false
   }
 });
 
 async function configure() {
-	await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
+	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173'];
+
+	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
+
+	await fastify.register(cors, { 
+		origin: (origin, cb) => {
+			if (!origin || allowedOrigin.includes(origin)) {
+				cb(null, true);
+			} else {
+				cb(new Error(`Not allowed by CORS: ${origin}`));
+			}
+		}, 
+		credentials: true
+	}); // autoriser n'importe qui a appeler l'API de ce serveur
 
 	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
 
-	await fastify.listen({ port: 3000 });
-	console.log('Server running on http://localhost:3000');
+	await fastify.listen({ port: 3000, host: '0.0.0.0' });
+	console.log(`Server running on http://localhost:3000`);
 }
 
 configure();
@@ -159,6 +168,30 @@ fastify.post('/deleteuser', async (request, reply)=>{
 });
 
 // verifier les identifiants:
+
+function updateIsConnected(userId) {
+	db.serialize(async()=>{
+		try {
+			await new Promise((resolve, reject) => {
+				db.run(
+					`UPDATE users SET connected = ? WHERE id = ?`,
+					[1, userId],
+					(err) => {
+						if (err) {
+							console.log("Erreur de mise a jour de connexion du joueur:", err);
+							reject(err);
+						} else {
+							resolve();
+						}
+					}
+				);
+			});
+		} catch (err) {
+			console.log("updateIsConnected error:", err);
+		}
+	});
+}
+
 fastify.post('/login', async (request, reply)=>{
 	const { email, password } = request.body;
 	if (DEBUG_MODE) {
@@ -173,18 +206,22 @@ fastify.post('/login', async (request, reply)=>{
 	if (user) {
 		if (DEBUG_MODE) {
 			console.log("****************************************");
-			console.log('user', user);
+			console.log('user', user.password);
 			console.log("****************************************");
 		}
-		if (bcrypt.compare(user.password, password)) {
+		if (await bcrypt.compare(password, user.password) === true) {
 			if (DEBUG_MODE)
 				console.log("User Ok");
 			request.session.set('user', user);
+			updateIsConnected(user.id);
 			return reply.send({ success: true, user: { login: user.login, email: user.email, level: user.level } });
 		}
 	} else {
-		if (DEBUG_MODE)
+		if (DEBUG_MODE) {
+			console.log("****************************************");
 			console.log("Wrong user");
+			console.log("****************************************");
+		}
 		return reply.send({ success: false, message: "Wrong email and/or password" });
 	}
 });
@@ -192,22 +229,48 @@ fastify.post('/login', async (request, reply)=>{
 fastify.get('/me', async (req, rep) => {
 	const user = req.session.get('user');
 	if (!user) {
-		return rep.code(401).send({ error: 'Disconnected'});
+		return rep.send({ error: 'Disconnected'});
 	}
 	return rep.send({ user });
 });
 
+function updateIsNotConnected(userId) {
+	db.serialize(async()=>{
+		try {
+			await new Promise((resolve, reject) => {
+				db.run(
+					`UPDATE users SET connected = ? WHERE id = ?`,
+					[0, userId],
+					(err) => {
+						if (err) {
+							console.log("Erreur de mise a jour de connexion du joueur:", err);
+							reject(err);
+						} else {
+							resolve();
+						}
+					}
+				);
+			});
+		} catch (err) {
+			console.log("updateIsNotConnected error:", err);
+		}
+	});
+}
+
 fastify.get('/logout', async (request, reply) => {
+	const user = request.session.get('user');
+	updateIsNotConnected(user.id);
 	request.session.delete('user');
 	reply.clearCookie('sessionId');
 	reply.send({ message: 'Deconnexion réussie'});
 // 	});
 });
-// fastify.get('/login', async (request, reply)=>{
+
+// fastify.get('/users/current', async (request, reply)=>{
 // 	try {
 // 		const row = await new Promise((resolve, reject)=>{
 // 			db.all(
-// 				`SELECT * FROM users WHERE level = ?`, 1, (err, row)=>{
+// 				`SELECT * FROM users WHERE connected = ?`, 1, (err, row)=>{
 // 					if (err) reject(err);
 // 					else resolve(row);
 // 				}

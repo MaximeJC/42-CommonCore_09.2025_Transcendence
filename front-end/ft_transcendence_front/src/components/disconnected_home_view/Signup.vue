@@ -32,7 +32,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		}
 
 		try {
-			const result = await fetch("http://localhost:3000/users", { // envoie une requete HTTP via cet URL (au port 3000)
+			const result = await fetch(`http://${window.location.hostname}:3000/users`, { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

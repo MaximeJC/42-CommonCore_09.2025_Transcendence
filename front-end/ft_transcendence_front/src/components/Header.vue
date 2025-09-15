@@ -11,7 +11,7 @@
 
 	const logout = async function logoutUser() {
 		try {
-			const response = await fetch('http://localhost:3000/logout' , {
+			const response = await fetch(`http://${window.location.hostname}:3000/logout` , {
 				method :'GET',
 				credentials: 'include'
 			});
