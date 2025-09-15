@@ -203,23 +203,23 @@ fastify.get('/logout', async (request, reply) => {
 	reply.send({ message: 'Deconnexion réussie'});
 // 	});
 });
-// fastify.get('/login', async (request, reply)=>{
-// 	try {
-// 		const row = await new Promise((resolve, reject)=>{
-// 			db.all(
-// 				`SELECT * FROM users WHERE level = ?`, 1, (err, row)=>{
-// 					if (err) reject(err);
-// 					else resolve(row);
-// 				}
-// 			);
-// 		});
-// 		reply.send(row);
-// 	} catch (err) {
-// 		if (DEBUG_MODE)
-// 			console.log("Erreur d'affichage des utilisateurs.\n");
-// 		reply.status(500).send({error: err.message});
-// 	}
-// });
+/* fastify.get('/login', async (request, reply)=>{
+	try {
+		const row = await new Promise((resolve, reject)=>{
+			db.all(
+				`SELECT * FROM users WHERE level = ?`, 1, (err, row)=>{
+					if (err) reject(err);
+					else resolve(row);
+				}
+			);
+		});
+		reply.send(row);
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur d'affichage des utilisateurs.\n");
+		reply.status(500).send({error: err.message});
+	}
+}); */
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARTIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -273,7 +273,7 @@ fastify.post('/games', async (request, reply)=>{
 	};
 });
 
-// afficher les parties:
+// afficher toutes les parties:
 fastify.get('/games', async (request, reply)=>{
 	try {
 		const games = await new Promise((resolve, reject)=>{
@@ -289,6 +289,33 @@ fastify.get('/games', async (request, reply)=>{
 		if (DEBUG_MODE)
 			console.log("Erreur d'affichage des parties.\n");
 		reply.status(500).send({error: err.message});
+	}
+});
+
+// afficher les parties qu'a joue un utilisateur particulier:
+fastify.get('/games/me', async (request, reply)=>{
+	const { login_current } = request.query;
+	if (!login_current)
+		return reply.status(400).send({ error: "Missing login." });
+
+	try {
+		const games = await new Promise((resolve, reject)=>{
+			db.all(
+				`SELECT * FROM games
+				WHERE login_winner = ? OR login_loser = ?
+				ORDER BY created_at DESC`,
+				[login_current, login_current],
+				(err, games)=>{
+					if (err) reject(err);
+					else resolve(games);
+				}
+			);
+		});
+		reply.send(games);
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur parties d'un utilisateur.");
+		reply.status(500).send({ error: err.message });
 	}
 });
 
