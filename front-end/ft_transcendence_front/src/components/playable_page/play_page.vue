@@ -8,7 +8,7 @@ const props = defineProps<{
 		show_play: boolean;
 	}>();
 
-const emit = defineEmits(['show_play']);
+const emit = defineEmits(['show_play', 'isPlayActive']);
 const activePlay = ref('');
 const isPlayActive = ref(false);
 const isonline = ref(false)
@@ -17,26 +17,25 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	isonline.value = isActive;
 	activePlay.value = type;
 	isPlayActive.value = !isPlayActive.value
+	emit('isPlayActive');
 	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
 </script>
 
 <template>
-	<div>
+	<div v-show="!isPlayActive">
 		<selec_play
-			v-show="props.show_play && !isPlayActive"
 			@show_play="emit('show_play')"
 			@typeplay="handletypeplay"
 			:show_play="props.show_play"
 			:set-language="props.setLanguage"
 		></selec_play>
+	</div>
+	<div v-show="isPlayActive">
 		<play
-		v-show="props.show_play && isPlayActive"
 		:activePlay="activePlay"
-
 		></play>
-			
 	</div>
 </template>
 

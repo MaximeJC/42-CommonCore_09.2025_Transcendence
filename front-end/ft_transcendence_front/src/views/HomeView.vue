@@ -17,7 +17,7 @@ const { setUser } = user();
 			setLanguage: (lang: string) => void;
 		}>();
 
-	let isConnect = ref(false);
+	let isConnect = ref(true);
 	let issetting = ref(false);
 
 	var checksession = async function session() {
@@ -90,7 +90,11 @@ const { setUser } = user();
 	const show_play = ref(false);
 	const toggleshow_play = () => {
 		show_play.value = !show_play.value;
+	}
+	const isPlayActive = ref(false)
 
+	const toggleisPlayActive = () =>{
+		isPlayActive.value = !isPlayActive.value;
 	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
@@ -139,8 +143,8 @@ const { setUser } = user();
 
 <template>
 	<div>
-		<div>
-		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"  @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
+		<div v-show="!isPlayActive">
+			<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"  @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
 		</div>
 		<div>
 			<div v-show="!isConnect && !issetting" title="home_disconnect" class="home_disconnect" >
@@ -166,7 +170,7 @@ const { setUser } = user();
 			</div>
 			<div class="home_connect" >
 				<div v-show="isConnect && show_play">
-					<play_page :setLanguage="props.setLanguage" :show_play="show_play"  @show_play="toggleshow_play"></play_page>
+					<play_page :setLanguage="props.setLanguage" @isPlayActive="toggleisPlayActive" :show_play="show_play"  @show_play="toggleshow_play"></play_page>
 				</div>
 			</div>
 		</div>
