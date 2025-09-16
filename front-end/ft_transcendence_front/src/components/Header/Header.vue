@@ -10,6 +10,12 @@
 	}>();
 	const emit = defineEmits(['show-form', 'show_setting']);
 
+	const handleButtonClick = () => {
+		if (props.isConnect)
+			logout();
+		emit('show-form');
+	};
+
 	const logout = async function logoutUser() {
 		try {
 			const response = await fetch(`http://${window.location.hostname}:3000/logout` , {
@@ -36,13 +42,12 @@
 	<header class="header">
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
 		<div class="end-button">
-			<button @click="emit('show-form')"  class="my-button" title="sign_up" >
+			<button @click=handleButtonClick  class="my-button" title="sign_up" >
 				<div v-show="!isConnect" data-i18n="header.signUp"></div>
-				<div @click="logout" v-show="isConnect" data-i18n="header.signOut"></div>
+				<div v-show="isConnect" data-i18n="header.signOut"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
 			<setting @show_setting="handleShowPage" v-show="isConnect" :setLanguage="props.setLanguage"></setting>
-		
 		</div>
 	</header>
 </template>
