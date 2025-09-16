@@ -17,7 +17,7 @@ const { setUser } = user();
 			setLanguage: (lang: string) => void;
 		}>();
 
-	let isConnect = ref(true);
+	let isConnect = ref(false);
 	let issetting = ref(false);
 
 	var checksession = async function session() {
