@@ -213,7 +213,7 @@ fastify.post('/login', async (request, reply)=>{
 				console.log("User Ok");
 			request.session.set('user', user);
 			updateIsConnected(user.id);
-			return reply.send({ success: true, user: { login: user.login, email: user.email, level: user.level } });
+			return reply.send({ success: true, user: user });
 		}
 	} else {
 		if (DEBUG_MODE) {

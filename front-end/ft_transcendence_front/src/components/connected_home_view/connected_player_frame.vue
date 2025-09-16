@@ -5,6 +5,10 @@ import play_historic from "./play&historic_button.vue"
 import play_return from "./play&return_button.vue" 
 import invit_return from "./invit&return_button.vue" 
 
+import { user } from '../../user';
+
+const { currentUser } = user();
+
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		historic: boolean;
@@ -81,32 +85,29 @@ const emit = defineEmits(['showOtherPlayer', 'show-historic']);
 </script>
 
 <template>
-	<div v-if="playerData" tittle="connected_player_frame" class="connected_player_frame">
+	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
 			<div title="login" class="login">
-				<div>{{ playerData.login }}</div>
+				<div v-if="currentUser?.login">{{ currentUser.login }}</div>
 			</div>
 		</div>
 		<div class="stat-container">
 			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
-			<div title="nbr_game_stat" class="stat">{{ playerData.nb_games }}</div>
+			<div title="nbr_game_stat" class="stat"v-if="currentUser">{{ currentUser.nb_games }}</div>
 		</div>
 		<div class="stat-container">
 			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
-			<div title="nbr-victory_stat" class="stat">{{ playerData.nb_won_games }}</div>
+			<div title="nbr-victory_stat" class="stat"v-if="currentUser">{{ currentUser.nb_won_games }}</div>
 		</div>
 		<div class="stat-container">
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
-			<div title="rank_stat" class="stat">{{ playerData.rank }}</div>
+			<div title="rank_stat" class="stat" v-if="currentUser">{{ currentUser.rank }}</div>
 		</div>
 		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
-		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
+		<invit_return @show-other_player="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
-	<div v-else>
-    	Chargement des données...
-    </div>
 </template>
 
 <style>
