@@ -27,7 +27,7 @@
 
 	async function getPlayers() {
 		try {
-			const response = await fetch("http://localhost:3000/leaderboard");
+			const response = await fetch(`http://${window.location.hostname}:3000/leaderboard`);
 			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`);
 			const data = await response.json();

@@ -25,7 +25,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		message.value = "";
 
 		try {
-			const result = await fetch("http://localhost:3000/login", { // envoie une requete HTTP via cet URL (au port 3000)
+			const result = await fetch(`http://${window.location.hostname}:3000/login`, { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",
@@ -75,14 +75,14 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	}
 
 	async function fetchProfile() {
-		const res = await fetch(`http://localhost:3000/me`, {
+		const res = await fetch(`http://${window.location.hostname}:3000/me`, {
 			credentials: 'include'
 		});
 	}
 
-	onMounted(() => {
-		fetchProfile()
-	})
+	// onMounted(() => {
+	// 	fetchProfile()
+	// })
 </script>
 
 <template>

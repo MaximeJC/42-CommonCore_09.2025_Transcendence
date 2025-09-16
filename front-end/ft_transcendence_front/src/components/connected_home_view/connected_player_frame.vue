@@ -44,10 +44,69 @@ async function fetchPlayerData() {
 }
 onMounted(()=>{ fetchPlayerData(); });
 const emit = defineEmits(['show-other_player', 'show-historic']);
+// import invit_return from "./invit&return_button.vue"
+
+// 	const props = defineProps<{
+// 			setLanguage: (lang: string) => void;
+// 			historic: boolean;
+// 			other_player: boolean;
+// 	}>();
+// 	const playerData = ref({
+// 		login: '',
+// 		nb_games: 0,
+// 		nb_won_games: 0,
+// 		rank: 0,
+// 	});
+
+
+// //TODO: optimiser le delai de response des fetch
+// async function fetchPlayerData(retries = 5, delay = 1000) {
+// 	try {
+// 		for (let i = 0; i < retries; i++) {
+// 			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+// 				method: 'GET',
+// 				credentials: 'include'
+// 			});
+
+// 			if (response.ok) {
+// 				const data = await response.json();
+
+// 				// Si user est présent, on peut sortir
+// 				if (data.user && data.user.login) {
+// 					playerData.value = {
+// 						login: data.user.login,
+// 						nb_games: data.user.nb_games,
+// 						nb_won_games: data.user.nb_won_games,
+// 						rank: data.user.rank
+// 					};
+// 					return;
+// 				}
+// 			}
+
+// 			// Attendre avant de réessayer
+// 			await new Promise(res => setTimeout(res, delay));
+// 		}
+
+// 		// console.warn("User non trouvé après plusieurs tentatives.");
+// 		// playerData.value = null;
+
+// 	} catch (error) {
+// 		console.error("Erreur dans fetchPlayerData:", error);
+// 		// playerData.value = null;
+// 	}
+// }
+
+// 	onMounted(async()=>{
+
+// 		await fetchPlayerData();
+// 	});
+	
+// 	const emit = defineEmits(['show-other_player', 'show-historic']);
+
 </script>
 
 <template>
-	<div tittle="connected_player_frame" class="connected_player_frame">
+	<div v-if="playerData" tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
 			<div tittle="login" class="login">
@@ -70,6 +129,9 @@ const emit = defineEmits(['show-other_player', 'show-historic']);
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
 		<invit_return @show-other_player="emit('show-other_player')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
+	<div v-else>
+    	Chargement des données...
+    </div>
 </template>
 
 <style>
