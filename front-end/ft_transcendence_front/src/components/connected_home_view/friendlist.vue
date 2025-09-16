@@ -51,7 +51,7 @@ async function fetchFriends() {
 	}
 }
 
-async function addFriend() { //todo A TESTER
+async function addFriend() {
 	try {
 		//todo recuperer les logins dynamiquement
 		const ajouteur = 'Louise';
@@ -84,8 +84,36 @@ async function addFriend() { //todo A TESTER
 	}
 }
 
+async function deleteFriend(unfriendLogin: string) {
+	try {
+		//todo recuperer les logins dynamiquement
+		const supprimeur = 'Louise';
+		// const current = await fetch('http://localhost:3000/me');
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const supprimeur = currentUser.login;
+		const result = await fetch(`http://localhost:3000/friends/delete`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: supprimeur,
+				login2: unfriendLogin
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami supprime avec succes.");
+		fetchFriends();
+	} catch (err) {
+		console.error("Erreur de suppression d'amitie:", err);
+	}
+}
+
 onMounted(()=>{ fetchFriends(); });
-	
+
 </script>
 
 // const friends: Friend[] = [
@@ -121,7 +149,7 @@ onMounted(()=>{ fetchFriends(); });
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
 						<img src="../../../images/yelow-play-button.png" alt="play button">
 					</button>
-					<button title="delete-button" class="delete-button">
+					<button title="delete-button" class="delete-button" @click="deleteFriend(friend.name)">
 						<img src="../../../images/trash_can.png" alt="trash can">
 						<img src="../../../images/trash_can_yellow.png" alt="trash can">
 					</button>
