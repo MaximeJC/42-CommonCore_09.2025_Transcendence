@@ -1,11 +1,12 @@
 <script setup lang="ts">
+	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
 	import con_home_view from './connected_home_view.vue'
 	import Head from '../components/Header/Header.vue';
 	import Connexion from '../components/disconnected_home_view/ConnexionButton.vue';
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
 	import setting from './setting_view.vue'
-	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
+	import play_page from '../components/playable_page/play_page.vue'
 // import { channel } from 'diagnostics_channel';
 
 import { user } from '../user';
@@ -86,6 +87,11 @@ const { setUser } = user();
 		issetting.value = !issetting.value;
 
 	}
+	const show_play = ref(false);
+	const toggleshow_play = () => {
+		show_play.value = !show_play.value;
+
+	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
@@ -148,14 +154,19 @@ const { setUser } = user();
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
-			<div v-show="isConnect && !issetting" title="home_connect" class="home_connect" >
+			<div v-show="isConnect && (!issetting && !show_play)" title="home_connect" class="home_connect" >
 				<div>
-					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
+					<con_home_view :isConnect="isConnect" @show_play="toggleshow_play" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
-			<div  class="home_connect" >
+			<div class="home_connect" >
 				<div ref="settingBox">
 					<setting v-show="isConnect && issetting" :setLanguage="props.setLanguage" :setting_activePage="setting_activePage"></setting>
+				</div>
+			</div>
+			<div class="home_connect" >
+				<div v-show="isConnect && show_play">
+					<play_page :setLanguage="props.setLanguage" :show_play="show_play"  @show_play="toggleshow_play"></play_page>
 				</div>
 			</div>
 		</div>

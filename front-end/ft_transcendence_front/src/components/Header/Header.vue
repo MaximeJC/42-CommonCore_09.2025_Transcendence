@@ -34,6 +34,7 @@
 	};
 
 	const handleShowPage = (pageName: string) => {
+		console.log(pageName)
 		emit('show_setting', pageName);
 	}
 </script>
