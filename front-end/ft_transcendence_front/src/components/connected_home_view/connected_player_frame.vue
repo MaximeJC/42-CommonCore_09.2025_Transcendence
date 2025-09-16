@@ -7,6 +7,8 @@ import invit_return from "./invit&return_button.vue"
 
 import { user } from '../../user';
 
+const emit = defineEmits(['show-other_player', 'show-historic', 'show_play']);
+
 const { currentUser } = user();
 
 const props = defineProps<{
@@ -22,33 +24,32 @@ const playerData = ref({
 	rank: 0,
 });
 
-async function fetchPlayerData() {
-	try {
-		//todo recuperer le login de l'utilisateur connecte
-		const currentUserLogin = "Louise";
-		// const current = await fetch('http://localhost:3000/me');
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const currentUserLogin = currentUser.login;
+//async function fetchPlayerData() {
+//	try {
+//		//todo recuperer le login de l'utilisateur connecte
+//		const currentUserLogin = "Louise";
+//		// const current = await fetch('http://localhost:3000/me');
+//		// if (!current.ok)
+//		// 	throw new Error(`Erreur http: ${current.status}`);
+//		// const currentUser = await current.json();
+//		// const currentUserLogin = currentUser.login;
 
-		const response = await fetch(`http://localhost:3000/users/current?login=${currentUserLogin}`);
-		if (!response.ok)
-			throw new Error('Player data fetch error');
+//		const response = await fetch(`http://localhost:3000/users/current?login=${currentUserLogin}`);
+//		if (!response.ok)
+//			throw new Error('Player data fetch error');
 
-		const data = await response.json();
-		playerData.value = {
-			login: data.login,
-			nb_games: data.nb_games,
-			nb_won_games: data.nb_won_games,
-			rank: data.rank,
-		};
-	} catch (error) {
-		console.log("Error:", error);
-	}
-}
-onMounted(()=>{ fetchPlayerData(); });
-const emit = defineEmits(['show-other_player', 'show-historic', 'show_play']);
+//		const data = await response.json();
+//		playerData.value = {
+//			login: data.login,
+//			nb_games: data.nb_games,
+//			nb_won_games: data.nb_won_games,
+//			rank: data.rank,
+//		};
+//	} catch (error) {
+//		console.log("Error:", error);
+//	}
+//}
+//onMounted(()=>{ fetchPlayerData(); });
 // import invit_return from "./invit&return_button.vue"
 
 // 	const props = defineProps<{
