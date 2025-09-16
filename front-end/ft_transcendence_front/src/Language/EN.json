@@ -55,5 +55,14 @@
 		"password": "Change my Password",
 		"about": "About",
 		"contact": "Contact"
+	},
+
+	"play":{
+    "local_play": "Local play",
+    "online_play": "Online play",
+    "VS_ia": "Player vs IA",
+    "VS_player": "Player vs Player",
+    "2_VS_2": "Two vs Two",
+    "tournament": "Tourney"
 	}
 }

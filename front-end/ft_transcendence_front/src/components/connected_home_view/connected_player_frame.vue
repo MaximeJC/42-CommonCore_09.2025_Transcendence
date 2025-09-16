@@ -43,7 +43,7 @@ async function fetchPlayerData() {
 	}
 }
 onMounted(()=>{ fetchPlayerData(); });
-const emit = defineEmits(['show-other_player', 'show-historic']);
+const emit = defineEmits(['show-other_player', 'show-historic', 'show_play']);
 // import invit_return from "./invit&return_button.vue"
 
 // 	const props = defineProps<{
@@ -101,7 +101,7 @@ const emit = defineEmits(['show-other_player', 'show-historic']);
 // 		await fetchPlayerData();
 // 	});
 	
-// 	const emit = defineEmits(['show-other_player', 'show-historic']);
+ 	//const emit = defineEmits(['show-other_player', 'show-historic']);
 
 </script>
 
@@ -125,8 +125,8 @@ const emit = defineEmits(['show-other_player', 'show-historic']);
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat">{{ playerData.rank }}</div>
 		</div>
-		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
-		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
+		<play_historic @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
+		<play_return @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
 		<invit_return @show-other_player="emit('show-other_player')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
 	<div v-else>
