@@ -678,3 +678,23 @@ fastify.get('/users/current', async (request, reply)=>{
 		reply.status(500).send({ error: err.message });
 	}
 });
+
+fastify.get('/users/connected', async (request, reply) => {
+	try {
+		const	rows = await new Promise((resolve, reject) => {
+			db.all(
+				`SELECT * FROM users WHERE connected = 1`,
+				(err, row) => {
+					if (err) reject(err);
+					else resolve(row);
+				}
+			);
+		});
+		if (!rows)
+			return reply.status(404).send({ error: "No user connected"})
+		reply.send(rows);
+	} catch (err) {
+		console.error("Error:", err);
+		reply.status(500).send({ error: err.message });
+	}
+})
