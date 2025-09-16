@@ -291,43 +291,4 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		0 0 80px #dd0aba;
 	}
 
-	@media (max-width: 1600px) {
-		.frame-connection{
-			width: 35rem;
-			padding: 1.5rem 2rem;
-		}
-		.connectionTitle{
-			font-size: 2.5rem;
-			margin-bottom: 0.6rem;
-		}
-		.c-input{
-			width: 34.5rem;
-			font-size: 1.2rem;
-		}
-		.c-error{
-			font-size: 0.8rem;
-		}
-		.c-line-button{
-			margin-top: 0.5rem
-		}
-		.c-ft-button{
-			height: 4rem;
-			width: 4rem;
-		}
-		.c-Submit-button{
-			font-size: 2.5rem;
-			margin-top: 0.5rem;
-			padding: 0.5rem 1rem;
-		}
-		.c-Submit-button > div{
-			margin-top:  0.5rem;
-		}
-	}
-
-	@media (max-width: 992px) {
-    	
-	}
-	@media (max-width: 576px) {
-    	
-	}
 </style>
