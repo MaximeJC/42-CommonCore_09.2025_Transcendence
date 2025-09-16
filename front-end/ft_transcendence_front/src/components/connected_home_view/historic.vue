@@ -19,15 +19,15 @@ const matches = ref<Match[]>([]);
 
 async function fetchMyGames() {
 	try {
-		const current = await fetch('http://localhost:3000/me');
+		const current = await fetch(`http://${window.location.hostname}:3000/me`);
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
-		const login = currentUser.login;
+		const login = currentUser.user.login;
 
-		console.log(login);
-
-		const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		console.log("Fonction fetchMyGames pour affichage de l'historique de l'utilisateur connecte", login);
+		
+		const result = await fetch(`http://${window.location.hostname}:3000/games/me?login_current=${encodeURIComponent(login)}`);
 		if (!result.ok)
 			throw new Error(`Erreur http: ${result.status}`);
 		const games = await result.json();

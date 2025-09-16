@@ -9,17 +9,17 @@ async function addFriend() { //todo A TESTER
 	try {
 		//todo recuperer les logins dynamiquement
 		// const ajouteur = 'Alice';
-		const current = await fetch('http://localhost:3000/me');
+		const current = await fetch(`http://${window.location.hostname}:3000/me`);
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
-		const ajouteur = currentUser.login;
+		const ajouteur = currentUser.user.login;
 
 		const ajoute = 'Mauvais';
 
 		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
 
-		const result = await fetch(`http://localhost:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
+		const result = await fetch(`http://${window.location.hostname}:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami ajoute avec succes.");

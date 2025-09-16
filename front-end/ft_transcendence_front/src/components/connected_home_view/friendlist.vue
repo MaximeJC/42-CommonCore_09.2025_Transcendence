@@ -27,15 +27,19 @@ const friends = ref<Friend[]>([]);
 async function fetchFriends() {
 	try {
 		//todo remplacer ce currentUserLogin code en dur par le login de l'utilisateur connecte:
-		const currentUserLogin = "Louise";
-		// const current = await fetch('http://localhost:3000/me');
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const currentUserLogin = currentUser.login;
+		// const currentUserLogin = "Louise";
+		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const currentUserLogin = currentUser.user.login;
 
-		const result = await fetch(`http://localhost:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
-		{
+		console.log(currentUserLogin);
+
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -55,17 +59,17 @@ async function addFriend() {
 	try {
 		//todo recuperer les logins dynamiquement
 		// const ajouteur = 'Louise';
-		const current = await fetch('http://localhost:3000/me');
+		const current = await fetch(`http://${window.location.hostname}:3000/me`);
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
-		const ajouteur = currentUser.login;
+		const ajouteur = currentUser.user.login;
 
 		const ajoute = search_friends.value;
 
 		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
 
-		const result = await fetch(`http://localhost:3000/friends`, {
+		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',
@@ -87,13 +91,13 @@ async function addFriend() {
 async function deleteFriend(unfriendLogin: string) {
 	try {
 		//todo recuperer les logins dynamiquement
-		const supprimeur = 'Louise';
-		// const current = await fetch('http://localhost:3000/me');
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const supprimeur = currentUser.login;
-		const result = await fetch(`http://localhost:3000/friends/delete`, {
+		// const supprimeur = 'Louise';
+		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const supprimeur = currentUser.user.login;
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/delete`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',
