@@ -49,12 +49,12 @@
 
 	const toggleissettnig = () => {
 		issetting.value = !issetting.value;
-		console.log(issetting.value);
 
 	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
+	const settingBox =  ref<HTMLElement | null>(null);
 	const handlePointerDownOutside = (e: PointerEvent) => {
 		const target = e.target as Node;
 		if(connectionBox.value && !connectionBox.value.contains(target))
@@ -65,9 +65,13 @@
 			{
 				showSignup.value = false;
 			}
+		if(settingBox.value && !settingBox.value.contains(target))
+			{
+				issetting.value = false;
+			}
 	}
 
-	const anyOpen = computed(() => showConnection.value || showSignup.value);
+	const anyOpen = computed(() => showConnection.value || showSignup.value || issetting.value);
 	watch(anyOpen, (newValue) => {
 		if (newValue) {
 			nextTick(() => {
@@ -114,13 +118,14 @@
 					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
-			<div v-show="isConnect && issetting" class="home_connect">
-				<setting :setLanguage="props.setLanguage" :setting_activePage="setting_activePage"></setting>
+			<div  class="home_connect" >
+				<div ref="settingBox">
+					<setting v-show="isConnect && issetting" :setLanguage="props.setLanguage" :setting_activePage="setting_activePage"></setting>
+				</div>
 			</div>
 		</div>
 	</div>
-</template>		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-
+</template>		
 
 <style>
 
