@@ -2,6 +2,9 @@
 import { ref, reactive, onMounted } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 // import axios from 'axios';
 
+import { user } from '../../user';
+import type { User } from '../../user';
+const { setUser } = user();
 // axios.defaults.withCredentials = true;
 
 const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
@@ -17,6 +20,8 @@ const error_email = ref(false);
 const error_password = ref(false);
 const message = ref("");
 const profile = reactive({ email: '' })
+
+
 
 async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
 		// reinitialiser les variables d'erreur et de message:
@@ -37,9 +42,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
 				success: boolean; // reussite de la requete
 				message?: string; // message optionnel
-				user?: { // objet optionnel contenant le login de l'utilisateur
-					login: string;
-				};
+				user?: User;
 				errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
 					email?: string;
 					password?: string;
@@ -54,6 +57,8 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			if (data.success && data.user?.login) {
 				message.value = `Welcome ${data.user?.login}!` //todo langues
 				console.log(message.value, "*******************");
+				if (data.user)
+					setUser(data.user);
 				emit('isconnected'); // emission de l'evenement de connexion reussie
 			} else {
 				message.value = data.message || "Connexion error"; //todo langues

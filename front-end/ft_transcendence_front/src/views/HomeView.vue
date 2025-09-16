@@ -8,6 +8,10 @@
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
 // import { channel } from 'diagnostics_channel';
 
+import { user } from '../user';
+import type { User } from '../user';
+const { setUser } = user();
+
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 		}>();
@@ -28,6 +32,7 @@
 			// console.log("*****************************************");
 			if (data.user?.login) {
 				isConnect.value = true;
+				setUser(data.user);
 				// return isConnect;
 			} else {
 				isConnect.value = false;
