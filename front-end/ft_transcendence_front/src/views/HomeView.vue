@@ -13,6 +13,7 @@
 		}>();
 
 	let isConnect = ref(false);
+	let issetting = ref(false);
 
 	var checksession = async function session() {
 		try {
