@@ -15,7 +15,9 @@ async function addFriend() { //todo A TESTER
 		// const currentUser = await current.json();
 		// const ajouteur = currentUser.login;
 
-		const ajoute = 'Alexandre';
+		const ajoute = 'Mauvais';
+
+		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
 
 		const result = await fetch(`http://localhost:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
 		if (!result.ok)
