@@ -36,7 +36,7 @@
 			<leaderbord @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
 			<friendlist @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
 		</div>
-		<div v-show="historic || other_player" tittle="historic" class="histo-container">
+		<div v-show="historic || other_player" title="historic" class="histo-container">
 			<histo v-show="historic" :setLanguage="props.setLanguage"></histo>
 			<histo_other v-show="other_player" :setLanguage="props.setLanguage"></histo_other>
 		</div>

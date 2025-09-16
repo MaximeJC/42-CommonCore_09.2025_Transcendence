@@ -1,9 +1,10 @@
 <script setup lang="ts">
 	import con_home_view from './connected_home_view.vue'
-	import Head from '../components/Header.vue';
+	import Head from '../components/Header/Header.vue';
 	import Connexion from '../components/disconnected_home_view/ConnexionButton.vue';
 	import connection_form from '../components/disconnected_home_view/connection_form.vue';
 	import Signup from '@/components/disconnected_home_view/Signup.vue';
+	import setting from './setting_view.vue'
 	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
 // import { channel } from 'diagnostics_channel';
 
@@ -42,6 +43,18 @@
 	checksession();
 
 	const showSignup = ref(false);
+
+	const setting_activePage = ref('')
+
+	const handleShowPage = (pageName: string) => {
+		setting_activePage.value = pageName;
+		if(setting_activePage.value != null)
+			issetting.value = true;
+		else
+			issetting.value = false;
+		console.log(issetting.value);
+	};
+
 	const toggleSignup = () => {
 		if(isConnect.value == false){
 			showSignup.value = !showSignup.value;
@@ -60,10 +73,17 @@
 
 	const toggleisconnected = () => {
 		isConnect.value = !isConnect.value;
+		
+	}
+
+	const toggleissettnig = () => {
+		issetting.value = !issetting.value;
+
 	}
 
 	const connectionBox = ref<HTMLElement | null>(null);
 	const signUpbox =  ref<HTMLElement | null>(null);
+	const settingBox =  ref<HTMLElement | null>(null);
 	const handlePointerDownOutside = (e: PointerEvent) => {
 		const target = e.target as Node;
 		if(connectionBox.value && !connectionBox.value.contains(target))
@@ -74,9 +94,13 @@
 			{
 				showSignup.value = false;
 			}
+		if(settingBox.value && !settingBox.value.contains(target))
+			{
+				issetting.value = false;
+			}
 	}
 
-	const anyOpen = computed(() => showConnection.value || showSignup.value);
+	const anyOpen = computed(() => showConnection.value || showSignup.value || issetting.value);
 	watch(anyOpen, (newValue) => {
 		if (newValue) {
 			nextTick(() => {
@@ -99,19 +123,15 @@
 	onUnmounted(() => {
   document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
 });
-
-
-
 </script>
-
 
 <template>
 	<div>
 		<div>
-		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup" :isConnect="isConnect"></Head>
+		<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"  @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
 		</div>
 		<div>
-			<div v-show="!isConnect" tittle="home_disconnect" class="home_disconnect" >
+			<div v-show="!isConnect && !issetting" title="home_disconnect" class="home_disconnect" >
 				<div>
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
@@ -122,14 +142,19 @@
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
 				</div>
 			</div>
-			<div v-show="isConnect" tittle="home_connect" class="home_connect" >
+			<div v-show="isConnect && !issetting" title="home_connect" class="home_connect" >
 				<div>
 					<con_home_view :isConnect="isConnect" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
 			</div>
+			<div  class="home_connect" >
+				<div ref="settingBox">
+					<setting v-show="isConnect && issetting" :setLanguage="props.setLanguage" :setting_activePage="setting_activePage"></setting>
+				</div>
+			</div>
 		</div>
 	</div>
-</template>
+</template>		
 
 <style>
 

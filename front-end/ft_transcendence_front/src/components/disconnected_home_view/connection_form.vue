@@ -59,7 +59,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 				message.value = data.message || "Connexion error"; //todo langues
 				console.log(message.value, "2*******************");
 				if (data.errors) { // si erreurs specifiques
-					error_email.value = !!data.errors.email; // '!!' permet de convertir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
+					error_email.value = !!data.errors.email; // '!!' permet de conve`rtir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
 					error_password.value = !!data.errors.password;
 				} else {
 					error_email.value = true;
@@ -295,43 +295,4 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		0 0 80px #dd0aba;
 	}
 
-	@media (max-width: 1600px) {
-		.frame-connection{
-			width: 35rem;
-			padding: 1.5rem 2rem;
-		}
-		.connectionTitle{
-			font-size: 2.5rem;
-			margin-bottom: 0.6rem;
-		}
-		.c-input{
-			width: 34.5rem;
-			font-size: 1.2rem;
-		}
-		.c-error{
-			font-size: 0.8rem;
-		}
-		.c-line-button{
-			margin-top: 0.5rem
-		}
-		.c-ft-button{
-			height: 4rem;
-			width: 4rem;
-		}
-		.c-Submit-button{
-			font-size: 2.5rem;
-			margin-top: 0.5rem;
-			padding: 0.5rem 1rem;
-		}
-		.c-Submit-button > div{
-			margin-top:  0.5rem;
-		}
-	}
-
-	@media (max-width: 992px) {
-    	
-	}
-	@media (max-width: 576px) {
-    	
-	}
 </style>

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
+	import setting from './setting_button.vue'
 	let UserCookie = ''; 
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		isConnect: boolean;
 	}>();
-	const emit = defineEmits(['show-form']);
+	const emit = defineEmits(['show-form', 'show_setting']);
 
 	const logout = async function logoutUser() {
 		try {
@@ -26,6 +27,9 @@
 		}
 	};
 
+	const handleShowPage = (pageName: string) => {
+		emit('show_setting', pageName);
+	}
 </script>
 
 <template>
@@ -37,6 +41,8 @@
 				<div @click="logout" v-show="isConnect" data-i18n="header.signOut"></div>
 			</button>
 			<lang-menu :setLanguage="props.setLanguage"></lang-menu>
+			<setting @show_setting="handleShowPage" v-show="isConnect" :setLanguage="props.setLanguage"></setting>
+		
 		</div>
 	</header>
 </template>

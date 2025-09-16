@@ -66,22 +66,5 @@
 		0 0 120px #fbff22;
 
 	}
-
-	@media (max-width: 1600px) {
-		.connexion-button{
-			font-size: 4.5rem;
-			padding: 0.6rem 3rem;
-		}
-		.connexion-button > div {
-			margin-top: 1rem;
-		}
-	}
-
-	@media (max-width: 992px) {
-    	
-	}
-	@media (max-width: 576px) {
-    	
-	}
 	
 </style>

@@ -71,21 +71,21 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 
 <template>
 	<div class="frame-signup" title="sign-up_frame">
-		<div class="signUpTitle" tittle="signup_tittle" data-i18n="header.signUp"></div>
+		<div class="signUpTitle" title="signup_title" data-i18n="header.signUp"></div>
 		<form class="form_signup" @submit.prevent="handleSubmit">
-			<label class="subTittle">
+			<label class="subtitle">
 					<div data-i18n="Signup.login"></div>
 			</label>
 			<input class="input" type="login" id="login" v-model="login" required>
 			<div  title="login-error" class="error"  >
 					<div v-show="!error_login" data-i18n="Signup.login_error"></div>
 			</div>
-			<label class="subTittle">Email</label>
+			<label class="subtitle">Email</label>
 			<input class="input" type="email" id="email" v-model="email" required>
 			<div  title="mail-error" class="error" >
 				<div v-show=" !error_email" data-i18n="Signup.mail_error"></div>
 			</div>
-			<label class="subTittle">
+			<label class="subtitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="input" type="password" id="password" v-model="password" required>
@@ -93,7 +93,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 				<div v-show=" !error_password" data-i18n="Signup.password_error"></div>
 
 			</div>
-			<label class="subTittle">
+			<label class="subtitle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
 			<input class="input" type="password" id="conf_password" v-model="conf_password" required>
@@ -101,11 +101,11 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
 
 			</div>
-			<div tittle="line_button" class="line-button">
+			<div title="line_button" class="line-button">
 				<div class="icon-button">
-					<button tittle="ft-signup" class="ft-button"></button>
+					<button title="ft-signup" class="ft-button"></button>
 				</div>
-				<button tittle="Submit-button" class="Submit-button">
+				<button title="Submit-button" class="Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>
 			</div>
@@ -172,7 +172,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		display: block;
 	}
 
-	.subTittle{
+	.subtitle{
 		font-family: netron;
 		color: white;
 		text-shadow: 

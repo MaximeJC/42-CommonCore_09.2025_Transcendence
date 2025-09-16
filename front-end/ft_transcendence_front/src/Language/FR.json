@@ -9,10 +9,10 @@
 	  "connection": "CONNEXION"
 	},
 	"Signup":{
-		"login": "Nom d'utilisateur",
+		"login": "Pseudo",
 		"password": "Mot de passe",
 		"conf_password": "Confirmation du mot de passe",
-		"login_error": "le Nom d'utilisateur doit faire entre 3 et 13 caractères.",
+		"login_error": "le Pseudo doit faire entre 3 et 13 caractères.",
 		"mail_error": "Email invalide.",
 		"password_error": "Condition du mot de passe.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
@@ -46,5 +46,16 @@
 		"o_score": "Score adv.",
 		"o_login": "Adversaire"
 
+	},
+
+	"setting":{
+		"profile": "profil",
+		"setting": "Réglages",
+		"avatar": "Changer mon Avatar",
+		"login": "Changer mon Pseudo",
+		"mail": "Changer mon Email",
+		"password": "Changer mon Mot de passe",
+		"about": "À propos",
+		"contact": "contact"
 	}
 }

@@ -44,5 +44,16 @@
  	   "time": "Game time",
  	   "o_score": "Opponent score",
  	   "o_login": "Opponent"
-	}	
+	},
+
+	"setting":{
+		"profile": "Profile",
+		"setting": "Settings",
+		"avatar": "Change my Avatar",
+		"login": "Change my Username",
+		"mail": "Change my Email",
+		"password": "Change my Password",
+		"about": "About",
+		"contact": "Contact"
+	}
 }

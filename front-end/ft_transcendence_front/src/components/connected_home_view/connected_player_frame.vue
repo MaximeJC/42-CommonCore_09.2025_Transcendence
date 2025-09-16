@@ -109,21 +109,21 @@ const emit = defineEmits(['show-other_player', 'show-historic']);
 	<div v-if="playerData" tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
-			<div tittle="login" class="login">
+			<div title="login" class="login">
 				<div>{{ playerData.login }}</div>
 			</div>
 		</div>
 		<div class="stat-container">
-			<div tittle="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
-			<div tittle="nbr_game_stat" class="stat">{{ playerData.nb_games }}</div>
+			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
+			<div title="nbr_game_stat" class="stat">{{ playerData.nb_games }}</div>
 		</div>
 		<div class="stat-container">
-			<div tittle="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
-			<div tittle="nbr-victory_stat" class="stat">{{ playerData.nb_won_games }}</div>
+			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
+			<div title="nbr-victory_stat" class="stat">{{ playerData.nb_won_games }}</div>
 		</div>
 		<div class="stat-container">
-			<div tittle="rank" class="label_stat" data-i18n="player_stat.rank"></div>
-			<div tittle="rank_stat" class="stat">{{ playerData.rank }}</div>
+			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
+			<div title="rank_stat" class="stat">{{ playerData.rank }}</div>
 		</div>
 		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
@@ -154,7 +154,6 @@ const emit = defineEmits(['show-other_player', 'show-historic']);
 		0 0 40px #dd0aba;
 		padding: 1rem 2rem;
 		border-radius: 20px;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
 	.avatar\+login{

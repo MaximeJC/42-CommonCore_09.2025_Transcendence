@@ -31,11 +31,11 @@ async function addFriend() { //todo A TESTER
 </script>
 
 <template>
-	<div tittle="button container" class="button-container">
-		<button v-show="isconnect" tittle="invit-button" class="invit-button">
+	<div title="button container" class="button-container">
+		<button v-show="isconnect" title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
-		<button v-show="!isconnect" tittle="invit-button" class="d-invit-button">
+		<button v-show="!isconnect" title="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">

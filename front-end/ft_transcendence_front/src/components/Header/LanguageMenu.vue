@@ -29,7 +29,6 @@
 
 	.lang-menu-container{
 		display: flex;
-		
 		position: relative;
 		border-radius: 20px;
 	}
@@ -154,36 +153,5 @@
 		transform: translateY(10%); 
 	}
 
-	@media (max-width: 1600px) {
-		.lang-menu-button{
-			font-size: 1.5rem;
-			padding: 0.5rem 2rem;
-		}
-		.lang-icon{
-			margin-bottom: 0.5rem;
-			width: 2.5rem;
-			height: 2.5rem;
-			margin-right: 1rem;
-		}
-		.lang-menu-button > div{
-			margin-top: 0.2rem;
-		}
-		.lang-options{
-			top: 3.2rem;
-			left: -8;
-			padding: 1rem 1.15rem;
-		}
-		.lang-button-option{
-			margin-bottom: 0.6rem;
-			font-size: 1.2rem;
-		}
-
-	}
-
-	@media (max-width: 992px) {
-    	
-	}
-	@media (max-width: 576px) {
-    	
-	}
+	
 </style>
