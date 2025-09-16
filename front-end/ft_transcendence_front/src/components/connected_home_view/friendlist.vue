@@ -1,57 +1,119 @@
 <script setup lang="ts">
-	import { ref, onMounted } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
+import { ref, onMounted } from 'vue';
+const props = defineProps<{
+		setLanguage: (lang: string) => void;
+}>();
 
-	const rootElement = ref<HTMLElement | null>(null);
+const rootElement = ref<HTMLElement | null>(null);
 
-	defineExpose({
-		rootElement
-	});
+defineExpose({
+	rootElement
+});
 
-	const emit = defineEmits(['show-other_player']);
+const emit = defineEmits(['show-other_player']);
 
-	const search_friends = ref("")
+const search_friends = ref("") // ami a ajouter
 
-	let friend: string;
+let friend: string;
 
-	interface Friend {
-		name: string;
-		avatar_src: string;
-		isconnected: boolean;
+interface Friend {
+	name: string;
+	avatar_src: string;
+	isconnected: boolean;
+}
+
+const friends = ref<Friend[]>([]);
+
+async function fetchFriends() {
+	try {
+		//todo remplacer ce currentUserLogin code en dur par le login de l'utilisateur connecte:
+		const currentUserLogin = "Louise";
+		// const current = await fetch('http://localhost:3000/me');
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const currentUserLogin = currentUser.login;
+
+		const result = await fetch(`http://localhost:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
+		{
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		});
+		if (!result.ok)
+			throw new Error(`Erreur http: ${result.status}`);
+		const friendList = await result.json();
+		friends.value = friendList;
+	} catch (err) {
+		console.error("Erreur de recuperation des amis:", err);
 	}
+}
 
-	const friends = ref<Friend[]>([]);
+async function addFriend() {
+	try {
+		//todo recuperer les logins dynamiquement
+		const ajouteur = 'Louise';
+		// const current = await fetch('http://localhost:3000/me');
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const ajouteur = currentUser.login;
 
-	async function fetchFriends() {
-		try {
-			//todo remplacer ce currentUserLogin code en dur par le login de l'utilisateur connecte:
-			const currentUserLogin = "Louise";
-			// const current = await fetch('http://localhost:3000/me');
-			// if (!current.ok)
-			// 	throw new Error(`Erreur http: ${current.status}`);
-			// const currentUser = await current.json();
-			// const currentUserLogin = currentUser.login;
+		const ajoute = search_friends.value;
 
-			const result = await fetch(`http://localhost:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
-			{
-				method: 'GET',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				}
-			});
-			if (!result.ok)
-				throw new Error(`Erreur http: ${result.status}`);
-			const friendList = await result.json();
-			friends.value = friendList;
-		} catch (err) {
-			console.error("Erreur de recuperation des amis:", err);
-		}
+		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
+
+		const result = await fetch(`http://localhost:3000/friends`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: ajouteur,
+				login2: ajoute
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami ajoute avec succes.");
+		fetchFriends();
+	} catch (err) {
+		console.error("Erreur de creation d'amitie:", err);
 	}
-	onMounted(()=>{ fetchFriends(); });
-	
+}
+
+async function deleteFriend(unfriendLogin: string) {
+	try {
+		//todo recuperer les logins dynamiquement
+		const supprimeur = 'Louise';
+		// const current = await fetch('http://localhost:3000/me');
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const supprimeur = currentUser.login;
+		const result = await fetch(`http://localhost:3000/friends/delete`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: supprimeur,
+				login2: unfriendLogin
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami supprime avec succes.");
+		fetchFriends();
+	} catch (err) {
+		console.error("Erreur de suppression d'amitie:", err);
+	}
+}
+
+onMounted(()=>{ fetchFriends(); });
+
 </script>
 
 // const friends: Friend[] = [
@@ -71,9 +133,9 @@
 	<div ref="rootElement" tittle="friend-list-container" class="friend-list-container">
 		<div class="tittle-leaderbord" data-i18n="friendlist.friendlist"></div>
 		<div class="add-friends" data-i18n="friendlist.addfriends"></div>
-		<form class="input-add-friends">
+		<form class="input-add-friends" @submit.prevent>
 			<input id="search_friends" v-model="search_friends" required placeholder="search"></input>
-			<button type="submit"></button>
+			<button @click="addFriend" type="button"></button>
 		</form>
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
@@ -87,7 +149,7 @@
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
 						<img src="../../../images/yelow-play-button.png" alt="play button">
 					</button>
-					<button title="delete-button" class="delete-button">
+					<button title="delete-button" class="delete-button" @click="deleteFriend(friend.name)">
 						<img src="../../../images/trash_can.png" alt="trash can">
 						<img src="../../../images/trash_can_yellow.png" alt="trash can">
 					</button>
