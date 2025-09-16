@@ -8,12 +8,12 @@ const isconnect = ref(false);
 async function addFriend() { //todo A TESTER
 	try {
 		//todo recuperer les logins dynamiquement
-		const ajouteur = 'Alice';
-		// const current = await fetch('http://localhost:3000/me');
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const ajouteur = currentUser.login;
+		// const ajouteur = 'Alice';
+		const current = await fetch('http://localhost:3000/me');
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const ajouteur = currentUser.login;
 
 		const ajoute = 'Mauvais';
 
