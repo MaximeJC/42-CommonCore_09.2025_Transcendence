@@ -1,10 +1,30 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-
 const emit = defineEmits(['show-other_player']);
 
 const isconnect = ref(false);
+
+async function addFriend() { //todo A TESTER
+	try {
+		//todo recuperer les logins dynamiquement
+		const ajouteur = 'Alice';
+		// const current = await fetch('http://localhost:3000/me');
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const ajouteur = currentUser.login;
+
+		const ajoute = 'Alexandre';
+
+		const result = await fetch(`http://localhost:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami ajoute avec succes.");
+	} catch (err) {
+		console.error("Erreur de creation d'amitie:", err);
+	}
+}
 
 </script>
 
@@ -17,7 +37,7 @@ const isconnect = ref(false);
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">
-			<button class="i-add-friends"></button>
+			<button @click="addFriend" class="i-add-friends"></button>
 			<button @click="emit('show-other_player')" tittle="return-button" class="return-button">
 				<div data-i18n="home_player_button.return"></div>
 			</button>
