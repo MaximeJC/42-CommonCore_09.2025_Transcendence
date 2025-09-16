@@ -18,13 +18,12 @@
 
 	async function fetchGames() {
 		try {
-			//todo : remplacer ce currentUserLogin en dur par le fetch, qui actuellement ne fonctionne pas:
-			const currentUserLogin = "Alice";
 			// const current = await fetch('http://localhost:3000/me');
 			// if (!current.ok)
 			// 	throw new Error(`Erreur http: ${current.status}`);
 			// const currentUser = await current.json();
 			// const currentUserLogin = currentUser.login;
+			const currentUserLogin = "Louise";
 
 			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(currentUserLogin)}`);
 			if (!result.ok)
@@ -39,6 +38,7 @@
 				score_o: game.login_winner === currentUserLogin? game.score_loser : game.score_winner,
 				o_login:  game.login_winner === currentUserLogin? game.login_loser : game.login_winner,
 			}));
+			console.log("Parties recuperees.");
 		} catch (err) {
 			console.error("Erreur de recuperation des parties:", err);
 		}

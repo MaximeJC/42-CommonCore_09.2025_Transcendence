@@ -18,7 +18,7 @@
 	async function fetchGames() {
 		try {
 			//todo : remplacer ce loginOfInterest en dur par celui sur lequel l'utilisateur a clique:
-			const loginOfInterest = "Alice";
+			const loginOfInterest = "Louise";
 
 			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(loginOfInterest)}`);
 			if (!result.ok)
@@ -33,6 +33,7 @@
 				score_o: game.login_winner === loginOfInterest? game.score_loser : game.score_winner,
 				o_login:  game.login_winner === loginOfInterest? game.login_loser : game.login_winner,
 			}));
+			console.log("Parties recuperees.");
 		} catch (err) {
 			console.error("Erreur de recuperation des parties:", err);
 		}

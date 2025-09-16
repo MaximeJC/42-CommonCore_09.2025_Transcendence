@@ -54,12 +54,12 @@ async function fetchFriends() {
 async function addFriend() {
 	try {
 		//todo recuperer les logins dynamiquement
-		const ajouteur = 'Louise';
-		// const current = await fetch('http://localhost:3000/me');
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const ajouteur = currentUser.login;
+		// const ajouteur = 'Louise';
+		const current = await fetch('http://localhost:3000/me');
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const ajouteur = currentUser.login;
 
 		const ajoute = search_friends.value;
 

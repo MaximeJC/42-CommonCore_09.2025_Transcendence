@@ -41,15 +41,15 @@ node db_server.js
 	# ajouter une partie:
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
-		-d '{"login_winner": "Louise", "login_loser": "Alice", "score_winner": "6", "score_loser": "4"}' \
+		-d '{"login_winner": "Louise", "login_loser": "axel", "score_winner": "6", "score_loser": "4"}' \
 
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
-		-d '{"login_winner": "Cocotte", "login_loser": "Alice", "score_winner": "3", "score_loser": "0"}' \
+		-d '{"login_winner": "kalicem", "login_loser": "axel", "score_winner": "3", "score_loser": "0"}' \
 
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
-		-d '{"login_winner": "Cocotte", "login_loser": "Louise", "score_winner": "5", "score_loser": "4"}'
+		-d '{"login_winner": "kalicem", "login_loser": "Louise", "score_winner": "5", "score_loser": "4"}'
 
 	# afficher toutes les parties:
 	curl http://localhost:3000/games

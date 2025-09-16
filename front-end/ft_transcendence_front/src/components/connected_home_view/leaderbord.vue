@@ -39,18 +39,18 @@
             }));
 		} catch (error) {
 			console.log("Erreur de recuperation du classement des joueurs");
-			const players: Player[] = [
-				{ rank: 1, name: "Micka", games: 200, victory: 180},
-				{ rank: 2, name: "Louise", games: 180, victory: 160},
-				{ rank: 3, name: "Maxime", games: 150, victory: 130},
-				{ rank: 4, name: "Axel", games: 135, victory: 112},
-				{ rank: 5, name: "Nico", games: 120, victory: 105},
-				{ rank: 6, name: "Thomas", games: 30, victory: 22},
-				{ rank: 7, name: "Anas", games: 20, victory: 14},
-				{ rank: 8, name: "Arthur", games: 10, victory: 6},
-				{ rank: 9, name: "Dorina", games: 5, victory: 2},
-				{ rank: 10, name: "Wictor", games: 2, victory: 1},
-			];
+			// const players: Player[] = [
+			// 	{ rank: 1, name: "Micka", games: 200, victory: 180},
+			// 	{ rank: 2, name: "Louise", games: 180, victory: 160},
+			// 	{ rank: 3, name: "Maxime", games: 150, victory: 130},
+			// 	{ rank: 4, name: "Axel", games: 135, victory: 112},
+			// 	{ rank: 5, name: "Nico", games: 120, victory: 105},
+			// 	{ rank: 6, name: "Thomas", games: 30, victory: 22},
+			// 	{ rank: 7, name: "Anas", games: 20, victory: 14},
+			// 	{ rank: 8, name: "Arthur", games: 10, victory: 6},
+			// 	{ rank: 9, name: "Dorina", games: 5, victory: 2},
+			// 	{ rank: 10, name: "Wictor", games: 2, victory: 1},
+			// ];
 		}
 	}
 	onMounted(()=>{ getPlayers() });
