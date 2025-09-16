@@ -10,7 +10,7 @@ defineExpose({
 	rootElement
 });
 
-const emit = defineEmits(['show-other_player']);
+const emit = defineEmits(['showOtherPlayer']);
 
 const search_friends = ref("") // ami a ajouter
 
@@ -140,10 +140,10 @@ onMounted(()=>{ fetchFriends(); });
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<button @click="emit('show-other_player')" class="avatar_button">
+					<button @click="emit('showOtherPlayer')" class="avatar_button">
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
-					<button @click="emit('show-other_player')" title="friend-button" class="friend-button">{{ friend.name }}</button>
+					<button @click="emit('showOtherPlayer')" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
 						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">

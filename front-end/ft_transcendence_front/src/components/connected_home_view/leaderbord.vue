@@ -1,59 +1,63 @@
 <script setup lang="ts">
 
-	import { ref, onMounted, defineExpose } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
+import { ref, onMounted, defineExpose } from 'vue';
+const props = defineProps<{
+		setLanguage: (lang: string) => void;
+}>();
 
-	const emit = defineEmits(['show-other_player']);
+const emit = defineEmits(['showOtherPlayer']);
+
+const showOtherPlayer = (loginToShow: string)=>{
+	console.log("Other player login:", loginToShow);
+	emit('showOtherPlayer', loginToShow); // emission de l'evenement vers le parent
+};
+
+const rootElement = ref<HTMLElement | null>(null);
+
+defineExpose({
+	rootElement
+});
 
 
-	const rootElement = ref<HTMLElement | null>(null);
 
-	defineExpose({
-		rootElement
-	});
+interface Player {
+	rank: number;
+	name: string;
+	games: number;
+	victory: number;
+}
 
-	
+const players = ref<Player[]>([]);
 
-	interface Player {
-		rank: number;
-		name: string;
-		games: number;
-		victory: number;
+async function getPlayers() {
+	try {
+		const response = await fetch(`http://${window.location.hostname}:3000/leaderboard`);
+		if (!response.ok)
+			throw new Error(`HTTP error! status: ${response.status}`);
+		const data = await response.json();
+			players.value = data.map((player: any) => ({
+				rank: player.rank,
+				name: player.name,
+				games: player.games,
+				victory: player.victory,
+			}));
+	} catch (error) {
+		console.log("Erreur de recuperation du classement des joueurs");
+		// const players: Player[] = [
+		// 	{ rank: 1, name: "Micka", games: 200, victory: 180},
+		// 	{ rank: 2, name: "Louise", games: 180, victory: 160},
+		// 	{ rank: 3, name: "Maxime", games: 150, victory: 130},
+		// 	{ rank: 4, name: "Axel", games: 135, victory: 112},
+		// 	{ rank: 5, name: "Nico", games: 120, victory: 105},
+		// 	{ rank: 6, name: "Thomas", games: 30, victory: 22},
+		// 	{ rank: 7, name: "Anas", games: 20, victory: 14},
+		// 	{ rank: 8, name: "Arthur", games: 10, victory: 6},
+		// 	{ rank: 9, name: "Dorina", games: 5, victory: 2},
+		// 	{ rank: 10, name: "Wictor", games: 2, victory: 1},
+		// ];
 	}
-
-	const players = ref<Player[]>([]);
-
-	async function getPlayers() {
-		try {
-			const response = await fetch(`http://${window.location.hostname}:3000/leaderboard`);
-			if (!response.ok)
-				throw new Error(`HTTP error! status: ${response.status}`);
-			const data = await response.json();
-            players.value = data.map((player: any) => ({
-					rank: player.rank,
-					name: player.name,
-					games: player.games,
-					victory: player.victory,
-            }));
-		} catch (error) {
-			console.log("Erreur de recuperation du classement des joueurs");
-			// const players: Player[] = [
-			// 	{ rank: 1, name: "Micka", games: 200, victory: 180},
-			// 	{ rank: 2, name: "Louise", games: 180, victory: 160},
-			// 	{ rank: 3, name: "Maxime", games: 150, victory: 130},
-			// 	{ rank: 4, name: "Axel", games: 135, victory: 112},
-			// 	{ rank: 5, name: "Nico", games: 120, victory: 105},
-			// 	{ rank: 6, name: "Thomas", games: 30, victory: 22},
-			// 	{ rank: 7, name: "Anas", games: 20, victory: 14},
-			// 	{ rank: 8, name: "Arthur", games: 10, victory: 6},
-			// 	{ rank: 9, name: "Dorina", games: 5, victory: 2},
-			// 	{ rank: 10, name: "Wictor", games: 2, victory: 1},
-			// ];
-		}
-	}
-	onMounted(()=>{ getPlayers() });
+}
+onMounted(()=>{ getPlayers() });
 </script>
 
 <template>
@@ -68,7 +72,7 @@
 		<div class="lead-list-container">
 			<div v-for="player in players" :key="player.rank" class="grid-row">
 				<div class="stat1">{{ player.rank}}</div>
-				<button @click="emit('show-other_player')" class="name-button">{{ player.name }}</button>
+				<button @click="showOtherPlayer(player.name)" class="name-button">{{ player.name }}</button>
 				<div class="stat2">{{ player.games }}</div>
 				<div class="stat2">{{ player.victory }}</div>
 			</div>

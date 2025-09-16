@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { EmitFlags } from 'typescript';
 
-
 const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
-	const emit = defineEmits(['show-historic']);
-
+const emit = defineEmits(['show-historic']);
 
 </script>
 

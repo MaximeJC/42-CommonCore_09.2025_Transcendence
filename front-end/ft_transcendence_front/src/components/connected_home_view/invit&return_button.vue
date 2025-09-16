@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const emit = defineEmits(['show-other_player']);
+const emit = defineEmits(['showOtherPlayer']);
 
 const isconnect = ref(false);
 
@@ -40,7 +40,7 @@ async function addFriend() { //todo A TESTER
 		</button>
 		<div class="i-button-container">
 			<button @click="addFriend" class="i-add-friends"></button>
-			<button @click="emit('show-other_player')" tittle="return-button" class="return-button">
+			<button @click="emit('showOtherPlayer')" tittle="return-button" class="return-button">
 				<div data-i18n="home_player_button.return"></div>
 			</button>
 		</div>

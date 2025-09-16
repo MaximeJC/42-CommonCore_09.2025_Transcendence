@@ -1,44 +1,50 @@
 <script setup lang="ts">
-	import { ref, onMounted, defineExpose } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
+import { ref, onMounted, defineExpose } from 'vue';
+import { watch } from 'vue';
 
+const props = defineProps<{
+	setLanguage: (lang: string) => void;
+	playerLogin: string | null;
+}>();
 
-	interface Match{
-		win: boolean;
-		date : number;
-		c_login: string;
-		score_c: number;
-		o_login: string;
-		score_o: number;
+interface Match{
+	win: boolean;
+	date: number;
+	c_login: string;
+	score_c: number;
+	o_login: string;
+	score_o: number;
+}
+
+const matches = ref<Match[]>([]);
+
+async function fetchGames(login: string) {
+	try {
+		const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		if (!result.ok)
+			throw new Error(`Erreur http: ${result.status}`);
+		const games = await result.json();
+
+		matches.value = games.map((game: any)=>({
+			win: game.login_winner === login,
+			date: game.created_at,
+			c_login: login,
+			score_c: game.login_winner === login? game.score_winner : game.score_loser,
+			score_o: game.login_winner === login? game.score_loser : game.score_winner,
+			o_login:  game.login_winner === login? game.login_loser : game.login_winner,
+		}));
+		console.log("Parties recuperees (historic_other.vue).");
+	} catch (err) {
+		console.error("Erreur de recuperation des parties:", err);
 	}
-	const matches = ref<Match[]>([]);
+}
 
-	async function fetchGames() {
-		try {
-			//todo : remplacer ce loginOfInterest en dur par celui sur lequel l'utilisateur a clique:
-			const loginOfInterest = "Louise";
+// appeler fetchGames lorsque playerLogin change:
+watch(()=>props.playerLogin, (newLogin)=>{
+	if (newLogin)
+		fetchGames(newLogin);
+}, { immediate: true });
 
-			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(loginOfInterest)}`);
-			if (!result.ok)
-				throw new Error(`Erreur http: ${result.status}`);
-			const games = await result.json();
-
-			matches.value = games.map((game: any)=>({
-				win: game.login_winner === loginOfInterest,
-				date: game.created_at,
-				c_login: loginOfInterest,
-				score_c: game.login_winner === loginOfInterest? game.score_winner : game.score_loser,
-				score_o: game.login_winner === loginOfInterest? game.score_loser : game.score_winner,
-				o_login:  game.login_winner === loginOfInterest? game.login_loser : game.login_winner,
-			}));
-			console.log("Parties recuperees.");
-		} catch (err) {
-			console.error("Erreur de recuperation des parties:", err);
-		}
-	}
-	onMounted(()=>{ fetchGames(); });
 </script>
 
 // const matches: match[] = [

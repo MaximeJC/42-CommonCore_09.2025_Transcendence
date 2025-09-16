@@ -1,63 +1,66 @@
 <script setup lang="ts">
-	import { ref, onMounted, defineExpose } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
+import { ref, onMounted, defineExpose } from 'vue';
+
+const props = defineProps<{
+	setLanguage: (lang: string) => void;
+}>();
 
 
-	interface Match{
-		win : boolean;
-		date : number;
-		c_login: string;
-		score_c: number;
-		o_login: string;
-		score_o: number;
+interface Match{
+	win: boolean;
+	date: number;
+	c_login: string;
+	score_c: number;
+	o_login: string;
+	score_o: number;
+}
+
+const matches = ref<Match[]>([]);
+
+async function fetchMyGames() {
+	try {
+		const current = await fetch('http://localhost:3000/me');
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const login = currentUser.login;
+
+		console.log(login);
+
+		const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		if (!result.ok)
+			throw new Error(`Erreur http: ${result.status}`);
+		const games = await result.json();
+
+		matches.value = games.map((game: any)=>({
+			win: game.login_winner === login,
+			date: game.created_at,
+			c_login: login,
+			score_c: game.login_winner === login? game.score_winner : game.score_loser,
+			score_o: game.login_winner === login? game.score_loser : game.score_winner,
+			o_login:  game.login_winner === login? game.login_loser : game.login_winner,
+		}));
+		console.log("Parties recuperees (historic.vue).");
+	} catch (err) {
+		console.error("Erreur de recuperation des parties:", err);
 	}
+}
+onMounted(()=>{ fetchMyGames() });
 
-	const matches = ref<Match[]>([]);
-
-	async function fetchGames() {
-		try {
-			// const current = await fetch('http://localhost:3000/me');
-			// if (!current.ok)
-			// 	throw new Error(`Erreur http: ${current.status}`);
-			// const currentUser = await current.json();
-			// const currentUserLogin = currentUser.login;
-			const currentUserLogin = "Louise";
-
-			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(currentUserLogin)}`);
-			if (!result.ok)
-				throw new Error(`Erreur http: ${result.status}`);
-			const games = await result.json();
-
-			matches.value = games.map((game: any)=>({
-				win: game.login_winner === currentUserLogin,
-				date: game.created_at,
-				c_login: currentUserLogin,
-				score_c: game.login_winner === currentUserLogin? game.score_winner : game.score_loser,
-				score_o: game.login_winner === currentUserLogin? game.score_loser : game.score_winner,
-				o_login:  game.login_winner === currentUserLogin? game.login_loser : game.login_winner,
-			}));
-			console.log("Parties recuperees.");
-		} catch (err) {
-			console.error("Erreur de recuperation des parties:", err);
-		}
-	}
-	onMounted(()=>{ fetchGames(); });
 </script>
 
-	// const matchs: match[] = [
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 2.50, score_o: 2, o_login: "nico"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 3.55, score_o: 3, o_login: "Louise"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 2.12, score_o: 4, o_login: "Maxime"},
-	// 	{win: false, c_login: "Micka", score_c: 4, date: 2.37, score_o: 5, o_login: "Axel"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 2.10, score_o: 4, o_login: "Thomas"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 1.40, score_o: 0, o_login: "Anas"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 2.12, score_o: 3, o_login: "Arthur"},
-	// 	{win: false, c_login: "Micka", score_c: 0, date: 2.43, score_o: 5, o_login: "Dorina"},
-	// 	{win: true, c_login: "Micka", score_c: 5, date: 1.55, score_o: 2, o_login: "wictor"},
-	// 	{win: false, c_login: "Micka", score_c: 1, date: 2.33, score_o: 5, o_login: "yichi"},
-	// ];
+// const matchs: match[] = [
+// 	{win: true, c_login: "Micka", score_c: 5, date: 2.50, score_o: 2, o_login: "nico"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 3.55, score_o: 3, o_login: "Louise"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 2.12, score_o: 4, o_login: "Maxime"},
+// 	{win: false, c_login: "Micka", score_c: 4, date: 2.37, score_o: 5, o_login: "Axel"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 2.10, score_o: 4, o_login: "Thomas"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 1.40, score_o: 0, o_login: "Anas"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 2.12, score_o: 3, o_login: "Arthur"},
+// 	{win: false, c_login: "Micka", score_c: 0, date: 2.43, score_o: 5, o_login: "Dorina"},
+// 	{win: true, c_login: "Micka", score_c: 5, date: 1.55, score_o: 2, o_login: "wictor"},
+// 	{win: false, c_login: "Micka", score_c: 1, date: 2.33, score_o: 5, o_login: "yichi"},
+// ];
 
 <template>
 	<div class="historic-container">
