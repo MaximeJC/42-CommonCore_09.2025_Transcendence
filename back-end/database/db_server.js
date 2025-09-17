@@ -6,6 +6,9 @@ import dbModule from './db.js' // importer cette fonction du fichier db.js
 import bcrypt from 'bcrypt';
 import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
+import fastifyMultipart from 'fastify-multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 import crypto from 'crypto';
 
 const { db, getUserByEmail } = dbModule;
@@ -23,6 +26,31 @@ await fastify.register(fastifySecureSession, {
 	sameSite: 'lax',
 	saveUninitialized: false
   }
+});
+
+fastify.register(fastifyMultipart)
+fastify.register(fastifyStatic, {
+	root: path.join(__dirname, 'uploads'),
+	prefix: '/upoads/',
+})
+
+fastify.post('/upload-avatar', async (request, reply) => {
+	const data = await request.file();
+	const filename = `${data.now()}-${data.filename}`;
+	const saveTo = path.join(__dirname, 'uploads', filename);
+
+	await data.toFile(saveTo);
+
+	reply.send({ url: `/uploads/${filename}` });
+
+});
+
+fastify.get('/upload-avatar', async (request, reply) => {
+	const data = await request.json();
+	if (!data)
+		return reply.send({ error: 'NO avatar'});
+	return reply.send({ data });
+
 });
 
 async function configure() {
