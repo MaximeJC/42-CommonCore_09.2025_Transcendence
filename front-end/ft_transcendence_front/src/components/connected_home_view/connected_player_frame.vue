@@ -7,6 +7,8 @@ import invit_return from "./invit&return_button.vue"
 
 import { user } from '../../user';
 
+const emit = defineEmits(['showOtherPlayer', 'show-historic', 'show_play']);
+
 const { currentUser } = user();
 
 const props = defineProps<{
@@ -82,7 +84,6 @@ const emit = defineEmits(['showOtherPlayer', 'show-historic']); */
 }
 onMounted(async()=>{ await fetchPlayerData(); }); */
 
-const emit = defineEmits(['showOtherPlayer', 'show-historic']);
 </script>
 
 <template>
@@ -107,7 +108,7 @@ const emit = defineEmits(['showOtherPlayer', 'show-historic']);
 		</div>
 		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
 		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
-		<invit_return @show-other_player="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
+		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
 </template>
 

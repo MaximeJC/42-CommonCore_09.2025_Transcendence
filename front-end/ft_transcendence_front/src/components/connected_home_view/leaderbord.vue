@@ -18,8 +18,6 @@ defineExpose({
 	rootElement
 });
 
-
-
 interface Player {
 	rank: number;
 	name: string;

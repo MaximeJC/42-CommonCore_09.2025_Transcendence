@@ -15,7 +15,7 @@ async function addFriend() { //todo A TESTER
 		const currentUser = await current.json();
 		const ajouteur = currentUser.user.login;
 
-		const ajoute = 'Mauvais';
+		const ajoute = 'Mauvais'; //todo recuperer le nom de l'ami
 
 		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
 

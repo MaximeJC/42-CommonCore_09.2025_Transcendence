@@ -71,12 +71,12 @@ node db_server.js
 
 	curl -X POST http://localhost:3000/friends \
 		-H "Content-Type: application/json" \
-		-d '{"login1": "Cocotte", "login2": "Louise"}'
+		-d '{"login1": "axel", "login2": "Louise"}'
 
 	# supprimer une amitie:
 	curl -X POST http://localhost:3000/friends/delete \
 		-H "Content-Type: application/json" \
-		-d '{"login1": "Mauvais", "login2": "Louise"}'
+		-d '{"login1": "kalicem", "login2": "Louise"}'
 
 	# tester la recuperation d'infos sur l'utilisateur connecte:
 		npm install node-fetch # si besoin
