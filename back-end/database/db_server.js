@@ -558,21 +558,15 @@ fastify.get('/friends/me', async (request, reply)=>{
 			db.all(
 				`SELECT DISTINCT
 					u.login as name,
-					u.avatar_url as avatar_src
+					u.avatar_url as avatar_src,
+					(u.connected = 1) as isconnected
 				FROM friends f
 				JOIN users u ON (u.login = f.login2)
 				WHERE f.login1 = ?`, 
 				[login_current], 
 				(err, friends)=>{
 					if (err) reject(err);
-					else {
-						//todo a modifier pour que isconnected ne soit plus en dur
-						const friendsWithConnectionStatus = friends.map(friend=>({
-							...friend,
-							isconnected: true
-						}));
-						resolve(friendsWithConnectionStatus);
-					}
+					else resolve(friends);
 				}
 			);
 		});
@@ -679,6 +673,7 @@ fastify.get('/users/current', async (request, reply)=>{
 	}
 });
 
+// envoyer tous les utilisateurs connectes:
 fastify.get('/users/connected', async (request, reply) => {
 	try {
 		const	rows = await new Promise((resolve, reject) => {

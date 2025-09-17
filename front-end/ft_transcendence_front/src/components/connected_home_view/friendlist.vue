@@ -37,8 +37,7 @@ async function fetchFriends() {
 
 		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
-		{
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
