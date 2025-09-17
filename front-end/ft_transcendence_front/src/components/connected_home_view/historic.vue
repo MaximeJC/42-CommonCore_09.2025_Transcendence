@@ -19,7 +19,10 @@ const matches = ref<Match[]>([]);
 
 async function fetchMyGames() {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
