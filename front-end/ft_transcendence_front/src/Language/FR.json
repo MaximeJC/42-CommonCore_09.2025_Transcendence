@@ -57,5 +57,14 @@
 		"password": "Changer mon Mot de passe",
 		"about": "À propos",
 		"contact": "contact"
+	},
+
+	"play":{
+		"local_play": "Jouer en local",
+		"online_play": "Jouer en ligne",
+		"VS_ia": "Joueur VS IA",
+		"VS_player": "Un VS Un",
+		"2_VS_2": "Deux VS Deux",
+		"tournament": "Tournoi"
 	}
 }

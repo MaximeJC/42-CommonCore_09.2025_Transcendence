@@ -6,6 +6,9 @@
 	import histo from '@/components/connected_home_view/historic.vue';
 	import histo_other from '@/components/connected_home_view/historic_other.vue'
 
+	const emit = defineEmits(['show_play']);
+
+
 	const historic = ref(false)
 	const other_player = ref(false)
 	
@@ -21,6 +24,8 @@
 		other_player.value = !other_player.value;
 	}
 
+	
+
 </script>
 
 <template>
@@ -30,7 +35,8 @@
 		    :other_player="other_player"
 		    :historic="historic"
 		    @show-other_player="toggleother_player"
-		    @show-historic="togglehistoric">
+		    @show-historic="togglehistoric"
+			@show_play="emit('show_play')">
 		</player_frame>
 		<div v-show="!historic && !other_player" title="leader+friend" class="subpages">
 			<leaderbord @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
