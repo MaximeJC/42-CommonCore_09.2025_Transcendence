@@ -4,13 +4,13 @@ import { EmitFlags } from 'typescript';
 const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
-const emit = defineEmits(['show-historic']);
+	const emit = defineEmits(['show-historic', 'show_play']);
 
 </script>
 
 <template>
 	<div title="button container" class="button-container">
-		<button title="play-button" class="play-button">
+		<button @click="emit('show_play')" title="play-button" class="play-button">
 			<div data-i18n="home_player_button.play"></div>
 		</button>
 		<button @click="emit('show-historic')" title="historic-button" class="historic-button">

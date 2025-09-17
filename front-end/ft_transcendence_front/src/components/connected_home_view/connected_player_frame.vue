@@ -106,9 +106,9 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat" v-if="currentUser">{{ currentUser.rank }}</div>
 		</div>
-		<play_historic @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
-		<play_return @show-historic="emit('show-historic')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
-		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
+		<play_historic @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
+		<play_return @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
+		<invit_return @show-other_player="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
 </template>
 

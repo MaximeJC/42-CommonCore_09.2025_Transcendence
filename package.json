@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@babylonjs/gui": "^8.27.1",
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.1.0",
+    "@fastify/secure-session": "^8.2.0",
+    "babylonjs": "^8.27.1",
+    "babylonjs-loaders": "^8.27.1",
+    "bcrypt": "^6.0.0",
+    "fastify": "^5.6.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/babylonjs": "^2.3.31"
+  }
+}

@@ -10,7 +10,7 @@
 	
 <template>
 	<div class="s_page">
-		<profile :setLanguage="props.setLanguage"></profile>
+		<profile v-show="setting_activePage == 'profil'" :setLanguage="props.setLanguage"></profile>
 	</div>	
 </template>
 

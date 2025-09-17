@@ -162,7 +162,6 @@ onMounted(()=>{ fetchFriends(); });
 
 <style>
 	.friend-list-container{
-
 		display: grid;
 		grid-template-rows: min-content;
 		height: 26rem;
