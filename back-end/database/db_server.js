@@ -8,8 +8,10 @@ import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
 import fastifyMultipart from 'fastify-multipart';
 import fastifyStatic from '@fastify/static';
+import { dirname } from 'path';
 import path from 'path';
 import crypto from 'crypto';
+import { fileURLToPath } from 'url';
 
 const { db, getUserByEmail } = dbModule;
 const fastify = Fastify({logger: true});
@@ -28,30 +30,47 @@ await fastify.register(fastifySecureSession, {
   }
 });
 
-fastify.register(fastifyMultipart)
-fastify.register(fastifyStatic, {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+await fastify.register(fastifyMultipart)
+await fastify.register(fastifyStatic, {
 	root: path.join(__dirname, 'uploads'),
-	prefix: '/upoads/',
+	prefix: '/uploads/',
 })
 
 fastify.post('/upload-avatar', async (request, reply) => {
 	const data = await request.file();
-	const filename = `${data.now()}-${data.filename}`;
+	if (!data) {
+    	return reply.status(400).send({ error: 'No file uploaded' });
+	}
+	const filename = `${Date.now()}-${data.filename}`;
 	const saveTo = path.join(__dirname, 'uploads', filename);
 
 	await data.toFile(saveTo);
+	const user = request.session.get('user');
+	if (!user || !user.login) {
+    	return reply.status(401).send({ error: 'User not logged in' });
+ 	}
 
-	reply.send({ url: `/uploads/${filename}` });
+	const relativePath = `/uploads/${filename}`;
+	const absolutePath = path.resolve(saveTo);
+	
+	await db.query('UPDATE users SET avatar_url = $1 WHERE login = $2',
+		[relativePath, user.login]
+	);
+
+	reply.send({ message: 'Avatar uploaded', avatar_url: relativePath });
 
 });
 
-fastify.get('/upload-avatar', async (request, reply) => {
-	const data = await request.json();
-	if (!data)
-		return reply.send({ error: 'NO avatar'});
-	return reply.send({ data });
+// fastify.get('/upload-avatar', async (request, reply) => {
+// 	const data = await request.file();
+// 	if (!data)
+// 		return reply.send({ error: 'NO avatar'});
+// 	return reply.send({ data });
 
-});
+// });
 
 async function configure() {
 	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173'];
