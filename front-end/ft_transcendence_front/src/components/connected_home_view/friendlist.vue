@@ -10,9 +10,9 @@ defineExpose({
 	rootElement
 });
 
-const emit = defineEmits(['showOtherPlayer']);
+const emit = defineEmits(['show-other_player']);
 
-const search_friends = ref(""); // ami a ajouter
+const search_friends = ref("") // ami a ajouter
 
 let friend: string;
 
@@ -35,9 +35,10 @@ async function fetchFriends() {
 		const currentUser = await current.json();
 		const currentUserLogin = currentUser.user.login;
 
-		console.log("fetchFriends(): /me =", currentUserLogin);
+		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
+		{
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -55,7 +56,10 @@ async function fetchFriends() {
 
 async function addFriend() {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
@@ -63,7 +67,7 @@ async function addFriend() {
 
 		const ajoute = search_friends.value;
 
-		console.log("addFriend(): /me =", ajouteur, " ajoute =", ajoute);
+		console.log("addFriend: ajouteur =", ajouteur, ", ajoute =", ajoute);
 
 		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
 			method: 'POST',
@@ -86,13 +90,16 @@ async function addFriend() {
 
 async function deleteFriend(unfriendLogin: string) {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
 		const supprimeur = currentUser.user.login;
 
-		console.log("deleteFriend(): /me =", supprimeur, " unfriendLogin =", unfriendLogin);
+		console.log("deleteFriend: supprimer =", supprimeur, ", supprime =", unfriendLogin);
 
 		const result = await fetch(`http://${window.location.hostname}:3000/friends/delete`, {
 			method: 'POST',
@@ -141,10 +148,10 @@ onMounted(()=>{ fetchFriends(); });
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<button @click="emit('showOtherPlayer')" class="avatar_button">
+					<button @click="emit('show-other_player')" class="avatar_button">
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
-					<button @click="emit('showOtherPlayer')" title="friend-button" class="friend-button">{{ friend.name }}</button>
+					<button @click="emit('show-other_player')" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
 						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
