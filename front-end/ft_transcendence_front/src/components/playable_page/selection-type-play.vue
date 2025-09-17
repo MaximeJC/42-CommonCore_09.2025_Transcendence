@@ -91,10 +91,10 @@
 	</div>
 	<div ref="offlineBox">
 		<div v-show="offline_play" class="select_offline_page">
-			<button @click="typeplay(false, 'vs_ia')" class="select_button">
+			<button @click="typeplay(false, '1P_VS_AI')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_ia"></div>
 			</button>
-			<button @click="typeplay(false, '1_vs_1')" class="select_button">
+			<button @click="typeplay(false, '2P_LOCAL')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_player"></div>
 			</button>
 			<button @click="typeplay(false, 'tournament')" class="select_button">
@@ -104,10 +104,10 @@
 	</div>
 	<div ref="onlineBox">
 		<div v-show="online_play" class="select_online_page">
-			<button @click="typeplay(true, '1_vs_1')" class="select_button">
+			<button @click="typeplay(true, '1V1_ONLINE')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_player"></div>
 			</button>
-			<button @click="typeplay(true, '2_vs_2')" class="select_button">
+			<button @click="typeplay(true, '4P_ONLINE')" class="select_button">
 				<div class="play_title" data-i18n="play.2_VS_2"></div>
 			</button>
 		</div>

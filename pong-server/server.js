@@ -37,7 +37,7 @@ app.register(async function (fastify) {
 			pseudo: 'Anonymous',
 			language: 'en',
 			avatarUrl: '' });
-		console.log("[Serveur] Client connecte: ${socket.id}");
+		console.log(`[Serveur] Client connecte: ${socket.id}`);
 
 		const welcomeMessage = {
 			type: 'connection_established',
@@ -90,7 +90,7 @@ app.register(async function (fastify) {
 		});
 
 		socket.on('close', () => {
-			console.log("[Serveur] Client deconnecte: ${socket.id}");
+			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
 			const clientInfo = clients.get(socket.id);
 
 			if (clientInfo && clientInfo.gameId) {
@@ -129,7 +129,7 @@ app.register(async function (fastify) {
 
 					game.broadcast('game_over', { end_message: endMessage });
 					
-					console.log("[Jeu ${game.gameId}] Partie terminee. ${endMessage}");
+					console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
 					games.delete(clientInfo.gameId);
 				}
 			}
@@ -145,7 +145,7 @@ function handleMatchmaking(playerInfo, gameMode)
 {
 	const isInQueue = matchmaking_1v1.some(p => p.socket.id === playerInfo.socket.id) || matchmaking_4p.some(p => p.socket.id === playerInfo.socket.id);
 	if (isInQueue) {
-		console.log("[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.");
+		console.log(`[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.`);
 		return;
 	}
 
@@ -165,7 +165,7 @@ function handleMatchmaking(playerInfo, gameMode)
 			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
 		}
 	} else {
-		console.error("[Matchmaking] Mode de jeu '${gameMode}' non reconnu.");
+		console.error(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
 		return;
 	}
 
@@ -211,11 +211,11 @@ function handlePrivateMatchmaking(playerInfo, opponentPseudo, gameMode) {
 			privateWaitingRooms.delete(roomKey);
 		} else {
 			// Un intrus essaie de rejoindre la partie.
-			console.warn('[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${playerInfo.pseudo}');
+			console.warn(`[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${playerInfo.pseudo}`);
 		}
 	} else {
 		// La salle n'existe pas, on la cree.
-		console.log('[Partie Privee] ${playerInfo.pseudo} a cree une salle pour jouer contre ${opponentPseudo}.');
+		console.log(`[Partie Privee] ${playerInfo.pseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
 		privateWaitingRooms.set(roomKey, {
 			player1: playerInfo,
 			opponent_pseudo: opponentPseudo,

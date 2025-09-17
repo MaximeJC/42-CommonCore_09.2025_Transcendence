@@ -143,7 +143,8 @@ const { setUser } = user();
 
 <template>
 	<div>
-		<div v-show="!isPlayActive">
+		<!-- <div v-show="!isPlayActive">-->
+		<div>
 			<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"  @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
 		</div>
 		<div>
