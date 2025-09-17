@@ -30,14 +30,14 @@ async function configure() {
 
 	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
 
-	await fastify.register(cors, { 
+	await fastify.register(cors, {
 		origin: (origin, cb) => {
 			if (!origin || allowedOrigin.includes(origin)) {
 				cb(null, true);
 			} else {
 				cb(new Error(`Not allowed by CORS: ${origin}`));
 			}
-		}, 
+		},
 		credentials: true
 	}); // autoriser n'importe qui a appeler l'API de ce serveur
 
@@ -300,7 +300,7 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-		
+
 		const loserExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM users WHERE login = ?`, [login_loser], (err, row)=>{
@@ -312,10 +312,10 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-		
+
 		if (!winnerExists || !loserExists)
 			return reply.status(400).send({error: "Login not found in database."});
-		
+
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser) VALUES (?,?,?,?)`,
@@ -446,8 +446,8 @@ fastify.get('/leaderboard', async (request, reply)=>{
 		updateUserRanks();
 		const leaderboard = await new Promise((resolve, reject)=>{
 			db.all(
-				`SELECT login as name, nb_games as games, nb_won_games as victory, rank 
-				FROM users 
+				`SELECT login as name, nb_games as games, nb_won_games as victory, rank
+				FROM users
 				ORDER BY rank ASC
 				LIMIT 10`,
 				(err, rows)=>{
@@ -471,7 +471,7 @@ fastify.post('/friends', async (request, reply)=>{
 	const {login1, login2} = request.body;
 	if (DEBUG_MODE)
 		console.log("Logins recus: ", {login1, login2});
-	
+
 	try {
 		const login1Exists = await new Promise((resolve, reject)=>{
 			db.get(
@@ -523,7 +523,7 @@ fastify.post('/friends', async (request, reply)=>{
 
 		if (relationExists)
 			return reply.status(400).send({error: "Friendship already exists."});
-		
+
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
@@ -561,8 +561,8 @@ fastify.get('/friends/me', async (request, reply)=>{
 					u.avatar_url as avatar_src
 				FROM friends f
 				JOIN users u ON (u.login = f.login2)
-				WHERE f.login1 = ?`, 
-				[login_current], 
+				WHERE f.login1 = ?`,
+				[login_current],
 				(err, friends)=>{
 					if (err) reject(err);
 					else {
@@ -626,7 +626,7 @@ fastify.post('/friends/delete', async (request, reply)=>{
 			return reply.status(400).send({message: "Friendship doesn't exist."});
 		if (DEBUG_MODE)
 			console.log("La relation existe bien.\n");
-	
+
 		await new Promise((resolve, reject)=>{
 			db.run(
 				`DELETE FROM friends WHERE (login1 = ? AND login2 = ?)`,
