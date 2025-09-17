@@ -1,0 +1,86 @@
+services:
+  ai_server:
+    container_name: HGP_ai_server
+    build:
+      context: ./requirements/ai_server
+      dockerfile: Dockerfile
+    image: HGP_ai_server_img
+    # env_file: ./.env
+    # depends_on:
+    #   - game_management
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+  front_end:
+    container_name: HGP_front_end
+    build:
+      context: ./requirements/front_end
+      dockerfile: Dockerfile
+    image: HGP_front_end_img
+    # env_file: ./.env
+    # depends_on:
+    #   - game_management
+    ports:
+      - "5173:443"
+    # volumes:
+    #   - front_end_data:/var/www/html:ro
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+  game_management:
+    container_name: HGP_game_management
+    build:
+      context: ./requirements/game_management
+      dockerfile: Dockerfile
+    image: HGP_game_management_img
+    # env_file: ./.env
+    # depends_on:
+    #   - sqlite3
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+  sqlite3:
+    container_name: HGP_database
+    build:
+      context: ./requirements/database
+      dockerfile: Dockerfile
+    image: HGP_database_img
+    # env_file: ./.env
+    volumes:
+      - sqlite_data:/var/lib/sqlite
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+  user_management:
+    container_name: HGP_user_management
+    build:
+      context: ./requirements/user_management
+      dockerfile: Dockerfile
+    image: HGP_user_management_img
+    # env_file: ./.env
+    # depends_on:
+    #   - sqlite3
+    # volumes:
+    #   - sqlite_data:/var/lib/sqlite
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+
+volumes:
+  sqlite_data:
+    driver_opts:
+      type: none
+      device: /home/mgouraud/data/sqlite
+      o: bind
+  front_data:
+    driver_opts:
+      type: none
+      device: /home/mgouraud/data/front
+
+networks:
+  transcendence_network:
+    driver: bridge
