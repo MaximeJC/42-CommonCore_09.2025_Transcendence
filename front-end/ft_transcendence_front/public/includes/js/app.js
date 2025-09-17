@@ -345,76 +345,81 @@ setAppInitializer(initializeApp);
 
 // --- POINT D'ENTREE DE L'APPLICATION ---
 
-window.addEventListener('DOMContentLoaded', () => {
+/**
+ * Demarre le processus de matchmaking. C'est la fonction que le client (Vue.js) appellera.
+ * @param {object} config - L'objet de configuration du jeu.
+ * @param {string} config.pseudo - Le pseudo du joueur.
+ * @param {string} config.opponentPseudo - Le pseudo de l'adversaire pour un match prive.
+ * @param {string} config.avatarUrl - L'URL de l'avatar.
+ * @param {string} config.gameMode - Le mode de jeu selectionne.
+ * @param {string} config.language - La langue selectionnee.
+ */
+async function startMatchmaking(config) {
     const lobby = document.getElementById('lobby');
-    const startButton = document.getElementById('start-game-button');
-    const pseudoInput = document.getElementById('pseudo-input');
-    const avatarInput = document.getElementById('avatar-input');
-    const gamemodeSelect = document.getElementById('gamemode-select');
     const canvas = document.getElementById('renderCanvas');
-	const languageSelect = document.getElementById('language-select');
 
-    startButton.addEventListener('click', async () => {
-        const pseudo = pseudoInput.value.trim();
-		// On recupere le pseudo de l'adversaire
-        const opponentPseudo = document.getElementById('opponent-pseudo-input').value.trim();
-        if (!pseudo) {
-            alert("Please enter a pseudo.");
-            return;
-        }
+    // if (!config.pseudo) {
+    //     alert("Configuration error: pseudo is required.");
+    //     return;
+    // }
 
-        gameState.pseudo = pseudo;
-        gameState.gameMode = gamemodeSelect.value;
-		gameState.language = languageSelect.value;
-		gameState.avatarUrl = avatarInput.value.trim(); //"includes/img/avatar1.jpg";
-		
-        lobby.style.display = 'none';
-		canvas.style.display = 'block';
+    // MAJ le gameState avec la configuration fournie
+    gameState.pseudo = config.pseudo;
+    gameState.gameMode = config.gameMode;
+    gameState.language = config.language;
+    gameState.avatarUrl = config.avatarUrl; // exemple "includes/img/avatar1.jpg";
+    gameState.opponentPseudo = config.opponentPseudo;
 
-		// On cree le moteur UNE SEULE FOIS.
-		engine = initializeEngine();
+    // On cache le lobby et on affiche le canvas
+    lobby.style.display = 'none';
+    canvas.style.display = 'block';
 
-		// On lance la boucle de rendu principale.
-		engine.runRenderLoop(() => {
-			if (activeScene) {
-				activeScene.render();
-			}
-		});
+    // On cree le moteur UNE SEULE FOIS.
+    if (!engine) {
+        engine = initializeEngine();
+
+        // On lance la boucle de rendu principale
+        engine.runRenderLoop(() => {
+            if (activeScene) {
+                activeScene.render();
+            }
+        });
+    }
 
 		// On affiche un simple ecran d'attente.
-		showWaitingScreen();
+    showWaitingScreen();
 
-		// On contacte le serveur.
-		try {
-			await networkManager.connect(JwtToken);
-			if (opponentPseudo && gameState.gameMode === "1V1_ONLINE") {
-				// Si un adversaire est specifie, on cree une partie privee
-				console.log("Demande de partie privee contre ${opponentPseudo}");
-				networkManager.sendMessage('create_private_match', {
-					my_pseudo: gameState.pseudo,
-					opponent_pseudo: opponentPseudo,
-					mode: gameState.gameMode, // On envoie aussi le mode de jeu
-					language: gameState.language,
-					avatarUrl: gameState.avatarUrl
-				});
-			} else {
-				// Sinon, on rejoint le matchmaking public
-				console.log("Demande de partie publique.");
-				networkManager.sendMessage('find_match', {
-					mode: gameState.gameMode,
-					pseudo: gameState.pseudo,
-					language: gameState.language,
-					avatarUrl: gameState.avatarUrl
-				});
-			}
+    // On contacte le serveur.
+    try {
+        await networkManager.connect(JwtToken); // JwtToken a ajouter dans config si besoin aussi
+        
+        if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
+            // Si un adversaire est specifie, on cree une partie privee
+            console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
+            networkManager.sendMessage('create_private_match', {
+                my_pseudo: gameState.pseudo,
+                opponent_pseudo: config.opponentPseudo,
+                mode: gameState.gameMode, // On envoie aussi le mode de jeu
+                language: gameState.language,
+                avatarUrl: gameState.avatarUrl
+            });
+        } else {
+            // Sinon, on rejoint le matchmaking public
+            console.log("Demande de partie publique.");
+            networkManager.sendMessage('find_match', {
+                mode: gameState.gameMode,
+                pseudo: gameState.pseudo,
+                language: gameState.language,
+                avatarUrl: gameState.avatarUrl
+            });
+        }
 
-		} catch (error) {
-			console.error("Echec de la connexion:", error);
-			lobby.style.display = 'block';
-			canvas.style.display = 'none';
-			alert("Connection to the server failed. Please try again.");
-		}
-    });
-});
+    } catch (error) {
+        console.error("Echec de la connexion:", error);
+        // En cas d'erreur, on nettoie et on retourne au lobby
+        returnToLobby();
+        alert("Connection to the server failed. Please try again.");
+    }
+}
 
-export { returnToLobby };
+export { startMatchmaking, returnToLobby };

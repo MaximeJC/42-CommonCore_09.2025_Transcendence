@@ -110,7 +110,7 @@ export class GameInstance {
 				break;
 
 			default:
-				console.error("[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.");
+				console.error(`[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.`);
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', 0));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN', '', 0));
 				break;

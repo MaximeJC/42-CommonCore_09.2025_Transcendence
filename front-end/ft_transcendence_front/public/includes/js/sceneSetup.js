@@ -7,8 +7,13 @@ import { debug } from './config.js';
  * Gere egalement le redimensionnement de la fenetre.
  * @returns {BABYLON.Engine} L'instance du moteur de rendu.
  */
-const canvas = document.getElementById("renderCanvas");
 export function initializeEngine() {
+	const canvas = document.getElementById('renderCanvas');
+
+	if (!canvas) {
+		console.error("Le canvas avec l'ID 'renderCanvas' est introuvable !");
+		return null;
+	}
 	canvas.tabIndex = 1;
 	canvas.focus();
 	const engine = new BABYLON.Engine(canvas, true);
@@ -41,6 +46,12 @@ export function createScene(engine) {
 	camera.setTarget(new BABYLON.Vector3(0, 10, 0)); 
 
 	// ACTIVATION ET PERSONNALISATION DES CONTROLES DE LA UNIVERSALCAMERA
+	const canvas = document.getElementById('renderCanvas');
+
+	if (!canvas) {
+		console.error("Le canvas avec l'ID 'renderCanvas' est introuvable !");
+		return null;
+	}
 	camera.attachControl(canvas, true);
 	camera.speed = 10.0;
 
