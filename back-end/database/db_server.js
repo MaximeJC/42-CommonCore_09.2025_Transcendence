@@ -35,10 +35,11 @@ await fastify.register(fastifySecureSession, {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const newdir = path.join(__dirname, '../..', 'front-end/ft_transcendence_front/');
 
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyStatic, {
-	root: path.join(__dirname, 'uploads'),
+	root: path.join(newdir, 'uploads'),
 	prefix: '/uploads/',
 });
 
@@ -50,7 +51,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 
 		const filename = `${Date.now()}-${data.filename}`;
-		const saveTo = path.join(__dirname, 'uploads', filename); //TODO : Voir pour le bon chemin
+		const saveTo = path.join(newdir, 'uploads', filename); //TODO : Voir pour le bon chemin
 
 		try {
 			// Utiliser pipeline pour sauvegarder le fichier de maniere securisee et efficace
@@ -151,8 +152,8 @@ fastify.post('/users', async (request, reply)=>{
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO users (login, email, password) VALUES (?, ?, ?)`,
-				[login, email, hashedPassword],
+				`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
+				[login, email, hashedPassword, '/images/default_avatar.png'],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
@@ -308,12 +309,35 @@ fastify.post('/login', async (request, reply)=>{
 });
 
 fastify.get('/me', async (req, rep) => {
-	const user = req.session.get('user');
-	if (!user) {
+	const userMe = req.session.get('user');
+	if (!userMe) {
 		return rep.send({ error: 'Disconnected'});
 	}
+
+	const user = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT * FROM users WHERE login = ?`,
+				[userMe.login],
+				(err, row)=>{
+					if (err) {
+						reject(err);
+					} else {
+						resolve(row);
+					}
+				}
+			);
+		});
+
 	return rep.send({ user });
 });
+
+// fastify.get('/me', async (req, rep) => {
+// 	const user = req.session.get('user');
+// 	if (!user) {
+// 		return rep.send({ error: 'Disconnected'});
+// 	}
+// 	return rep.send({ user });
+// });
 
 function updateIsNotConnected(userId) {
 	db.serialize(async()=>{
