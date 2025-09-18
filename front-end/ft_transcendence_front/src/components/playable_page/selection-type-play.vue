@@ -121,7 +121,7 @@
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -132,7 +132,7 @@
 	grid-template-columns: 1fr 1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -143,7 +143,7 @@
 	grid-template-columns:1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }

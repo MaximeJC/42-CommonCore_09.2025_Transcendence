@@ -184,7 +184,7 @@ const { setUser } = user();
 		display: flex;
 		justify-content: center;
 		position: absolute;
-		top: 50%;
+		top: 250%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}

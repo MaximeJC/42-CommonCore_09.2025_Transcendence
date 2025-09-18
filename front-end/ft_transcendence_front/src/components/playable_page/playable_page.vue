@@ -1,22 +1,42 @@
 <script setup lang="ts">
-	import { onMounted, ref } from "vue"
+	import { onMounted, ref ,nextTick , watch, } from "vue"
 	import * as BABYLON from "babylonjs"
 	import * as GUI from "@babylonjs/gui"
-
+	import { user } from '../../user';
 	// Importe la fonction de demarrage depuis le module app.js.
 	import { startMatchmaking } from "../../../public/includes/js/app.js";
+
+	const emit = defineEmits(['gameisfinish']);
+
+	const props = defineProps<{
+		setLanguage: (lang: string) => void;
+		activePlay: string;
+	}>();
 	
-// TODO : envoyer les vrai donnees
-	// definit la config du jeu ici, dans des variables.
-	const gameConfig = {
-		pseudo: "kalicem",
-		opponentPseudo: "", // Laisser vide pour un match public
-		avatarUrl: "includes/img/avatar1.jpg", // Laisser vide pour avatar defaut
-		gameMode: "1P_VS_AI", //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
-		language: "fr" //en, fr, es
+	const { currentUser } = user();
+
+
+//// TODO : envoyer les vrai donnees
+//	// definit la config du jeu ici, dans des variables.
+	interface GameConfig {
+		pseudo: string;
+		opponentPseudo: string; // Laisser vide pour un match public
+		avatarUrl: string; // Laisser vide pour avatar defaut
+		gameMode: string; //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
+		language: string; //en, fr, es
 	};
 
 	function handleStartGame() {
+		const gameConfig: GameConfig = {
+			pseudo: currentUser.value?.login ?? "",
+			opponentPseudo: "", // Laisser vide pour un match public
+			avatarUrl: "includes/img/avatar1.jpg", // Laisser vide pour avatar defaut
+			gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
+			language: "fr" //en, fr, es
+		};
+
+		if(props.activePlay === "2P_LOCAL")
+			gameConfig.opponentPseudo = "Player2"
 		console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 		startMatchmaking(gameConfig);
 	}
@@ -32,6 +52,14 @@
 			document.body.appendChild(guiScript)
 		}
 	})
+
+	watch(() => props.activePlay, (newVal) => {
+		if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" ){
+			nextTick().then(() => {
+				handleStartGame();
+			});
+		}
+	})
 </script>
 
 <template>
@@ -39,9 +67,7 @@
 <!-- <div class="game-wrapper"> -->
 	<div class="home_disconnect">
 		<!-- lobby -->
-		<div id="lobby">
-			<button class="connexion-button" @click="handleStartGame">Commencer</button>
-		</div>
+		<div id="lobby"></div>
 
 		<canvas id="renderCanvas"></canvas>
 	</div>
@@ -50,31 +76,35 @@
 <style scoped>
 
 .home_disconnect {
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	top: 50%;
+	left: 50%;
 }
 
 #renderCanvas {
-	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	z-index: -1;
+	display: none; 
+	margin: 0;
+	padding: 0;
+	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: -1; 
-	display: none; 
 }
 
 #lobby {
 	color: white;
 	z-index: 1;
+	position: relative;
 }
 
-html, body {
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-}
+
 </style>
