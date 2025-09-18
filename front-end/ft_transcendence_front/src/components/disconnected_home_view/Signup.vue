@@ -5,6 +5,9 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 		}>();
 
+	const emit = defineEmits(['issignup']);
+	
+
 	// references reactives:
 	const login = ref("");
 	const email = ref("");
@@ -56,6 +59,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 				email.value = "";
 				password.value = "";
 				conf_password.value = "";
+				emit('issignup');
 			} else {
 				if (data.message?.includes("login"))
 					error_login.value = true;

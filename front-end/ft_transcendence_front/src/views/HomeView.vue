@@ -153,7 +153,7 @@ const { setUser } = user();
 					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
 				</div>
 				<div ref="signUpbox">
-					<Signup :setLanguage="props.setLanguage" v-show="showSignup"></Signup>
+					<Signup :setLanguage="props.setLanguage" v-show="showSignup" @issignup="toggleSignup"></Signup>
 				</div>
 				<div ref="connectionBox">
 					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
