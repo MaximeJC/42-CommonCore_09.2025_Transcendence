@@ -61,7 +61,6 @@
 <style scoped>
 	.home-container{
 		display: flex;
-		height: 100vh;
 		flex-direction: column;
 		position: relative;
 	}

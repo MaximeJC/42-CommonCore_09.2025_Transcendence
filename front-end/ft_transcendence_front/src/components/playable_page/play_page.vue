@@ -21,6 +21,8 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
+
+
 </script>
 
 <template>
@@ -35,6 +37,8 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	<div v-show="isPlayActive">
 		<play
 		:activePlay="activePlay"
+		:set-language="props.setLanguage"
+		@gameisfinish="handletypeplay"
 		></play>
 	</div>
 </template>
