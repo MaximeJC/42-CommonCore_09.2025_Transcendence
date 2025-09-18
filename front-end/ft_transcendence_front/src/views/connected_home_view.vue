@@ -1,6 +1,7 @@
 <script setup lang="ts">
 	import { ref, onMounted, nextTick, watch } from 'vue';
 	import player_frame from '../components/connected_home_view/connected_player_frame.vue'
+	import otherplayer_frame from '../components/connected_home_view/connected_otherplayer_frame.vue'
 	import leaderbord from '../components/connected_home_view/leaderbord.vue';
 	import friendlist from '../components/connected_home_view/friendlist.vue';
 	import histo from '@/components/connected_home_view/historic.vue';
@@ -33,13 +34,21 @@ const toggleother_player = (login: string) => {
 <template>
 	<div class="page">
 		<player_frame
+		v-show="!other_player"
 		    :setLanguage="props.setLanguage"
 		    :other_player="other_player"
 		    :historic="historic"
-		    @show-other_player="toggleother_player"
+		    @showOtherPlayer="toggleother_player"
 		    @show-historic="togglehistoric"
 			@show_play="emit('show_play')">
 		</player_frame>
+		<otherplayer_frame
+			v-show="other_player"
+			:setLanguage="props.setLanguage"
+			:other_player="other_player"
+			:selectedPlayerLogin="selectedPlayerLogin"
+			@showOtherPlayer="toggleother_player"
+		></otherplayer_frame>
 		<div v-show="!historic && !other_player" title="leader+friend" class="subpages">
 			<leaderbord @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
 			<friendlist @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
