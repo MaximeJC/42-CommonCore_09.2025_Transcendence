@@ -355,71 +355,71 @@ setAppInitializer(initializeApp);
  * @param {string} config.language - La langue selectionnee.
  */
 async function startMatchmaking(config) {
-    const lobby = document.getElementById('lobby');
-    const canvas = document.getElementById('renderCanvas');
+	const lobby = document.getElementById('lobby');
+	const canvas = document.getElementById('renderCanvas');
 
-    // if (!config.pseudo) {
-    //     alert("Configuration error: pseudo is required.");
-    //     return;
-    // }
+	// if (!config.pseudo) {
+	//	 alert("Configuration error: pseudo is required.");
+	//	 return;
+	// }
 
-    // MAJ le gameState avec la configuration fournie
-    gameState.pseudo = config.pseudo;
-    gameState.gameMode = config.gameMode;
-    gameState.language = config.language;
-    gameState.avatarUrl = config.avatarUrl; // exemple "includes/img/avatar1.jpg";
-    gameState.opponentPseudo = config.opponentPseudo;
+	// MAJ le gameState avec la configuration fournie
+	gameState.pseudo = config.pseudo;
+	gameState.gameMode = config.gameMode;
+	gameState.language = config.language;
+	gameState.avatarUrl = config.avatarUrl; // exemple "includes/img/avatar1.jpg";
+	gameState.opponentPseudo = config.opponentPseudo;
 
-    // On cache le lobby et on affiche le canvas
-    lobby.style.display = 'none';
-    canvas.style.display = 'block';
+	// On cache le lobby et on affiche le canvas
+	lobby.style.display = 'none';
+	canvas.style.display = 'block';
 
-    // On cree le moteur UNE SEULE FOIS.
-    if (!engine) {
-        engine = initializeEngine();
+	// On cree le moteur UNE SEULE FOIS.
+	if (!engine) {
+		engine = initializeEngine();
 
-        // On lance la boucle de rendu principale
-        engine.runRenderLoop(() => {
-            if (activeScene) {
-                activeScene.render();
-            }
-        });
-    }
+		// On lance la boucle de rendu principale
+		engine.runRenderLoop(() => {
+			if (activeScene) {
+				activeScene.render();
+			}
+		});
+	}
 
 		// On affiche un simple ecran d'attente.
-    showWaitingScreen();
+	showWaitingScreen();
 
-    // On contacte le serveur.
-    try {
-        await networkManager.connect(JwtToken); // JwtToken a ajouter dans config si besoin aussi
-        
-        if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
-            // Si un adversaire est specifie, on cree une partie privee
-            console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
-            networkManager.sendMessage('create_private_match', {
-                my_pseudo: gameState.pseudo,
-                opponent_pseudo: config.opponentPseudo,
-                mode: gameState.gameMode, // On envoie aussi le mode de jeu
-                language: gameState.language,
-                avatarUrl: gameState.avatarUrl
-            });
-        } else {
-            // Sinon, on rejoint le matchmaking public
-            console.log("Demande de partie publique.");
-            networkManager.sendMessage('find_match', {
-                mode: gameState.gameMode,
-                pseudo: gameState.pseudo,
-                language: gameState.language,
-                avatarUrl: gameState.avatarUrl
-            });
-        }
+	// On contacte le serveur.
+	try {
+		await networkManager.connect(JwtToken); // JwtToken a ajouter dans config si besoin aussi
+		
+		if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
+			// Si un adversaire est specifie, on cree une partie privee
+			console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
+			networkManager.sendMessage('create_private_match', {
+				my_pseudo: gameState.pseudo,
+				opponent_pseudo: config.opponentPseudo,
+				mode: gameState.gameMode, // On envoie aussi le mode de jeu
+				language: gameState.language,
+				avatarUrl: gameState.avatarUrl
+			});
+		} else {
+			// Sinon, on rejoint le matchmaking public
+			console.log("Demande de partie publique.");
+			networkManager.sendMessage('find_match', {
+				mode: gameState.gameMode,
+				pseudo: gameState.pseudo,
+				language: gameState.language,
+				avatarUrl: gameState.avatarUrl
+			});
+		}
 
-    } catch (error) {
-        console.error("Echec de la connexion:", error);
-        // En cas d'erreur, on nettoie et on retourne au lobby
-        returnToLobby();
-        alert("Connection to the server failed. Please try again.");
-    }
+	} catch (error) {
+		console.error("Echec de la connexion:", error);
+		// En cas d'erreur, on nettoie et on retourne au lobby
+		returnToLobby();
+		alert("Connection to the server failed. Please try again.");
+	}
 }
 
 export { startMatchmaking, returnToLobby };
