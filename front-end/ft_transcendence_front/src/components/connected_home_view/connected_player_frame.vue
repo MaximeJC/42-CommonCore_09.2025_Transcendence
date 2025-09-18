@@ -87,9 +87,9 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 <template>
 	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
-			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
+			<img v-if="currentUser?.login" :src="currentUser.avatar_url" alt="Avatar" class="avatar">
 			<div title="login" class="login">
-				<div v-if="currentUser?.login">{{ currentUser.login }}</div>
+				<div v-if="currentUser?.login">{{currentUser.login }}</div>
 			</div>
 		</div>
 		<div class="stat-container">

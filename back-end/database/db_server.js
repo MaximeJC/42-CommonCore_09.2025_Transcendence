@@ -6,7 +6,15 @@ import dbModule from './db.js' // importer cette fonction du fichier db.js
 import bcrypt from 'bcrypt';
 import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import { dirname } from 'path';
+
 import crypto from 'crypto';
+import { pipeline } from 'stream/promises'; // Pour gérer les flux proprement
+import fs from 'fs'; // Pour créer le flux d'écriture
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { db, getUserByEmail } = dbModule;
 const fastify = Fastify({logger: true});
@@ -17,13 +25,88 @@ await fastify.register(fastifyCookie);
 await fastify.register(fastifySecureSession, {
   key: crypto.randomBytes(32), //generer une cle aleatoire
   cookie: {
-    path: '/',
-    httpOnly: true,
-    secure: false,
+	path: '/',
+	httpOnly: true,
+	secure: false,
 	sameSite: 'lax',
 	saveUninitialized: false
   }
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const newdir = path.join(__dirname, '../..', 'front-end/ft_transcendence_front/');
+
+await fastify.register(fastifyMultipart);
+await fastify.register(fastifyStatic, {
+	root: path.join(newdir, 'uploads'),
+	prefix: '/uploads/',
+});
+
+fastify.post('/upload-avatar', async (request, reply) => {
+	try {
+		const data = await request.file();
+		if (!data) {
+			return reply.status(400).send({ error: 'No file uploaded' });
+		}
+
+		const filename = `${Date.now()}-${data.filename}`;
+		const saveTo = path.join(newdir, 'uploads', filename); //TODO : Voir pour le bon chemin
+
+		try {
+			// Utiliser pipeline pour sauvegarder le fichier de maniere securisee et efficace
+			console.log(`[AVATAR] Sauvegarde dans: ${saveTo}`);
+			await pipeline(data.file, fs.createWriteStream(saveTo));
+			console.log(`[AVATAR] Fichier sauvegarde avec succes.`);
+
+		} catch (err) {
+			console.error("Erreur lors de la sauvegarde du fichier:", err);
+			return reply.status(500).send({ error: 'Could not save the file' });
+		}
+		
+		const user = request.session.get('user');
+		if (!user || !user.login) {
+			return reply.status(401).send({ error: 'User not logged in' });
+		}
+
+		const relativePath = `/uploads/${filename}`;
+
+		console.log(`[AVATAR] Mise a jour de la BDD pour l'utilisateur ${user.login} avec le chemin ${relativePath}`);
+		
+		await new Promise((resolve, reject) => {
+			db.run(
+				'UPDATE users SET avatar_url = ? WHERE login = ?',
+				[relativePath, user.login],
+					function (err) {
+					if (err) {
+						reject(err);
+					} else {
+						resolve();
+					}
+				}
+			);
+		});
+
+		console.log(`[AVATAR] BDD mise a jour avec succes.`);
+
+		reply.send({ message: 'Avatar uploaded', avatar_url: relativePath });
+	} catch (error) {
+		console.error("!!! ERREUR INTERNE DANS /upload-avatar !!!", error);
+		return reply.status(500).send({ 
+			message: 'Internal Server Error', 
+			error: error.message
+		});
+	}
+});
+
+
+// fastify.get('/upload-avatar', async (request, reply) => {
+// 	const data = await request.file();
+// 	if (!data)
+// 		return reply.send({ error: 'NO avatar'});
+// 	return reply.send({ data });
+
+// });
 
 async function configure() {
 	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173'];
@@ -69,8 +152,8 @@ fastify.post('/users', async (request, reply)=>{
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO users (login, email, password) VALUES (?, ?, ?)`,
-				[login, email, hashedPassword],
+				`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
+				[login, email, hashedPassword, '/images/default_avatar.png'],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
@@ -226,12 +309,35 @@ fastify.post('/login', async (request, reply)=>{
 });
 
 fastify.get('/me', async (req, rep) => {
-	const user = req.session.get('user');
-	if (!user) {
+	const userMe = req.session.get('user');
+	if (!userMe) {
 		return rep.send({ error: 'Disconnected'});
 	}
+
+	const user = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT * FROM users WHERE login = ?`,
+				[userMe.login],
+				(err, row)=>{
+					if (err) {
+						reject(err);
+					} else {
+						resolve(row);
+					}
+				}
+			);
+		});
+
 	return rep.send({ user });
 });
+
+// fastify.get('/me', async (req, rep) => {
+// 	const user = req.session.get('user');
+// 	if (!user) {
+// 		return rep.send({ error: 'Disconnected'});
+// 	}
+// 	return rep.send({ user });
+// });
 
 function updateIsNotConnected(userId) {
 	db.serialize(async()=>{

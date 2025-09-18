@@ -1,5 +1,7 @@
 <script setup lang="ts">
 	import { ref, onMounted, nextTick, watch } from 'vue';
+	import axios from 'axios';
+
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 	}>();
@@ -16,6 +18,69 @@
 	}
 		
 	const act: player = {email: "test@test.fr", login: "test" , avatar: "../../../images/default_avatar.png"};
+
+	const avatarFile = ref<File | null>(null);
+	const uploadedAvatar = ref("");
+
+	const handleAvatarChange = (event: Event) => {
+		const input = event.target as HTMLInputElement;
+		if (input.files && input.files[0]) {
+			avatarFile.value = input.files[0];
+		}
+	};
+
+	const getUserLogin = async function userLogin() {
+		try {
+			const response = await fetch(`http://${window.location.hostname}:3000/me` , {
+				method :'GET',
+				credentials: 'include',
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				return (data.user.login);
+			}
+			else 
+				console.log("Erreur de recuperation du user");
+		} catch (err) {
+				console.error("Erreur de deconnexion:", err);
+		}
+	};
+
+	const uploadAvatar = async () => {
+		if (!avatarFile.value) {
+			console.warn("AUcun fichier selectionne");
+			return ;
+		}
+		console.log("Fichier à uploader:", avatarFile.value);
+		const formData = new FormData();
+		formData.append("file", avatarFile.value);
+
+
+		const userLogin = getUserLogin();
+
+		try {
+			const response = await axios.post(`http://${window.location.hostname}:3000/upload-avatar`, formData, {
+				withCredentials: true,
+				headers: {
+                'Content-Type': undefined // ou 'multipart/form-data' si 'undefined' ne marche pas, mais c'est moins fiable
+				},
+			});
+
+			const result = response.data;
+			console.log('Upload réussi:', result);
+
+			if (result.avatar_url) {
+				act.avatar = `http://${window.location.hostname}:3000${result.avatar_url}`;
+				uploadedAvatar.value = act.avatar;
+			} else {
+				console.error("Erreur lors de l'upload");
+			}
+		} catch (error) {
+			console.error("Erreur lors de la requete:", error);
+		}
+	}
+
 </script>
 
 <template>
@@ -29,10 +94,10 @@
 				</div>
 			</div>	
 			<div title="avatar_container" class="set_container" > 
-				<form title="form_avatar" class="set_form" >
+				<form title="form_avatar" class="set_form" @submit.prevent="uploadAvatar">
 					<label title="avatar_label" class="set_subtitle" data-i18n="setting.avatar" ></label>
 					<div class="set_sub_inp">
-						<input title="avatar_input" class="set_input" type="avatar_src" id="avatar_src" v-model="new_avatar_src" required></input>
+						<input title="avatar_input" class="set_input" type="file" id="avatar_src" required @change="handleAvatarChange"></input>
 						<button type="submit" title="avatar_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div class="set_error">source invalide</div>
