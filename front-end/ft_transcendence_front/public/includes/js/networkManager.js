@@ -2,6 +2,7 @@
 
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
+import { returnToLobby } from './app.js'
 
 // On determine le protocole WebSocket. Si la page est en HTTPS, on utilise 'wss:', sinon 'ws:'.
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -23,7 +24,7 @@ let mainAppInitializer = null;
  * @param {function} initializer - La fonction a appeler quand le jeu doit demarrer.
  */
 export function setAppInitializer(initializer) {
-    mainAppInitializer = initializer;
+	mainAppInitializer = initializer;
 }
 
 
@@ -160,6 +161,13 @@ class NetworkManager {
 					console.log("- Perdant:", endData.loser);
 					console.log("- Duree:", endData.duration, "secondes");
 					endGame(gameState, finalMessage);
+
+					//test partage donnees sur front
+					const gameResultEvent = new CustomEvent('gameresult', {
+					detail: message.data
+						});
+					window.dispatchEvent(gameResultEvent);
+					returnToLobby();
 					break;
 				
 				case 'error':
