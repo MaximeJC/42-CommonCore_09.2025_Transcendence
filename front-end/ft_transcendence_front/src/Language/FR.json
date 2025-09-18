@@ -65,6 +65,8 @@
 		"VS_ia": "Joueur VS IA",
 		"VS_player": "Un VS Un",
 		"2_VS_2": "Deux VS Deux",
-		"tournament": "Tournoi"
+		"tournament": "Tournoi",
+		"4_players": "4 Joueurs",
+		"8_players": "8 Joueurs"
 	}
 }

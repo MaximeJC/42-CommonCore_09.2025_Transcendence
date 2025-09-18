@@ -3,6 +3,7 @@
 	import * as BABYLON from "babylonjs"
 	import * as GUI from "@babylonjs/gui"
 	import { user } from '../../user';
+	import tournament from "./tournament_page.vue";
 	// Importe la fonction de demarrage depuis le module app.js.
 	import { startMatchmaking } from "../../../public/includes/js/app.js";
 
@@ -63,13 +64,13 @@
 </script>
 
 <template>
-	
-<!-- <div class="game-wrapper"> -->
-	<div class="home_disconnect">
-		<!-- lobby -->
+	<div v-show="props.activePlay != 'tournament'" class="home_disconnect">
 		<div id="lobby"></div>
 
 		<canvas id="renderCanvas"></canvas>
+	</div>
+	<div v-show="props.activePlay === 'tournament'">
+		<tournament :setLanguage="props.setLanguage"></tournament>
 	</div>
 </template>
 
