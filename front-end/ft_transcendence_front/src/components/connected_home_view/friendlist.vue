@@ -152,7 +152,7 @@ onMounted(()=>{ fetchFriends(); });
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<button @click="showOtherPlayer(friend.name)" class="avatar_button">{{ friend.name }}
+					<button @click="showOtherPlayer(friend.name)" class="avatar_button">
 						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
 					</button>
 					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>

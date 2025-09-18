@@ -50,10 +50,25 @@ fastify.post('/upload-avatar', async (request, reply) => {
 			return reply.status(400).send({ error: 'No file uploaded' });
 		}
 
-		const filename = `${Date.now()}-${data.filename}`;
+		const user = request.session.get('user');
+		if (!user || !user.login) {
+			return reply.status(401).send({ error: 'User not logged in' });
+		}
+
+		const filename = `${user.login}-${data.filename}`;
 		const saveTo = path.join(newdir, 'uploads', filename); //TODO : Voir pour le bon chemin
 
 		try {
+
+			const fileToDelete = fs.readdirSync(`${newdir}/uploads`);
+			console.log("fileToDelete:", fileToDelete);
+			for (const file of fileToDelete) {
+				console.log("file:", file);
+				if (file.startsWith(`${user.login}-`)) {
+					fs.unlinkSync(path.join(`${newdir}/uploads`, file));
+				}
+			}
+
 			// Utiliser pipeline pour sauvegarder le fichier de maniere securisee et efficace
 			console.log(`[AVATAR] Sauvegarde dans: ${saveTo}`);
 			await pipeline(data.file, fs.createWriteStream(saveTo));
@@ -62,11 +77,6 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		} catch (err) {
 			console.error("Erreur lors de la sauvegarde du fichier:", err);
 			return reply.status(500).send({ error: 'Could not save the file' });
-		}
-		
-		const user = request.session.get('user');
-		if (!user || !user.login) {
-			return reply.status(401).send({ error: 'User not logged in' });
 		}
 
 		const relativePath = `/uploads/${filename}`;
