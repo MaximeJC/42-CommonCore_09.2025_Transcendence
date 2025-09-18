@@ -49,8 +49,8 @@ services:
       dockerfile: Dockerfile
     image: hgp_database_img
     # env_file: ./.env
-    volumes:
-      - sqlite_data:/var/lib/sqlite
+    # volumes:
+    #   - sqlite_data:/var/lib/sqlite
     networks:
       - transcendence_network
     restart: unless-stopped
