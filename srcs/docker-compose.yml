@@ -1,10 +1,10 @@
 services:
   ai_server:
-    container_name: HGP_ai_server
+    container_name: hgp_ai_server
     build:
       context: ./requirements/ai_server
       dockerfile: Dockerfile
-    image: HGP_ai_server_img
+    image: hgp_ai_server_img
     # env_file: ./.env
     # depends_on:
     #   - game_management
@@ -13,11 +13,11 @@ services:
     restart: unless-stopped
 
   front_end:
-    container_name: HGP_front_end
+    container_name: hgp_front_end
     build:
       context: ./requirements/front_end
       dockerfile: Dockerfile
-    image: HGP_front_end_img
+    image: hgp_front_end_img
     # env_file: ./.env
     # depends_on:
     #   - game_management
@@ -30,11 +30,11 @@ services:
     restart: unless-stopped
 
   game_management:
-    container_name: HGP_game_management
+    container_name: hgp_game_management
     build:
       context: ./requirements/game_management
       dockerfile: Dockerfile
-    image: HGP_game_management_img
+    image: hgp_game_management_img
     # env_file: ./.env
     # depends_on:
     #   - sqlite3
@@ -43,11 +43,11 @@ services:
     restart: unless-stopped
 
   sqlite3:
-    container_name: HGP_database
+    container_name: hgp_database
     build:
       context: ./requirements/database
       dockerfile: Dockerfile
-    image: HGP_database_img
+    image: hgp_database_img
     # env_file: ./.env
     volumes:
       - sqlite_data:/var/lib/sqlite
@@ -56,11 +56,11 @@ services:
     restart: unless-stopped
 
   user_management:
-    container_name: HGP_user_management
+    container_name: hgp_user_management
     build:
       context: ./requirements/user_management
       dockerfile: Dockerfile
-    image: HGP_user_management_img
+    image: hgp_user_management_img
     # env_file: ./.env
     # depends_on:
     #   - sqlite3
