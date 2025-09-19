@@ -41,7 +41,7 @@ node db_server.js
 	# ajouter une partie:
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
-		-d '{"login_winner": "Louise", "login_loser": "axel", "score_winner": "6", "score_loser": "4"}' \
+		-d '{"login_winner": "Louise", "login_loser": "Bimo", "score_winner": "6", "score_loser": "4"}' \
 
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
@@ -81,7 +81,7 @@ node db_server.js
 	# tester la recuperation d'infos sur l'utilisateur connecte:
 		npm install node-fetch # si besoin
 		# creer un fichier test.js a l'interieur duquel:
-		fetch('http://localhost:3000/users/current?login=Louise')    
+		fetch('http://localhost:3000/users/specificlogin?login=Louise')    
 			.then(response => response.json())
 			.then(data => console.log('Données utilisateur:', data))
 			.catch(error => console.error('Erreur:', error));

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 
 import { ref, onMounted, defineProps } from 'vue';
-import play_historic from "./play&historic_button.vue" 
-import play_return from "./play&return_button.vue" 
-import invit_return from "./invit&return_button.vue" 
+import play_historic from "./play&historic_button.vue";
+import play_return from "./play&return_button.vue";
+import invit_return from "./invit&return_button.vue";
+import { watch } from 'vue';
 
 const emit = defineEmits(['showOtherPlayer']);
 
@@ -22,17 +23,9 @@ const playerData = ref({
 	rank: 0,
 });
 
-/* async function fetchPlayerData() {
+async function fetchOtherPlayerData(otherPlayerLogin: string) {
 	try {
-		//todo recuperer le login de l'utilisateur connecte
-		// const currentUserLogin = "Louise";
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const currentUserLogin = currentUser.user.login;
-
-		const response = await fetch(`http://${window.location.hostname}:3000/users/current?login=${currentUserLogin}`);
+		const response = await fetch(`http://${window.location.hostname}:3000/users/specificlogin?login=${otherPlayerLogin}`);
 		if (!response.ok)
 			throw new Error('Player data fetch error');
 
@@ -47,7 +40,15 @@ const playerData = ref({
 		console.log("Error:", error);
 	}
 }
-onMounted(()=>{ fetchPlayerData(); });
+
+watch(
+    () => props.selectedPlayerLogin,
+    (newLogin) => {
+        if (newLogin)
+            fetchOtherPlayerData(newLogin);
+    },
+    { immediate: true }
+);
 
 /* async function fetchPlayerData(retries = 5, delay = 1000) {
 	try {
@@ -87,21 +88,17 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
-			<div title="login" class="login">
-				<!--<div v-if="currentUser?.login">{{ currentUser.login }}</div>-->
-			</div>
+			<div title="login" class="login">{{ playerData.login }}</div>
 		</div>
 		<div class="stat-container">
-			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
-			<!--<div title="nbr_game_stat" class="stat"v-if="currentUser">{{ currentUser.nb_games }}</div>-->
+			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games">{{ playerData.nb_games }}</div>
+				
 		</div>
 		<div class="stat-container">
-			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
-			<!--<div title="nbr-victory_stat" class="stat"v-if="currentUser">{{ currentUser.nb_won_games }}</div>-->
+			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory">{{ playerData.nb_won_games }}</div>
 		</div>
 		<div class="stat-container">
-			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
-			<!--<div title="rank_stat" class="stat" v-if="currentUser">{{ currentUser.rank }}</div>-->
+			<div title="rank" class="label_stat" data-i18n="player_stat.rank">{{ playerData.rank }}</div>
 		</div>
 		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
