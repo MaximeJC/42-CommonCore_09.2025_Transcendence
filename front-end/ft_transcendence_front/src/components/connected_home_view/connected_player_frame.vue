@@ -33,7 +33,7 @@ const playerData = ref({
 		const currentUser = await current.json();
 		const currentUserLogin = currentUser.user.login;
 
-		const response = await fetch(`http://${window.location.hostname}:3000/users/current?login=${currentUserLogin}`);
+		const response = await fetch(`http://${window.location.hostname}:3000/users/specificlogin?login=${currentUserLogin}`);
 		if (!response.ok)
 			throw new Error('Player data fetch error');
 
@@ -50,7 +50,7 @@ const playerData = ref({
 }
 onMounted(()=>{ fetchPlayerData(); });
 
-/* async function fetchPlayerData(retries = 5, delay = 1000) {
+async function fetchPlayerData(retries = 5, delay = 1000) {
 	try {
 		for (let i = 0; i < retries; i++) {
 			const response = await fetch(`http://${window.location.hostname}:3000/me`, {

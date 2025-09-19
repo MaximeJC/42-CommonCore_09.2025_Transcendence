@@ -250,7 +250,6 @@ fastify.post('/deleteuser', async (request, reply)=>{
 });
 
 // verifier les identifiants:
-
 function updateIsConnected(userId) {
 	db.serialize(async()=>{
 		try {
@@ -371,7 +370,7 @@ fastify.get('/logout', async (request, reply) => {
 // 	});
 });
 
-// fastify.get('/users/current', async (request, reply)=>{
+// fastify.get('/users/specificlogin', async (request, reply)=>{
 // 	try {
 // 		const row = await new Promise((resolve, reject)=>{
 // 			db.all(
@@ -754,8 +753,8 @@ fastify.post('/friends/delete', async (request, reply)=>{
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS CONNECTES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Informations sur l'utilisateur actuellement connecte, pour l'affichage par connected_player_frame.vue
-fastify.get('/users/current', async (request, reply)=>{
+// Informations sur un utilisateur en particulier, pour l'affichage par connected_player_frame.vue
+fastify.get('/users/specificlogin', async (request, reply)=>{
 	const login = request.query.login;
 	if (!login)
 		return reply.status(400).send({ error: "Missing login" });
