@@ -1,9 +1,17 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 const sqlite = sqlite3.verbose();
 
-let db = new sqlite3.Database('./database.db');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dbPath = path.join(__dirname, 'database.db');
+console.log(`Chemin de la DB : ${dbPath}`);
+
+let db = new sqlite3.Database(dbPath);
 
 // creer table d'utilisateurs, table de parties et table d'amities
 db.serialize(()=>{
