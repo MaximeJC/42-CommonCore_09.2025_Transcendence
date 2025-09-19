@@ -84,7 +84,7 @@ db.serialize(()=>{
 
 export async function getUserByEmail(email) {
 	db = await open({
-			filename: './database.db',
+			filename: dbPath,
 			driver: sqlite3.Database,
 		});
 		console.log('Base de données ouverte');
