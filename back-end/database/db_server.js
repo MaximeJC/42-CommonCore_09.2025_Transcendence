@@ -109,7 +109,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 // });
 
 async function configure() {
-	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173'];
+	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173', 'http://10.12.12.2:5173'];
 
 	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
 

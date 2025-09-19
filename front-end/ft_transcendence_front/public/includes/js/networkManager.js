@@ -12,7 +12,9 @@ const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const host = window.location.host;
 
 // On assemble l'URL complete du WebSocket.
-const WS_URL = `${protocol}//localhost:3003`;
+// const WS_URL = `${protocol}//localhost:3003`;
+const hostname = window.location.hostname;
+const WS_URL = `${protocol}//${hostname}:3003`;
 
 console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
@@ -160,6 +162,7 @@ class NetworkManager {
 					console.log("- Vainqueur:", endData.winner);
 					console.log("- Perdant:", endData.loser);
 					console.log("- Duree:", endData.duration, "secondes");
+					console.log("gameMode:", endData.gameMode);
 					endGame(gameState, finalMessage);
 
 					//test partage donnees sur front

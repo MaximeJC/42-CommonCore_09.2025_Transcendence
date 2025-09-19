@@ -342,7 +342,8 @@ export class GameInstance {
 						loser: loserPseudo,
 						duration: this.gameDurationInSeconds,
 						score_left: score_left,
-						score_right: score_right
+						score_right: score_right,
+						gameMode: this.gameState.gameMode
 					}
 				}));
 			}
