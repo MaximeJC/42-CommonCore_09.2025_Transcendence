@@ -22,7 +22,8 @@
 		loser: 'leperdant',
 		score_left: 0,
 		score_right: 0,
-		duration: 0
+		duration: 0,
+		gameMode: '1V1_ONLINE'
 	});
 
 
@@ -36,11 +37,37 @@
 		language: string; //en, fr, es
 	};
 
+	async function addGameToDataBase(newGame: any) {
+		if (!newGame.winner || !newGame.loser) {
+			console.error("Donnees de partie incompletes", newGame);
+			return;
+		}
+		try {
+			const response = await fetch(`http://${window.location.hostname}:3000/games`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					login_winner: newGame.winner,
+					login_loser: newGame.loser,
+					score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
+					score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right
+				})
+			});
+			if (!response.ok)
+				throw new Error(`Erreur http: ${response.status}`);
+			console.log("Partie enregistree dans la base de donnees avec succes.");
+		} catch (err) {
+			console.error("Erreur d'ajout de partie a la base de donnees:", err);
+		}
+	}
+
 	// --- GESTION DE L'EVENEMENT DE FIN DE PARTIE ---
 	function handleGameResult(event: CustomEvent) {
 		console.log("Evenement 'gameresult' capture par Vue!", event.detail);
 		gameResult.value = event.detail; // Met a jour nos donnees
 		showResultScreen.value = true;
+		addGameToDataBase(gameResult.value);
 	}
 
 	function handleStartGame() {
@@ -79,11 +106,12 @@
 	});
 
 	watch(() => props.activePlay, (newVal) => {
-		if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" ){
+		//todo gerer ce if...
+		// if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" ){
 			nextTick().then(() => {
 				handleStartGame();
 			});
-		}
+		// }
 	})
 </script>
 
@@ -112,8 +140,9 @@
 				<div class="grid-row">
 					<div class="stat1">{{ gameResult.score_left }}</div>
 					<div class="stat1">{{ gameResult.loser }}</div>
-					<div class="stat2">{{ gameResult.duration }} s</div>
+					<div class="stat2">{{ gameResult.duration }}</div>
 					<div class="stat2">{{ gameResult.score_right }}</div>
+					<!-- <div class="stat2">{{ gameResult.gameMode }}</div> -->
 				</div>
 			</div>
 	</div>
