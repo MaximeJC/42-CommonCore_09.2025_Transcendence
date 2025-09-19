@@ -291,21 +291,38 @@ fastify.post('/login', async (request, reply)=>{
 		console.log("****************************************");
 	}
 
+	// Validation de base
+	if (!email || !password) {
+        return reply.status(400).send({ success: false, message: "Email and password are required." });
+    }
+
 	const user = await getUserByEmail(email);
 	if (DEBUG_MODE)
 		console.log("Utilisateur trouve: ", user);
+
 	if (user) {
 		if (DEBUG_MODE) {
 			console.log("****************************************");
 			console.log('user', user.password);
 			console.log("****************************************");
 		}
-		if (await bcrypt.compare(password, user.password) === true) {
+		const passwordMatch = await bcrypt.compare(password, user.password);
+
+		if (passwordMatch === true) {
+			
 			if (DEBUG_MODE)
 				console.log("User Ok");
 			request.session.set('user', user);
 			updateIsConnected(user.id);
 			return reply.send({ success: true, user: user });
+		} else {
+			// Le mot de passe est incorrect
+			if (DEBUG_MODE) console.log("Mot de passe incorrect pour l'utilisateur:", user.login);
+			return reply.status(401).send({ 
+				success: false, 
+				message: "Invalid credentials.", 
+				field: "password"
+			});
 		}
 	} else {
 		if (DEBUG_MODE) {
@@ -313,7 +330,7 @@ fastify.post('/login', async (request, reply)=>{
 			console.log("Wrong user");
 			console.log("****************************************");
 		}
-		return reply.send({ success: false, message: "Wrong email and/or password" });
+		return reply.status(401).send({ success: false, message: "Invalid credentials.", field: "email"	});
 	}
 });
 

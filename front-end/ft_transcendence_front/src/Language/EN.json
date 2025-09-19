@@ -17,6 +17,7 @@
 		"login_used_error": "The Username is already in use.",
 		"mail_used_error": "The email is already in use.",
 		"password_error": "Password conditions.",
+		"password_invalid": "Incorrect password.",
 		"conf_password_error": "The two passwords are not identical.",
 		"submit": "SUBMIT"
 	},

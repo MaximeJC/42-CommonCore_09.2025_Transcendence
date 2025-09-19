@@ -17,6 +17,7 @@
 		"login_used_error": "Le nom d'utilisateur est déjà utilisé",
 		"mail_used_error": "Email est déjà utilisé",
 		"password_error": "Condition du mot de passe.",
+		"password_invalid": "Mot de passe incorrect.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
 		"submit": "VALIDER"
 	},

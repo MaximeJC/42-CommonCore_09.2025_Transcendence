@@ -17,6 +17,7 @@
 		"login_used_error": "El nombre de usuario ya está en uso",
 		"mail_used_error": "El correo electrónico ya está en uso.",
 		"password_error": "Condiciones de la contraseña.",
+		"password_invalid": "Contraseña incorrecta.",
 		"conf_password_error": "Las dos contraseñas no son idénticas.",
 		"submit": "ENVIAR"
 	},
