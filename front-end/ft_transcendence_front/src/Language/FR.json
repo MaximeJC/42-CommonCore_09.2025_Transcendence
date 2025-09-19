@@ -14,6 +14,8 @@
 		"conf_password": "Confirmation du mot de passe",
 		"login_error": "le Pseudo doit faire entre 3 et 13 caractères.",
 		"mail_error": "Email invalide.",
+		"login_used_error": "Le nom d'utilisateur est déjà utilisé",
+		"mail_used_error": "Email est déjà utilisé",
 		"password_error": "Condition du mot de passe.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
 		"submit": "VALIDER"

@@ -171,10 +171,10 @@ fastify.post('/users', async (request, reply)=>{
 		if (DEBUG_MODE)
 			console.log("Erreur d'ajout d'un utilisateur:", err.stack);
 		if (err.code === 'SQLITE_CONSTRAINT') {
-			if (err.message.includes('UNIQUE constraint failed: user.email'))
-				return reply.status(409).send({ success: false, message: "Email already used." });
-			else if (err.message.includes('UNIQUE constraint failed: users.login'))
-				return reply.status(409).send({ success: false, message: "Login already used." });
+			if (err.message.includes('UNIQUE constraint failed: users.login'))
+				return reply.status(409).send({ success: false, message: "Login already used.", field: "login" });
+			else if (err.message.includes('UNIQUE constraint failed: users.email'))
+				return reply.status(409).send({ success: false, message: "Email already used.", field: "email" });
 		}
 		reply.status(500).send({ success: false, message: "Server error: " + err.message });
 	}

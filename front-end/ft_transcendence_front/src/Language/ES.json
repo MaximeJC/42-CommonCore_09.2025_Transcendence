@@ -14,6 +14,8 @@
 		"conf_password": "Confirmación de la contraseña",
 		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
 		"mail_error": "Correo electrónico no válido.",
+		"login_used_error": "El nombre de usuario ya está en uso",
+		"mail_used_error": "El correo electrónico ya está en uso.",
 		"password_error": "Condiciones de la contraseña.",
 		"conf_password_error": "Las dos contraseñas no son idénticas.",
 		"submit": "ENVIAR"

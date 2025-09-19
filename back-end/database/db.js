@@ -98,11 +98,27 @@ export async function getUserByEmail(email) {
 	}
 }
 
+export async function getUserByLogin(login) {
+	db = await open({
+			filename: dbPath,
+			driver: sqlite3.Database,
+		});
+		console.log('Base de données ouverte');
+	try {
+		const user = db.get("SELECT * FROM users WHERE login = ?", [login]);
+		console.log('login trouvé en base:', user);
+		return (user);
+	} catch (err) {
+		console.error('Erreur dans getUserByLogin:', err);
+		throw err;
+	}
+}
+
 // export async function getUsers() {
 // 	return db.all("SELECT login, email FROM users");
 // }
 
-export default { db, getUserByEmail }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
+export default { db, getUserByEmail, getUserByLogin }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
 
 //todo salt_key ? cle de cryptage des mdp
 
