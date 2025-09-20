@@ -9,7 +9,7 @@ const props = defineProps<{
 
 interface Match{
 	win: boolean;
-	date: number;
+	date: string | number;
 	c_login: string;
 	score_c: number;
 	o_login: string;
@@ -17,6 +17,18 @@ interface Match{
 }
 
 const matches = ref<Match[]>([]);
+
+function formatDate(date: string | number): string {
+	// Si `date` est un nombre (timestamp en secondes), le convertir en millisecondes
+	const dateObj = typeof date === 'number' ? new Date(date * 1000) : new Date(date);
+
+	const day = String(dateObj.getDate()).padStart(2, '0');
+	const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+	const hours = String(dateObj.getHours()).padStart(2, '0');
+	const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+	
+	return `${day}/${month} - ${hours}:${minutes}`;
+}
 
 async function fetchGames(login: string) {
 	try {
@@ -79,7 +91,7 @@ watch(()=>props.playerLogin, (newLogin)=>{
 				</div>
 				<div>{{ match.c_login }}</div>
 				<div>{{ match.score_c }}</div>
-				<div>{{ match.date }} min </div>
+				<div>{{ formatDate(match.date) }} </div>
 				<div>{{ match.score_o }}</div>
 				<div>{{ match.o_login }}</div>
 			</div>
