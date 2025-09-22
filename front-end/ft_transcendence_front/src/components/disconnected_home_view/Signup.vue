@@ -164,7 +164,6 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 
 	.frame-signup{
 		width: 25rem;
-
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-auto-rows: min-content;
@@ -180,10 +179,8 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		padding: 2rem 3rem;
 		border-radius: 20px;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-		margin-top: 3rem
+		margin-top: 3rem auto;
 	}
-
-	
 
 	.signUpTitle{
 		display: flex;
@@ -238,7 +235,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 	}
 
 	.input{
-		width: 25rem;
+		width: 100%;
 		font-size: 1.2em;
 		margin-bottom: 0.5rem;
 		border-radius: 20px;
@@ -344,47 +341,73 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		0 0 40px #dd0aba,
 		0 0 80px #dd0aba;
 	}
-	@media (max-width: 1600px) {
-		.frame-signup{
-			width: 40rem;
-			padding: 2rem 3rem;
-			margin-top: 3rem
+
+	@media (max-width: 1200px) {
+		.frame-signup {
+			width: 25rem;
+			margin-top: 2rem;
 		}
-		.signUpTitle{
-			font-size: 2.5rem;
-			margin-bottom: 1rem;
+
+		.input {
+			width: 90%;
+			font-size: 1.2em;
+			margin-bottom: 0.5rem;
+			border-radius: 20px;
+			border: none;
+			padding: 0.1rem 1rem;
 		}
-		.input{
-		width: 40rem;
-		font-size: 1.2em;
+	}
+
+	@media (max-width: 768px) {
+		.frame-signup {
+			width: 30rem;
+			padding: 2rem;
 		}
-		.error{
-			font-size: 0.8rem;
+		.signUpTitle {
+			font-size: 2.2rem;
 		}
-		.line-button{
-			margin-top: 0.1rem;
-		}
-		.ft-button{
+		.ft-button {
 			height: 4.5rem;
 			width: 4.5rem;
-			margin-top: 0.2rem;
 		}
-		.Submit-button{
-			margin-top: 0.4rem;
+		.Submit-button {
+			font-size: 1.8rem;
+		}
+	}
 
+	@media (max-width: 480px) {
+		.frame-signup {
+			width: 95%;
+			padding: 1.5rem 1rem;
+			margin-top: 1.5rem;
+		}
+		.signUpTitle {
 			font-size: 2rem;
-			padding: 0.5rem 2rem;
 		}
-		.Submit-button > div{
-			margin-top:  0.5rem;
+		.subtitle {
+			font-size: 1.1rem;
+		}
+		.error {
+			font-size: 0.9rem;
+		}
+		.ft-button {
+			height: 4rem;
+			width: 4rem;
+		}
+		.Submit-button {
+			font-size: 1.6rem;
+		}
+		.Submit-button > div {
+			margin-top: 0.8rem;
 		}
 
-	}
-
-	@media (max-width: 992px) {
-    	
-	}
-	@media (max-width: 576px) {
-    	
+		.input {
+			width: 85%;
+			font-size: 1.2em;
+			margin-bottom: 0.5rem;
+			border-radius: 20px;
+			border: none;
+			padding: 0.1rem 1rem;
+		}
 	}
 </style>
