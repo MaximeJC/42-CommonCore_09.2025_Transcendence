@@ -1,14 +1,19 @@
 <script setup lang="ts">
-	import { ref, onMounted, nextTick, watch } from 'vue';
-	import player_frame from '../components/connected_home_view/connected_player_frame.vue'
-	import otherplayer_frame from '../components/connected_home_view/connected_otherplayer_frame.vue'
-	import leaderbord from '../components/connected_home_view/leaderbord.vue';
-	import friendlist from '../components/connected_home_view/friendlist.vue';
-	import histo from '@/components/connected_home_view/historic.vue';
-	import histo_other from '@/components/connected_home_view/historic_other.vue'
+import { ref, onMounted, nextTick, watch } from 'vue';
+import { setLanguage, updateText } from '../service/translators';
+import player_frame from '../components/connected_home_view/connected_player_frame.vue'
+import otherplayer_frame from '../components/connected_home_view/connected_otherplayer_frame.vue'
+import leaderbord from '../components/connected_home_view/leaderbord.vue';
+import friendlist from '../components/connected_home_view/friendlist.vue';
+import histo from '@/components/connected_home_view/historic.vue';
+import histo_other from '@/components/connected_home_view/historic_other.vue'
 
-	const emit = defineEmits(['show_play']);
+const emit = defineEmits(['show_play']);
 
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
 
 const historic = ref(false);
 const other_player = ref(false);
