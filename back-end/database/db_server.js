@@ -118,21 +118,32 @@ fastify.post('/upload-avatar', async (request, reply) => {
 
 // });
 
-async function configure() {
-	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173', 'http://10.12.12.2:5173'];
+	async function configure() {
+	const allowedOrigins = [
+		'http://localhost:5173',
+		'http://127.0.0.1:5173',
+	];
+
+	await fastify.register(cors, {
+		origin: (origin, cb) => {
+			if (!origin) {
+				return cb(null, true);
+			}
+			if (allowedOrigins.includes(origin)) {
+				return cb(null, true);
+			}
+
+			if (origin.startsWith('http://10.') || origin.startsWith('http://192.') ||
+				origin.startsWith('https://10.') || origin.startsWith('https://192.'))
+			{
+				return cb(null, true);
+			}
+			cb(new Error(`Not allowed by CORS: ${origin}`));
+		},
+		credentials: true
+	});
 
 	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
-
-	await fastify.register(cors, { 
-		origin: (origin, cb) => {
-			if (!origin || allowedOrigin.includes(origin)) {
-				cb(null, true);
-			} else {
-				cb(new Error(`Not allowed by CORS: ${origin}`));
-			}
-		}, 
-		credentials: true
-	}); // autoriser n'importe qui a appeler l'API de ce serveur
 
 	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
 
@@ -293,8 +304,8 @@ fastify.post('/login', async (request, reply)=>{
 
 	// Validation de base
 	if (!email || !password) {
-        return reply.status(400).send({ success: false, message: "Email and password are required." });
-    }
+		return reply.status(400).send({ success: false, message: "Email and password are required." });
+	}
 
 	const user = await getUserByEmail(email);
 	if (DEBUG_MODE)

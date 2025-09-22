@@ -165,7 +165,7 @@ function handleMatchmaking(playerInfo, gameMode)
 			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
 		}
 	} else {
-		console.error(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
+		console.log(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
 		return;
 	}
 
