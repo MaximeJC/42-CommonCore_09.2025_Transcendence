@@ -4,8 +4,6 @@ import { user } from '../../user';
 import tournament from "./tournament_page.vue";
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
-// const emit = defineEmits(['gameisfinish']);
-
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
@@ -82,7 +80,6 @@ function handleGameResult(event: CustomEvent) {
 const handleReturnToLobby = () => {
 	console.log("retour au lobby recu!");
 	showResultScreen.value = false;
-	// emit('gameisfinish');
 	const target = 'profil';
 	window.location.hash = target.startsWith('/') ? target : '/' + target;
 }

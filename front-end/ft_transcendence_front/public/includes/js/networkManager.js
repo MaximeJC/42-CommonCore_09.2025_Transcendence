@@ -170,7 +170,7 @@ class NetworkManager {
 					detail: message.data
 						});
 					window.dispatchEvent(gameResultEvent);
-					returnToLobby();
+					returnToLobby(true);
 					break;
 				
 				case 'error':
