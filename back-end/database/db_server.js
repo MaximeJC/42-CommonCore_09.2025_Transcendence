@@ -8,6 +8,7 @@ import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
+import validator from 'validator';
 import { dirname } from 'path';
 
 import crypto from 'crypto';
@@ -157,13 +158,23 @@ fastify.post('/users', async (request, reply)=>{
 	if (!login || !email || !password) {
 		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing" });
 	}
-	const	hashedPassword = await bcrypt.hash(password, 10);
+	let cleanLogin, cleanEmail, cleanPassword;
+
+	cleanLogin = validator.trim(login);
+	cleanLogin = validator.escape(cleanLogin);
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	cleanPassword = validator.escape(password);
+
+	const	hashedPassword = await bcrypt.hash(cleanPassword, 10);
 
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
-				[login, email, hashedPassword, '/images/default_avatar.png'],
+				[cleanLogin, cleanEmail, hashedPassword, '/images/default_avatar.png'],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
