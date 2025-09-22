@@ -24,50 +24,53 @@
 	const offlineBox = ref<HTMLElement | null>(null);
 	const onlineBox =  ref<HTMLElement | null>(null);
 	const playBox =  ref<HTMLElement | null>(null);
-	//const handlePointerDownOutside = (e: PointerEvent) => {
-	//	const target = e.target as Node | null;
-	//	if (!target) return;
 
-	//	// Fermer offline seulement si ouvert et clic en dehors
-	//	if (offline_play.value && offlineBox.value && !offlineBox.value.contains(target)) {
-	//		offline_play.value = false;
-	//	}
+	const handlePointerDownOutside = (e: PointerEvent) => {
+		const target = e.target as Node | null;
+		if (!target) return;
 
-	//	// Fermer online seulement si ouvert et clic en dehors
-	//	if (online_play.value && onlineBox.value && !onlineBox.value.contains(target)) {
-	//		online_play.value = false;
-	//	}
+		if ((target as Element).closest && (target as Element).closest('[data-ignore-outside]')) return
 
-	//	// Gérer l'affichage du "play" uniquement quand rien d'autre n'est ouvert
-	//	if (!offline_play.value && !online_play.value && playBox.value && !playBox.value.contains(target)) {
-	//		if(props.show_play === true)
-	//			emit('show_play');
-	//	}
-	//};
+		// Fermer offline seulement si ouvert et clic en dehors
+		if (offline_play.value && offlineBox.value && !offlineBox.value.contains(target)) {
+			offline_play.value = false;
+		}
 
-	//const anyOpen = computed(() => offline_play.value || online_play.value|| playBox.value);
-	//watch(anyOpen, (newValue) => {
-	//	if (newValue) {
-	//		nextTick(() => {
-	//			document.addEventListener(
-	//				'pointerdown',
-	//				handlePointerDownOutside,
-	//				{ capture: true}
-	//			);
-	//		})
-	//	}	
-	//	else {
-	//		document.removeEventListener(
-	//			'pointerdown',
-	//			handlePointerDownOutside,
-	//			{ capture: true}
-	//		);
-	//	}
-	//});
+		// Fermer online seulement si ouvert et clic en dehors
+		if (online_play.value && onlineBox.value && !onlineBox.value.contains(target)) {
+			online_play.value = false;
+		}
 
-	//onUnmounted(() => {
-	//document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
-	//})
+		// Gérer l'affichage du "play" uniquement quand rien d'autre n'est ouvert
+		if (!offline_play.value && !online_play.value && playBox.value && !playBox.value.contains(target)) {
+			if(props.show_play === true)
+				emit('show_play');
+		}
+	};
+
+	const anyOpen = computed(() => offline_play.value || online_play.value|| playBox.value);
+	watch(anyOpen, (newValue) => {
+		if (newValue) {
+			nextTick(() => {
+				document.addEventListener(
+					'pointerdown',
+					handlePointerDownOutside,
+					{ capture: true}
+				);
+			})
+		}	
+		else {
+			document.removeEventListener(
+				'pointerdown',
+				handlePointerDownOutside,
+				{ capture: true}
+			);
+		}
+	});
+
+	onUnmounted(() => {
+	document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+	})
 
 	const typeplay = (connection: boolean, type: string ) => {
 		//console.log(pageName);

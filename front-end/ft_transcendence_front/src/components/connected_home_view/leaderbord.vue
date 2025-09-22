@@ -1,8 +1,12 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineExpose, nextTick , watch } from 'vue';
+import { ref, onMounted, defineExpose, watch} from 'vue';
+
+import { user } from '../../user';
+const { currentUser } = user();
+
 const props = defineProps<{
-		setLanguage: (lang: string) => void;
+	setLanguage: (lang: string) => void;
 }>();
 
 const emit = defineEmits(['showOtherPlayer']);
@@ -55,13 +59,12 @@ async function getPlayers() {
 		// ];
 	}
 }
-onMounted(()=>{ getPlayers() });
+// onMounted(()=>{ getPlayers() });
 
-watch(() => props.setLanguage, (newVal) => {
-	nextTick().then(() => {
-		getPlayers();
-	});
-})
+watch(() => currentUser.value?.login ?? "", (newLogin) => {
+	getPlayers();
+}, { immediate: true }); 
+
 </script>
 
 <template>

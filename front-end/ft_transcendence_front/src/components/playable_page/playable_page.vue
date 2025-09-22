@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
+import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
 import tournament from "./tournament_page.vue";
 import { startMatchmaking } from "../../../public/includes/js/app.js";
-
-const emit = defineEmits(['gameisfinish']);
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
 }>();
+
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
+
 
 const { currentUser } = user();
 
@@ -82,7 +87,8 @@ function handleGameResult(event: CustomEvent) {
 const handleReturnToLobby = () => {
 	console.log("retour au lobby recu!");
 	showResultScreen.value = false;
-	emit('gameisfinish');
+	const target = 'profil';
+	window.location.hash = target.startsWith('/') ? target : '/' + target;
 }
 
 function handleStartGame() {
@@ -124,11 +130,11 @@ onUnmounted(() => {
 
 watch(() => props.activePlay, (newVal) => {
 	//todo gerer ce if...
-	// if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" ){
+	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE"  ){
 		nextTick().then(() => {
 			handleStartGame();
 		});
-	// }
+	 }
 })
 
 </script>

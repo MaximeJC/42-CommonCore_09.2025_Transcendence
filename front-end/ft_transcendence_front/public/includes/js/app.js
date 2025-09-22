@@ -24,7 +24,7 @@ let activeScene = null;
 /**
  * Nettoie la scene de jeu actuelle et retourne au lobby.
  */
-function returnToLobby() {
+function returnToLobby(endgame) {
 	console.log("Nettoyage de la scene et retour au lobby...");
 
 	// Arreter la boucle de rendu pour eviter les erreurs
@@ -62,8 +62,8 @@ function returnToLobby() {
 		lobby.style.display = 'block';
 	if (canvas)
 		canvas.style.display = 'none';
-
-	window.dispatchEvent(new CustomEvent('babylon-returned-to-lobby'));
+	if (endgame === false)
+		window.dispatchEvent(new CustomEvent('babylon-returned-to-lobby'));
 }
 
 /**

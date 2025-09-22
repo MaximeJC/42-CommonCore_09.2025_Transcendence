@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick , watch } from 'vue';
+import { ref, onMounted, watch} from 'vue';
+
+import { user } from '../../user';
+const { currentUser } = user();
+
 const props = defineProps<{
-		setLanguage: (lang: string) => void;
+	setLanguage: (lang: string) => void;
 }>();
 
 const rootElement = ref<HTMLElement | null>(null);
@@ -29,16 +33,16 @@ interface Friend {
 
 const friends = ref<Friend[]>([]);
 
-async function fetchFriends() {
+async function fetchFriends(currentUserLogin: string) {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const currentUserLogin = currentUser.user.login;
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const currentUserLogin = currentUser.user.login;
 
 		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
@@ -60,14 +64,14 @@ async function fetchFriends() {
 
 async function addFriend() {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const ajouteur = currentUser.user.login;
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		const ajouteur = currentUser.value?.login ?? "";
 
 		const ajoute = search_friends.value;
 
@@ -89,7 +93,7 @@ async function addFriend() {
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami ajoute avec succes.");
-		fetchFriends();
+		fetchFriends(ajouteur);
 	} catch (err) {
 		console.error("Erreur de creation d'amitie:", err);
 	}
@@ -97,14 +101,14 @@ async function addFriend() {
 
 async function deleteFriend(unfriendLogin: string) {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const supprimeur = currentUser.user.login;
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		const supprimeur = currentUser.value?.login ?? "";
 
 		console.log("deleteFriend: supprimer =", supprimeur, ", supprime =", unfriendLogin);
 
@@ -121,19 +125,22 @@ async function deleteFriend(unfriendLogin: string) {
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami supprime avec succes.");
-		fetchFriends();
+		fetchFriends(supprimeur);
 	} catch (err) {
 		console.error("Erreur de suppression d'amitie:", err);
 	}
 }
 
-onMounted(()=>{ fetchFriends(); });
+// onMounted(()=>{ fetchFriends(); });
 
-watch(() => props.setLanguage, (newVal) => {
-	nextTick().then(() => {
-		fetchFriends();
-	});
-})
+
+watch(() => currentUser.value?.login ?? "", (newLogin) => {
+	if (newLogin !== "") { 
+		fetchFriends(currentUser.value?.login ?? "");
+	} else {
+		friends.value = [];
+	}
+}, { immediate: true }); 
 
 </script>
 
