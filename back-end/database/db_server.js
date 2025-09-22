@@ -822,7 +822,7 @@ fastify.get('/users/specificlogin', async (request, reply)=>{
 	try {
 		const user = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT login, avatar_url, nb_games, nb_won_games, rank FROM users WHERE login = ?`,
+				`SELECT login, avatar_url, nb_games, nb_won_games, connected, rank FROM users WHERE login = ?`,
 				[login],
 				(err, row)=>{
 					if (err) reject(err);

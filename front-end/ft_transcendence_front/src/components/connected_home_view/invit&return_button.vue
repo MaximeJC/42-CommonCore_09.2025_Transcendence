@@ -3,7 +3,12 @@ import { ref } from 'vue';
 
 const emit = defineEmits(['showOtherPlayer']);
 
-const isconnect = ref(false);
+//const isconnect = ref(false);
+
+const props = defineProps<{
+		setLanguage: (lang: string) => void;
+		connect: number;
+}>();
 
 async function addFriend() { //todo A TESTER
 	try {
@@ -32,10 +37,10 @@ async function addFriend() { //todo A TESTER
 
 <template>
 	<div title="button container" class="button-container">
-		<button v-show="isconnect" title="invit-button" class="invit-button">
+		<button v-show="props.connect === 1" title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
-		<button v-show="!isconnect" title="invit-button" class="d-invit-button">
+		<button v-show="props.connect === 0" title="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">

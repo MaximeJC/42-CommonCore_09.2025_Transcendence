@@ -22,6 +22,7 @@ const playerData = ref({
 	nb_games: 0,
 	nb_won_games: 0,
 	rank: 0,
+	connect: 0,
 });
 
 async function fetchOtherPlayerData(otherPlayerLogin: string) {
@@ -38,6 +39,7 @@ async function fetchOtherPlayerData(otherPlayerLogin: string) {
 			nb_games: data.nb_games,
 			nb_won_games: data.nb_won_games,
 			rank: data.rank,
+			connect: data.connected,
 		};
 		console.log(playerData);
 	} catch (error) {
@@ -108,7 +110,7 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat" >{{ playerData.rank }}</div>
 		</div>
-		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" ></invit_return>
+		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :connect="playerData.connect" :setLanguage="props.setLanguage" ></invit_return>
 	</div>
 </template>
 
