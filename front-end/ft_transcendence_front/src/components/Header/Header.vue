@@ -66,14 +66,14 @@
 	.header{
 		display: flex;
 		justify-content: space-between;
-		align-items:flex-start
+		align-items:center;
+		padding: 1rem 3rem;
 	}
 
 	.end-button{
 		display: flex;
 		justify-content: end;
-		margin-top: 2rem;
-		margin-right: 3rem;
+		align-items: stretch;
 		gap: 2rem;
 	}
 
@@ -102,8 +102,9 @@
 	}
 
 	.my-button > div {
-		margin-top: 0.5rem;
+	/*	margin-top: 0.5rem;*/
 	}
+
 	.my-button:hover{
 		background-color: rgba(251, 255, 34, 0.5);
 		border: 2px solid #fbff22;
@@ -127,9 +128,9 @@
 		background-color: rgba(156, 50, 133, 0);
 		font-family: neon;
 		color: #ffbcf4;
-		margin-left: 1.5rem;
+		/* margin-left: 1.5rem; */
 		font-size: 5rem;
-		margin-top: 1.4rem;
+		/* margin-top: 1.4rem; */
 		text-shadow: 
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
@@ -138,6 +139,7 @@
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
 		position: relative;
+		margin: 0;
 	}
 	.logo::after {
 		content: '';
@@ -156,49 +158,46 @@
 		left: 0;
 	}
 
-	@media (max-width: 1600px) {
-		.end-button{
-			margin-top: 1.5rem;
-			margin-right: 2rem;
-			gap: 1.5rem;
-		}
-
-		.my-button{
-			font-size: 1.5rem;
+	@media (max-width: 1200px) {
+		.header {
 			padding: 1rem 2rem;
 		}
-		.my-button > div {
-			margin-top: 0.5rem;
-		}
 		.logo {
-			font-size: 4rem; /* Ajustez la taille de la police */
-			margin-left: 1.2rem;
-			margin-top: 0.8rem;
-
+			font-size: 3.3rem;
 		}
 		.logo::after {
-			width: 32rem; /* Réduisez la longueur de la ligne */
+			width: 27rem;
+		}
+		.my-button {
+			font-size: 1.6rem;
+			padding: 0.8rem 1.5rem;
 		}
 	}
 
-	@media (max-width: 992px) {
-    	.logo {
-    	    font-size: 3rem;
-    	    margin-left: 1rem;
-			
-    	}
-    	.logo::after {
-    	    width: 24rem; /* Réduire la longueur de la ligne */
+	@media (max-width: 768px) {
+		.header {
+			flex-direction: column;
+			align-items: center;
+			gap: 2rem;
+			padding: 1.5rem 1rem;
 		}
-	}
-	@media (max-width: 576px) {
-    	.logo {
-    	    font-size: 2.5rem;
-    	    margin-left: 0.5rem;
-    	}
-    	.logo::after {
-    	    width: 100%;
-    	}
+
+		.logo {
+			text-align: center;
+			font-size: 3rem;
+		}
+
+		.logo::after {
+			width: 100%;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+
+		.end-button {
+			justify-content: center;
+			margin: 0;
+			width: 100%;
+		}
 	}
 	
 </style>
