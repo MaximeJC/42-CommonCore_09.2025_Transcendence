@@ -26,7 +26,6 @@
   </template>
 
 <style>
-
 	.lang-menu-container{
 		display: flex;
 		position: relative;
@@ -64,7 +63,7 @@
 
 	.lang-menu-button > div{
 		align-self: center;
-		margin-top: 0.5rem;
+		/*margin-top: 0.5rem;*/
 	}
 
 	.lang-menu-button:hover{
@@ -146,12 +145,54 @@
 
 	.lang-icon{
 		position:relative;
-		margin-bottom: 0.5rem;
-		width: 3.5rem;
-		height: 3.5rem;
+		margin-bottom: 0.4rem;
+		width: 3rem;
+		height: 3rem;
 		margin-right: 1rem;
 		transform: translateY(10%); 
 	}
 
-	
+	@media (max-width: 1200px) {
+		.lang-menu-button {
+			font-size: 1.6rem;
+			padding: 0.4rem 1.5rem;
+		}
+
+		.lang-icon {
+			width: 2.3rem;
+			height: 2.3rem;
+		}
+
+		.lang-options {
+			top: 3.8rem;
+			padding: 0.8rem 1rem;
+		}
+
+		.lang-button-option {
+			font-size: 1.2rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.lang-icon {
+			margin-right: 0.5rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.lang-menu-button {
+			font-size: 1.6rem;
+			padding: 0.3rem 1rem;
+		}
+
+		.lang-icon {
+			width: 2.4rem;
+			height: 2.4rem;
+		}
+
+		.lang-options {
+			top: 3.2rem;
+		}
+	}
+
 </style>
