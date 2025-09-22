@@ -1,163 +1,227 @@
 <script setup lang="ts">
-	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
-	import con_home_view from './connected_home_view.vue'
-	import Head from '../components/Header/Header.vue';
-	import Connexion from '../components/disconnected_home_view/ConnexionButton.vue';
-	import connection_form from '../components/disconnected_home_view/connection_form.vue';
-	import Signup from '@/components/disconnected_home_view/Signup.vue';
-	import setting from './setting_view.vue'
-	import play_page from '../components/playable_page/play_page.vue'
-// import { channel } from 'diagnostics_channel';
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue';
 
+// Components
+import Head from '../components/Header/Header.vue';
+import home from './disconnected_home_view.vue';
+import con_home_view from './connected_home_view.vue';
+import setting from './setting_view.vue';
+import play_page from '../components/playable_page/play_page.vue';
+
+// User
 import { user } from '../user';
 import type { User } from '../user';
 const { setUser } = user();
 
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-		}>();
+// Props
+const props = defineProps<{
+  setLanguage: (lang: string) => void;
+}>();
 
-	let isConnect = ref(false);
-	let issetting = ref(false);
+// State
+const isConnect = ref(false);
+const issetting = ref(false);
+const showSignup = ref(false);
+const Signup = ref(false);
+const setting_activePage = ref('');
+const showConnection = ref(false);
+const show_play = ref(false);
+const isPlayActive = ref(false);
+const settingBox = ref<HTMLElement | null>(null);
 
-	var checksession = async function session() {
-		try {
-			const response = await fetch(`http://${window.location.hostname}:3000/me` , {
-				method :'GET',
-				credentials: 'include'
-			});
-			const data = await response.json();
-			// console.log("*****************************************");
-			// console.log("Test data:");
-			// console.log(data.user.login);
-			// console.log("*****************************************");
-			if (data.user?.login) {
-				isConnect.value = true;
-				setUser(data.user);
-				// return isConnect;
-			} else {
-				isConnect.value = false;
-				// return isConnect;
-			}
-			console.log("*********isConnect*1**************");
-			console.log(isConnect.value);
-			console.log("************************");
-		} catch (err) {
-				console.error("Erreur de session:", err);
-		}
-	};
+// ------------------------------
+// Méthodes
+// ------------------------------
 
-	checksession();
+// HASH
+type View = 'home' | 'connexion' | 'profil' | 'settings' | 'play';
 
-	const showSignup = ref(false);
+/** Retourne la vue courante à partir du hash (#/profil, #/settings, …) */
+function getViewFromHash(): View {
+  const h = (window.location.hash || '').replace(/^#/, '');
+  const path = h.startsWith('/') ? h : '/' + h;
+  switch (path) {
+    case '/connexion': return 'connexion';
+    case '/profil':    return 'profil';
+    case '/settings':  return 'settings';
+    case '/play':      return 'play';
+    case '/':
+    case '':
+    default:           return 'home';
+  }
+}
 
-	const setting_activePage = ref('')
+/** Met à jour le hash (ceci crée une entrée d’historique → bouton Retour OK) */
+function navigateTo(view: View) {
+  const target =
+    view === 'home'      ? '/':
+    view === 'connexion' ? '/connexion':
+    view === 'profil'    ? '/profil':
+    view === 'settings'  ? '/settings':
+    /* view === 'play'  */ '/play';
 
-	const handleShowPage = (pageName: string) => {
-		setting_activePage.value = pageName;
-		if(setting_activePage.value != null)
-			issetting.value = true;
-		else
-			issetting.value = false;
-		console.log(issetting.value);
-	};
+  // évite la navigation inutile
+  const current = getViewFromHash();
+  if (current !== view) {
+    window.location.hash = target.startsWith('/') ? target : '/' + target;
+  }
+}
 
-	const toggleSignup = () => {
-		if(isConnect.value == false){
-			showSignup.value = !showSignup.value;
-			if (showConnection.value)
-				showConnection.value = !showConnection.value;
-		}
-		else if (isConnect.value == true){
-			isConnect.value = !isConnect.value;
-		}
-	}
+/** Applique la vue (hash) → flags (tes v-show) */
+function applyHashToFlags() {
+  const view = getViewFromHash();
 
-	const showConnection = ref(false);
-	const toggleConnection = () => {
-		showConnection.value = !showConnection.value;
-	}
+  if (view === 'connexion' || view === 'home') {
+    isConnect.value = false;
+    issetting.value = false;
+    show_play.value = false;
+  } else if (view === 'profil') {
+    isConnect.value = true;
+    issetting.value = false;
+    show_play.value = false;
+  } else if (view === 'settings') {
+    isConnect.value = true;
+    issetting.value = true;
+    show_play.value = false;
+  } else if (view === 'play') {
+    isConnect.value = true;
+    issetting.value = false;
+    show_play.value = true;
+  }
+}
 
-	const toggleisconnected = () => {
-		isConnect.value = !isConnect.value;
-		
-	}
+/** Applique flags → vue (hash) quand tu toggles via tes boutons */
+function syncFlagsToHash() {
+  if (!isConnect.value) {
+    navigateTo('connexion');
+    return;
+  }
+  if (issetting.value) {
+    navigateTo('settings');
+  } else if (show_play.value) {
+    navigateTo('play');
+  } else {
+    navigateTo('profil');
+  }
+}
 
-	const toggleissettnig = () => {
-		issetting.value = !issetting.value;
+const checksession = async function session() {
+  try {
+    const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const data = await response.json();
+    if (data.user?.login) {
+      isConnect.value = true;
+      setUser(data.user as User);
+      // si l'utilisateur est connecté mais l'URL n'est pas cohérente, redirige vers /#/profil
+      if (!['profil', 'settings', 'play'].includes(getViewFromHash())) {
+        navigateTo('profil');
+      } else {
+        applyHashToFlags();
+      }
+    } else {
+      isConnect.value = false;
+      if (!['home', 'connexion'].includes(getViewFromHash())) {
+        navigateTo('connexion');
+      } else {
+        applyHashToFlags();
+      }
+    }
+  } catch (err) {
+    console.error('Erreur de session:', err);
+  }
+};
 
-	}
-	const show_play = ref(false);
-	const toggleshow_play = () => {
-		show_play.value = !show_play.value;
-	}
-	const isPlayActive = ref(false)
+const isSignup = () => {
+  if (isConnect.value != true)
+	Signup.value = !Signup.value;
+  else
+	toggleisconnected();
 
-	const toggleisPlayActive = () =>{
-		isPlayActive.value = !isPlayActive.value;
-	}
+};
 
-	const connectionBox = ref<HTMLElement | null>(null);
-	const signUpbox =  ref<HTMLElement | null>(null);
-	const settingBox =  ref<HTMLElement | null>(null);
-	const handlePointerDownOutside = (e: PointerEvent) => {
-		const target = e.target as Node;
-		if(connectionBox.value && !connectionBox.value.contains(target))
-			{
-				showConnection.value = false;
-			}
-		if(signUpbox.value && !signUpbox.value.contains(target))
-			{
-				showSignup.value = false;
-			}
-		if(settingBox.value && !settingBox.value.contains(target))
-			{
-				issetting.value = false;
-			}
-	}
+const handleShowPage = (pageName: string) => {
+  // garde ton fonctionnement actuel
+  setting_activePage.value = pageName;
+  issetting.value = !!setting_activePage.value;
+  // synchro URL
+  syncFlagsToHash();
+};
 
-	const anyOpen = computed(() => showConnection.value || showSignup.value || issetting.value);
-	watch(anyOpen, (newValue) => {
-		if (newValue) {
-			nextTick(() => {
-				document.addEventListener(
-					'pointerdown',
-					handlePointerDownOutside,
-					{ capture: true}
-				);
-			})
-		}	
-		else {
-			document.removeEventListener(
-				'pointerdown',
-				handlePointerDownOutside,
-				{ capture: true}
-			);
-		}
-	});
+const toggleisconnected = () => {
+  isConnect.value = !isConnect.value;
+  // quand on (dé)connecte, ajuste l’URL
+  syncFlagsToHash();
+};
 
-	onUnmounted(() => {
+const toggleissettnig = () => {
+  issetting.value = !issetting.value;
+  if (issetting.value) show_play.value = false;
+  syncFlagsToHash();
+};
+
+const toggleshow_play = () => {
+  show_play.value = !show_play.value;
+  if (show_play.value) issetting.value = false;
+  syncFlagsToHash();
+};
+
+const toggleisPlayActive = () => {
+  isPlayActive.value = !isPlayActive.value;
+};
+
+const handlePointerDownOutside = (e: PointerEvent) => {
+  const target = e.target as Node;
+  if (settingBox.value && !settingBox.value.contains(target)) {
+    if (issetting.value) {
+      issetting.value = false;
+      // si on ferme le panneau via clic extérieur, retourne vers /#/profil
+      syncFlagsToHash();
+    }
+  }
+};
+
+// Watchers & Lifecycle
+const anyOpen = computed(() => issetting.value);
+watch(anyOpen, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      document.addEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+    });
+  } else {
+    document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+  }
+});
+
+onMounted(() => {
+  // 1) Applique la vue au montage (si pas de hash, on laisse la logique de checksession décider)
+  applyHashToFlags();
+
+  // 2) Écoute des retours/avances navigateur (hashchange)
+  window.addEventListener('hashchange', applyHashToFlags);
+
+  // 3) Vérifie la session (ajuste aussi l’URL si besoin)
+  checksession();
+});
+
+onUnmounted(() => {
   document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+  window.removeEventListener('hashchange', applyHashToFlags);
 });
 </script>
+
 
 <template>
 	<div>
 		<!-- <div v-show="!isPlayActive">-->
 		<div>
-			<Head :setLanguage="props.setLanguage" @show-form="toggleSignup"  @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
+			<Head :setLanguage="props.setLanguage" @show-form="isSignup" @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
 		</div>
 		<div>
 			<div v-show="!isConnect && !issetting" title="home_disconnect" class="home_disconnect" >
-				<div>
-					<Connexion :setLanguage="props.setLanguage" v-show="!showSignup && !showConnection" @show-connection="toggleConnection"></Connexion>
-				</div>
-				<div ref="signUpbox">
-					<Signup :setLanguage="props.setLanguage" v-show="showSignup" @issignup="toggleSignup"></Signup>
-				</div>
-				<div ref="connectionBox">
-					<connection_form :setLanguage="props.setLanguage" v-show="showConnection && !showSignup" @isconnected="toggleisconnected"></connection_form>
-				</div>
+				<home :setLanguage="props.setLanguage" :isConnect="isConnect" :Signup="Signup" @isconnected="toggleisconnected"></home>
 			</div>
 			<div v-show="isConnect && (!issetting && !show_play)" title="home_connect" class="home_connect" >
 				<div>
@@ -193,4 +257,4 @@ const { setUser } = user();
 		display: flex;
 		justify-content: center;
 	}
-</style>
+</style>http://localhost:5173/#/profil

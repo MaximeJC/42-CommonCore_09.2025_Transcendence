@@ -95,14 +95,18 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 			<div title="login" class="login">{{ playerData.login }}</div>
 		</div>
 		<div class="stat-container">
-			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games">{{ playerData.nb_games }}</div>
-				
+			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
+			<div title="nbr_game_stat" class="stat" >{{ playerData.nb_games }}</div>
+			
 		</div>
 		<div class="stat-container">
-			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory">{{ playerData.nb_won_games }}</div>
+			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
+			<div title="nbr-victory_stat" class="stat" >{{ playerData.nb_won_games }}</div>
+			
 		</div>
 		<div class="stat-container">
-			<div title="rank" class="label_stat" data-i18n="player_stat.rank">{{ playerData.rank }}</div>
+			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
+			<div title="rank_stat" class="stat" >{{ playerData.rank }}</div>
 		</div>
 		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
