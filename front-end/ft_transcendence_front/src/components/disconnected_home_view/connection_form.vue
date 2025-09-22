@@ -136,7 +136,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		padding: 2rem 3rem;
 		border-radius: 20px;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-		margin-top: 3rem
+		margin-top: 3rem auto;
 	}
 
 	.connectionTitle{
@@ -188,7 +188,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	}
 
 	.c-input{
-		width: 25rem;
+		width: 100%;
 		font-size: 1.2rem;
 		margin-bottom: 0.5rem;
 		border-radius: 20px;
@@ -294,6 +294,68 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba,
 		0 0 80px #dd0aba;
+	}
+
+	@media (max-width: 1200px) {
+		.frame-connection {
+			width: 25rem;
+			margin-bottom: 10rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.frame-connection {
+			width: 28rem;
+			padding: 2rem;
+			margin-bottom: 15rem;
+		}
+		.connectionTitle {
+			font-size: 2.2rem;
+		}
+		.c-ft-button {
+			height: 4.5rem;
+			width: 4.5rem;
+		}
+		.c-Submit-button {
+			font-size: 1.8rem;
+		}
+	}
+
+	/* Pour les mobiles */
+	@media (max-width: 480px) {
+		.frame-connection {
+			width: 95%;
+			padding: 1.2rem 1rem;
+			margin-bottom: 15rem;
+		}
+		.connectionTitle {
+			font-size: 2rem;
+		}
+		.c-subTitle {
+			font-size: 1.1rem;
+		}
+		.c-error {
+			font-size: 0.9rem;
+		}
+		.c-ft-button {
+			height: 4rem;
+			width: 4rem;
+		}
+		.c-Submit-button {
+			font-size: 1.6rem;
+		}
+		.c-Submit-button > div {
+			margin-top: 0.8rem;
+		}
+
+		.input {
+			width: 85%;
+			font-size: 1.2em;
+			margin-bottom: 0.5rem;
+			border-radius: 20px;
+			border: none;
+			padding: 0.1rem 1rem;
+		}
 	}
 
 </style>
