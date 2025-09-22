@@ -19,6 +19,7 @@
 	src: url("../../fonts/netron.regular.otf") format("opentype");
 	}
 	.connexion-button{
+		margin-top: 10rem;
 		font-family: netron;
 		align-items: center;
 		background-color: rgba(156, 50, 133, 0.5);
@@ -71,6 +72,7 @@
 		.connexion-button {
 			font-size: 3rem;
 			padding: 1rem 3.5rem;
+			margin-top: 0rem;
 		}
 	}
 
@@ -78,6 +80,7 @@
 		.connexion-button {
 			font-size: 2.5rem;
 			padding: 1rem 3rem;
+			
 		}
 		.connexion-button > div {
 			margin-top: 0.8rem;
