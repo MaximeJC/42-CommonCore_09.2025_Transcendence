@@ -161,6 +161,7 @@
 		.lang-icon {
 			width: 2.3rem;
 			height: 2.3rem;
+			margin-top: 0.8rem;
 		}
 
 		.lang-options {
@@ -182,16 +183,18 @@
 	@media (max-width: 480px) {
 		.lang-menu-button {
 			font-size: 1.6rem;
-			padding: 0.3rem 1rem;
+			padding: 0.8rem 2rem;
 		}
 
 		.lang-icon {
-			width: 2.4rem;
-			height: 2.4rem;
+			width: 2.3rem;
+			height: 2.3rem;
+			margin-top: 0.1rem;
+
 		}
 
 		.lang-options {
-			top: 3.2rem;
+			top: 3.4rem;
 		}
 	}
 

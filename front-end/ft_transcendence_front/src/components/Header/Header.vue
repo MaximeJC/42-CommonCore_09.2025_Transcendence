@@ -197,7 +197,9 @@
 			justify-content: center;
 			margin: 0;
 			width: 100%;
+			font-size: 2rem;
 		}
+
 	}
 	
 </style>

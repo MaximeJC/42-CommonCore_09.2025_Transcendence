@@ -89,6 +89,7 @@
 			font-size: 2rem;
 			padding: 0.8rem 2rem;
 			width: auto;
+			margin-bottom: 15rem;
 		}
 		.connexion-button > div {
 			margin-top: 0.5rem;

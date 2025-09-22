@@ -379,7 +379,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		.frame-signup {
 			width: 95%;
 			padding: 1.5rem 1rem;
-			margin-top: 1.5rem;
+			margin-bottom: 14rem;
 		}
 		.signUpTitle {
 			font-size: 2rem;
@@ -407,7 +407,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			margin-bottom: 0.5rem;
 			border-radius: 20px;
 			border: none;
-			padding: 0.1rem 1rem;
+			padding: 0.1rem 1.2rem;
 		}
 	}
 </style>

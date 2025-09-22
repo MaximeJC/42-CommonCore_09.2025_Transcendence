@@ -325,7 +325,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 	@media (max-width: 480px) {
 		.frame-connection {
 			width: 95%;
-			padding: 1.2rem 1rem;
+			padding: 1.2rem 1.2rem;
 			margin-bottom: 15rem;
 		}
 		.connectionTitle {
@@ -348,13 +348,13 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			margin-top: 0.8rem;
 		}
 
-		.input {
-			width: 85%;
+		.c-input {
+			width: 95%;
 			font-size: 1.2em;
 			margin-bottom: 0.5rem;
 			border-radius: 20px;
 			border: none;
-			padding: 0.1rem 1rem;
+			padding: 0.1rem 0.6rem;
 		}
 	}
 
