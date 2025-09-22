@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineExpose } from 'vue';
+import { ref, onMounted, defineExpose, nextTick , watch } from 'vue';
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 }>();
@@ -56,6 +56,12 @@ async function getPlayers() {
 	}
 }
 onMounted(()=>{ getPlayers() });
+
+watch(() => props.setLanguage, (newVal) => {
+	nextTick().then(() => {
+		getPlayers();
+	});
+})
 </script>
 
 <template>

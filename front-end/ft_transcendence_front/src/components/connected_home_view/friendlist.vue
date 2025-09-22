@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick , watch } from 'vue';
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 }>();
@@ -128,6 +128,12 @@ async function deleteFriend(unfriendLogin: string) {
 }
 
 onMounted(()=>{ fetchFriends(); });
+
+watch(() => props.setLanguage, (newVal) => {
+	nextTick().then(() => {
+		fetchFriends();
+	});
+})
 
 </script>
 

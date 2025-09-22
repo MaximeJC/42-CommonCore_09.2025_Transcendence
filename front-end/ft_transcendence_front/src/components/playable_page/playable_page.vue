@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
-import * as BABYLON from "babylonjs"
-import * as GUI from "@babylonjs/gui"
 import { user } from '../../user';
 import tournament from "./tournament_page.vue";
-// Importe la fonction de demarrage depuis le module app.js.
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
 const emit = defineEmits(['gameisfinish']);
@@ -28,9 +25,8 @@ const gameResult = ref({
 	playerRightTop: 'player2'
 });
 
-
-//// TODO : envoyer les vrai donnees
-//	// definit la config du jeu ici, dans des variables.
+// TODO : envoyer les vrai donnees
+// definit la config du jeu ici, dans des variables.
 interface GameConfig {
 	pseudo: string;
 	opponentPseudo: string; // Laisser vide pour un match public
@@ -75,7 +71,7 @@ function formatDuration(seconds: number): string {
 		return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
-// --- GESTION DE L'EVENEMENT DE FIN DE PARTIE ---
+// GESTION DE L'EVENEMENT DE FIN DE PARTIE
 function handleGameResult(event: CustomEvent) {
 	console.log("Evenement 'gameresult' capture par Vue!", event.detail);
 	gameResult.value = event.detail; // Met a jour nos donnees
@@ -85,7 +81,6 @@ function handleGameResult(event: CustomEvent) {
 
 const handleReturnToLobby = () => {
 	console.log("retour au lobby recu!");
-	// TODO : FAIRE UN RETOUR A L'ACCEUIL
 	showResultScreen.value = false;
 	emit('gameisfinish');
 }
