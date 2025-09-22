@@ -343,12 +343,13 @@ export class GameInstance {
 						duration: this.gameDurationInSeconds,
 						score_left: score_left,
 						score_right: score_right,
-						gameMode: this.gameState.gameMode
+						gameMode: this.gameState.gameMode,
+						playerLeftTop: this.gameState.activePlayers.find(p => p.name === 'player_left_top').pseudo,
+						playerRightTop: this.gameState.activePlayers.find(p => p.name === 'player_right_top').pseudo
 					}
 				}));
 			}
 		});
-
 
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);

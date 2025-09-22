@@ -23,7 +23,9 @@ const gameResult = ref({
 	score_left: 0,
 	score_right: 0,
 	duration: 0,
-	gameMode: '1V1_ONLINE'
+	gameMode: '1V1_ONLINE',
+	playerLeftTop: 'player1',
+	playerRightTop: 'player2'
 });
 
 
@@ -81,6 +83,13 @@ function handleGameResult(event: CustomEvent) {
 	addGameToDataBase(gameResult.value);
 }
 
+const handleReturnToLobby = () => {
+	console.log("retour au lobby recu!");
+	// TODO : FAIRE UN RETOUR A L'ACCEUIL
+	showResultScreen.value = false;
+	emit('gameisfinish');
+}
+
 function handleStartGame() {
 	showResultScreen.value = false;
 	const gameConfig: GameConfig = {
@@ -108,11 +117,13 @@ onMounted(() => {
 		document.body.appendChild(guiScript)
 	}
 
+	window.addEventListener('babylon-returned-to-lobby', handleReturnToLobby);
 	window.addEventListener('gameresult', handleGameResult as EventListener);
 })
 
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
+	window.removeEventListener('babylon-returned-to-lobby', handleReturnToLobby);
 	window.removeEventListener('gameresult', handleGameResult as EventListener);
 });
 
@@ -144,20 +155,25 @@ watch(() => props.activePlay, (newVal) => {
 
 			<div title="result-header" class="grid-header">
 				<div class="sub1" data-i18n="">Score gauche</div>
-				<div class="sub1" data-i18n="">Perdant</div>
+				<div class="sub1" data-i18n="">Joueur gauche</div>
 				<div class="sub2" data-i18n="">Duree</div>
+				<div class="sub1" data-i18n="">Joueur droit</div>
 				<div class="sub2" data-i18n="">Score droite</div>
 			</div>
 			<div class="result-list-container">
 				<div class="grid-row">
 					<div class="stat1">{{ gameResult.score_left }}</div>
-					<div class="stat1">{{ gameResult.loser }}</div>
+					<!--<div class="stat1">{{ gameResult.loser }}</div>-->
+					<div class="stat2">{{ gameResult.playerLeftTop }}</div>
 					<div class="stat2">{{ formatDuration(gameResult.duration) }}</div>
+					<div class="stat2">{{ gameResult.playerRightTop }}</div>
 					<div class="stat2">{{ gameResult.score_right }}</div>
+
 					<!-- <div class="stat2">{{ gameResult.gameMode }}</div> -->
 				</div>
 			</div>
-	</div>
+
+		</div>
 </template>
 
 <style scoped>
@@ -248,7 +264,9 @@ watch(() => props.activePlay, (newVal) => {
 
 .grid-row{
 		display: grid;
-		grid-template-columns: 0.1fr 0.6fr 0.3fr 0.3fr;
+		grid-template-columns: repeat(5, 1fr);
+		align-items: center;
+		justify-items: center;
 		padding: 3px;
 		border-bottom: 1px solid #ddd;
 		color: white;
@@ -266,10 +284,11 @@ watch(() => props.activePlay, (newVal) => {
 
 .grid-header{
 		display: grid;
-		grid-template-columns: 0.3fr 0.5fr 0.1fr 0.3fr;
 		padding: 3px;
 		border-bottom: 1px solid #ddd;
-		/*justify-content: ;*/
+		grid-template-columns: repeat(5, 1fr);
+		justify-items: start;
+		align-items: center;
 	}	
 
 .grid-header > div{

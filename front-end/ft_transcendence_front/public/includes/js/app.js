@@ -54,7 +54,7 @@ function returnToLobby() {
 	gameState.activePlayers = [];
 	gameState.ball = null;
 	// ... (reinitialiser d'autres etats si besoin)
-	
+
 	// Reafficher le lobby HTML
 	const lobby = document.getElementById('lobby');
 	const canvas = document.getElementById('renderCanvas');
@@ -62,6 +62,8 @@ function returnToLobby() {
 		lobby.style.display = 'block';
 	if (canvas)
 		canvas.style.display = 'none';
+
+	window.dispatchEvent(new CustomEvent('babylon-returned-to-lobby'));
 }
 
 /**
@@ -83,12 +85,53 @@ function showWaitingScreen() {
 	else
 		text.text = "Searching for game...";
 	text.color = "white";
-	// text.fontFamily = "Courier New, monospace";
+	text.fontFamily = "netron";
 	text.fontSize = 24;
 	ui.addControl(text);
 
+	// ------------------------------------
+
+	const cancelButton = BABYLON.GUI.Button.CreateSimpleButton("cancelButton", "ANNULER");
+	cancelButton.width = "200px";
+	cancelButton.height = "50px";
+	cancelButton.color = "#dd0aba";
+	cancelButton.fontSize = '20px';
+	cancelButton.background = "rgba(156, 50, 133, 0.5)";
+	cancelButton.cornerRadius = 5;
+	cancelButton.thickness = 1;
+
+	cancelButton.fontFamily = "netron";
+	 if (cancelButton.textBlock) {
+		cancelButton.textBlock.color = "white"; 
+	}
+	
+	cancelButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+	cancelButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+	cancelButton.top = "-50px";
+	const hoverBackgroundColor = "rgba(251, 255, 34, 0.5)";
+	const hoverBorderColor = "#fbff22";
+
+	cancelButton.onPointerEnterObservable.add(() => {
+		cancelButton.background = hoverBackgroundColor;
+		cancelButton.color = hoverBorderColor;
+	});
+
+	cancelButton.onPointerOutObservable.add(() => {
+		cancelButton.background = "rgba(156, 50, 133, 0.5)";
+		cancelButton.color = "#dd0aba";
+	});
+
+	cancelButton.onPointerUpObservable.add(() => {
+		console.log("Le bouton 'Quitter' a ete clique.");
+		returnToLobby();
+	});
+
+	ui.addControl(cancelButton);
+
+	// ------------------------------------
 	activeScene = waitingScene;
 }
+
 
 /**
  * Anime la camera de la scene de jeu sur une trajectoire predefinie.
