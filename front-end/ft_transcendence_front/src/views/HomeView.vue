@@ -224,7 +224,7 @@ onUnmounted(() => {
 			<div v-show="!isConnect && !issetting" title="home_disconnect" class="home_disconnect" >
 				<home :setLanguage="props.setLanguage" :isConnect="isConnect" :Signup="Signup" @isconnected="toggleisconnected"></home>
 			</div>
-			<div v-show="isConnect && (!issetting && !show_play)" title="home_connect" class="home_connect" >
+			<div v-if="isConnect && (!issetting && !show_play)" title="home_connect" class="home_connect" >
 				<div>
 					<con_home_view :isConnect="isConnect" @show_play="toggleshow_play" :setLanguage="props.setLanguage" ></con_home_view>
 				</div>
