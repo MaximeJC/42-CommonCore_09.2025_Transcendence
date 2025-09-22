@@ -859,3 +859,45 @@ fastify.get('/users/connected', async (request, reply) => {
 		reply.status(500).send({ error: err.message });
 	}
 })
+
+fastify.post('/users/change-email', async (request, reply)=>{
+	const {email} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!email) {
+		return reply.status(400).send({ success: false, message: "email is missing" });
+	}
+	let cleanEmail;
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	const user = request.session.get('user');
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.run(
+				`UPDATE users SET email = ? WHERE id = ?`,
+				[cleanEmail, user.id],
+				function (err) {
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
+				}
+			);
+		});
+		if (DEBUG_MODE)
+			console.log("New email successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New email successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement d'email", err.stack);
+		if (err.code === 'SQLITE_CONSTRAINT') {
+			if (err.message.includes('UNIQUE constraint failed: users.email'))
+				return reply.status(409).send({ success: false, message: "Email already used.", field: "email" });
+		}
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});

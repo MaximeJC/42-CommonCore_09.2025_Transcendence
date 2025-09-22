@@ -85,6 +85,166 @@
 		}
 	}
 
+
+	const login = ref("");
+	const email = ref("");
+	const password = ref("");
+	const conf_password = ref("");
+	const message = ref("");
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_login_used = ref(false);
+	const error_email_used = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
+
+	async function handleEmail() { // fonction asynchrone appelee lors de la tentative de creation d'un nouvel utilisateur
+		// reinitialiser les variables d'erreur et de message:
+		error_email.value = false;
+		error_email_used.value = false;
+		message.value = "";
+
+		//verification basique de l'email
+		// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		// if (!emailRegex.test(email.value)) {
+		// 	error_email.value = true;
+		// 	return;
+		// }
+
+		try {
+			const result = await fetch(`http://${window.location.hostname}:3000/users/change-email`, { // envoie une requete HTTP via cet URL (au port 3000)
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: new_email.value, 
+				}),
+				credentials: 'include',
+			});
+			
+			console.log (" email = " + new_email.value);
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+				field?: 'email';
+			}
+
+			const data: ServerResponse = await result.json();
+			console.log("data Sever response: ", data);
+
+			// verifier si login ou email presente dans DB
+			if (!result.ok)
+			{
+				message.value = data.message || "An error occurred.";
+				 if (data.field === 'email') {
+					error_email_used.value = true;
+					console.error("email deja utilise!");			
+				}
+				console.error("message.value = " + message.value);
+				return;
+			}
+			
+			if (data.success) { // afficher un message et reinitialiser les variables
+				message.value = "Email successfully changed";
+				new_email.value = "";
+				console.log(message.value);
+			} else {
+				if (data.message?.includes("email"))
+					error_email.value = true;
+				message.value = data.message || "Email change error"; //todo langue
+				console.log(message.value);
+			}
+		} catch (err) {
+			message.value = "Cannot change email"; //todo langue
+			console.error("Fetch error:", err); 
+		}
+	}
+
+	// async function handleSubmit() { // fonction asynchrone appelee lors de la tentative de creation d'un nouvel utilisateur
+	// 	// reinitialiser les variables d'erreur et de message:
+	// 	error_login.value = false;
+	// 	error_email.value = false;
+	// 	error_login_used.value = false;
+	// 	error_email_used.value = false;
+	// 	error_password.value = false;
+	// 	error_conf_password.value = false;
+	// 	message.value = "";
+	
+	// 	// verifier que mdp est correctement repete:
+	// 	if (password.value !== conf_password.value) {
+	// 		error_conf_password.value = true;
+	// 		// message.value = "Passwords are not the same"; //todo langue
+	// 		return;
+	// 	}
+
+	// 	// verifier taille pseudo
+	// 	const loginLength = login.value.trim().length;
+	// 	if (loginLength < 3 || loginLength > 13) {
+	// 		error_login.value = true;
+	// 		return;
+	// 	}
+
+	// 	//verification basique de l'email
+	// 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	// 	if (!emailRegex.test(email.value)) {
+	// 		error_email.value = true;
+	// 		return;
+	// 	}
+
+	// 	try {
+	// 		const result = await fetch(`http://${window.location.hostname}:3000/users`, { // envoie une requete HTTP via cet URL (au port 3000)
+	// 			method: "POST",
+	// 			headers: { "Content-Type": "application/json" },
+	// 			body: JSON.stringify({
+	// 				login: login.value, 
+	// 				email: email.value, 
+	// 				password: password.value,
+	// 			}),
+	// 		});
+			
+	// 		interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+	// 			success: boolean; // reussite de la requete
+	// 			message?: string; // message optionnel
+	// 			field?: 'login' | 'email';
+	// 		}
+
+	// 		const data: ServerResponse = await result.json();
+
+	// 		// verifier si login ou email presente dans DB
+	// 		if (!result.ok)
+	// 		{
+	// 			message.value = data.message || "An error occurred.";
+	// 			if (data.field === 'login') {
+	// 				error_login_used.value = true;
+	// 				console.error("login deja utilise!");			
+
+	// 			} else if (data.field === 'email') {
+	// 				error_email_used.value = true;
+	// 				console.error("email deja utilise!");			
+	// 			}
+	// 			console.error("message.value = " + message.value);
+	// 			return;
+	// 		}
+			
+	// 		if (data.success) { // afficher un message et reinitialiser les variables
+	// 			message.value = "Account successfully created"; //todo langue
+	// 			login.value = "";
+	// 			email.value = "";
+	// 			password.value = "";
+	// 			conf_password.value = "";
+	// 			emit('issignup');
+	// 		} else {
+	// 			if (data.message?.includes("login"))		
+	// 				error_login.value = true;
+	// 			if (data.message?.includes("email"))
+	// 				error_email.value = true;
+	// 			message.value = data.message || "Subscription error"; //todo langue
+	// 		}
+	// 	} catch (err) {
+	// 		message.value = "Cannot contact server"; //todo langue
+	// 		console.error("Fetch error:", err); 
+	// 	}
+	// }
+
 </script>
 
 <template>
@@ -113,7 +273,7 @@
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
 						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
-						<button type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div class="set_error">email invalide</div>
 				</form>
