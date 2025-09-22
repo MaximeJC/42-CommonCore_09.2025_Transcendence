@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const playerData = ref({
 	login: '',
+	avatar_url: '',
 	nb_games: 0,
 	nb_won_games: 0,
 	rank: 0,
@@ -30,12 +31,15 @@ async function fetchOtherPlayerData(otherPlayerLogin: string) {
 			throw new Error('Player data fetch error');
 
 		const data = await response.json();
+		console.log(data);
 		playerData.value = {
 			login: data.login,
+			avatar_url: data.avatar_url,
 			nb_games: data.nb_games,
 			nb_won_games: data.nb_won_games,
 			rank: data.rank,
 		};
+		console.log(playerData);
 	} catch (error) {
 		console.log("Error:", error);
 	}
@@ -87,7 +91,7 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 <template>
 	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
-			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
+			<img :src="playerData.avatar_url" alt="Avatar" class="avatar">
 			<div title="login" class="login">{{ playerData.login }}</div>
 		</div>
 		<div class="stat-container">
