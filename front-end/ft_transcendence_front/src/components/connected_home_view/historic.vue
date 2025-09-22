@@ -84,8 +84,8 @@ onMounted(()=>{ fetchMyGames() });
 			<div data-i18n="historic.victory"></div>
 			<div data-i18n="historic.login"></div>
 			<div data-i18n="historic.my_score"></div>
-			<div data-i18n="historic.date"></div>
-			<div data-i18n="historic.score_o"></div>
+			<div data-i18n="historic.time"></div>
+			<div data-i18n="historic.o_score"></div>
 			<div data-i18n="historic.o_login"></div>
 		</div>
 		<div class="list-container">
@@ -107,7 +107,7 @@ onMounted(()=>{ fetchMyGames() });
 <style>
 	.historic-container{
 		display: grid;
-		grid-template-rows: min-content;
+		grid-template-rows: 0.2fr 0.1fr 1fr;
 		grid-template-columns: 1fr;
 		width:auto;
 		height: 26rem;
@@ -159,7 +159,7 @@ onMounted(()=>{ fetchMyGames() });
 		display: grid;
 		grid-template-columns: 0.5fr 1fr 0.5fr 1fr 0.5fr 1fr;
 		text-align: center;
-		align-items: center;
+		align-items: start;
 		border-bottom: 1px solid #ddd;
 		padding: 3px;
 	}	

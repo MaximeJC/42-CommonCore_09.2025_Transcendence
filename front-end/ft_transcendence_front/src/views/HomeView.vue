@@ -83,6 +83,7 @@ function applyHashToFlags() {
     isConnect.value = true;
     issetting.value = true;
     show_play.value = false;
+	handleShowPage("profil")
   } else if (view === 'play') {
     isConnect.value = true;
     issetting.value = false;

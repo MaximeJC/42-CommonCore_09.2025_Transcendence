@@ -8,6 +8,7 @@ import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
+import validator from 'validator';
 import { dirname } from 'path';
 
 import crypto from 'crypto';
@@ -168,13 +169,23 @@ fastify.post('/users', async (request, reply)=>{
 	if (!login || !email || !password) {
 		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing" });
 	}
-	const	hashedPassword = await bcrypt.hash(password, 10);
+	let cleanLogin, cleanEmail, cleanPassword;
+
+	cleanLogin = validator.trim(login);
+	cleanLogin = validator.escape(cleanLogin);
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	cleanPassword = validator.escape(password);
+
+	const	hashedPassword = await bcrypt.hash(cleanPassword, 10);
 
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
-				[login, email, hashedPassword, '/images/default_avatar.png'],
+				[cleanLogin, cleanEmail, hashedPassword, '/images/default_avatar.png'],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
@@ -307,7 +318,14 @@ fastify.post('/login', async (request, reply)=>{
 		return reply.status(400).send({ success: false, message: "Email and password are required." });
 	}
 
-	const user = await getUserByEmail(email);
+	let cleanEmail, cleanPassword;
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	cleanPassword = validator.escape(password);
+
+	const user = await getUserByEmail(cleanEmail);
 	if (DEBUG_MODE)
 		console.log("Utilisateur trouve: ", user);
 
@@ -317,7 +335,7 @@ fastify.post('/login', async (request, reply)=>{
 			console.log('user', user.password);
 			console.log("****************************************");
 		}
-		const passwordMatch = await bcrypt.compare(password, user.password);
+		const passwordMatch = await bcrypt.compare(cleanPassword, user.password);
 
 		if (passwordMatch === true) {
 			
@@ -615,6 +633,11 @@ fastify.post('/friends', async (request, reply)=>{
 	if (DEBUG_MODE)
 		console.log("Logins recus: ", {login1, login2});
 	
+	let cleanLogin2;
+
+	cleanLogin2 = validator.trim(login2);
+	cleanLogin2 = validator.escape(cleanLogin2);
+
 	try {
 		const login1Exists = await new Promise((resolve, reject)=>{
 			db.get(
@@ -635,7 +658,7 @@ fastify.post('/friends', async (request, reply)=>{
 
 		const login2Exists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM users WHERE login = ?`, [login2], (err, row)=>{
+				`SELECT 1 FROM users WHERE login = ?`, [cleanLogin2], (err, row)=>{
 					if (err) reject(err);
 					else {
 						if (row) resolve(true);
@@ -648,12 +671,12 @@ fastify.post('/friends', async (request, reply)=>{
 		if (!login2Exists)
 			return reply.status(400).send({error: "Login2 not found in database."});
 		if (DEBUG_MODE)
-			console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
+			console.log("Login2 a bien ete trouve dans la base de donnees: ", {cleanLogin2});
 
 		const relationExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM friends WHERE (login1 = ? AND login2 = ?) OR (login2 = ? AND login1 = ?)`,
-				[login1, login2, login2, login1],
+				[login1, cleanLogin2, cleanLogin2, login1],
 				(err, row)=>{
 					if (err) reject(err);
 					else {
@@ -670,12 +693,12 @@ fastify.post('/friends', async (request, reply)=>{
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[login1, login2],
+				[login1, cleanLogin2],
 				(err)=>{ if (err) reject(err); }
 			);
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[login2, login1],
+				[cleanLogin2, login1],
 				(err)=>{
 					if (err) reject(err);
 					else resolve(this);
