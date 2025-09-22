@@ -145,9 +145,9 @@
 
 	.lang-icon{
 		position:relative;
-		margin-bottom: 0.4rem;
-		width: 3rem;
-		height: 3rem;
+		margin-bottom: 0.5rem;
+		width: 3.5rem;
+		height: 3.5rem;
 		margin-right: 1rem;
 		transform: translateY(10%); 
 	}
