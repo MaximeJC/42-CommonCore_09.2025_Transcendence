@@ -297,7 +297,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	// Action du bouton: appeler la fonction de retour au lobby
 	exitButton.onPointerUpObservable.add(() => {
 		console.log("Le bouton 'Quitter' a ete clique.");
-		returnToLobby();
+		returnToLobby(false);
 	});
 
 	// On appelle notre nouvelle fonction pour creer la modale VS cachee
@@ -314,7 +314,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 		BABYLON.ActionManager.OnPickTrigger,
 		function () {
 			console.log("Retour au menu principal...");
-			returnToLobby();
+			returnToLobby(false);
 		}
 	));
 
