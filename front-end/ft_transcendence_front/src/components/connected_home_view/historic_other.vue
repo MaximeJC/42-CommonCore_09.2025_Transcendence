@@ -79,8 +79,8 @@ watch(()=>props.playerLogin, (newLogin)=>{
 			<div data-i18n="historic.victory"></div>
 			<div data-i18n="historic.login"></div>
 			<div data-i18n="historic.my_score"></div>
-			<div data-i18n="historic.date"></div>
-			<div data-i18n="historic.score_o"></div>
+			<div data-i18n="historic.time"></div>
+			<div data-i18n="historic.o_score"></div>
 			<div data-i18n="historic.o_login"></div>
 		</div>
 		<div class="list-container">
@@ -100,23 +100,6 @@ watch(()=>props.playerLogin, (newLogin)=>{
 </template>
 
 <style>
-	.historic-container{
-		display: grid;
-		grid-template-rows: min-content;
-		grid-template-columns: 1fr;
-		width:auto;
-		height: 26rem;
-		background-color: rgba(156, 50, 133, 0.5);
-		border: 2px solid #e251ca;
-		box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
-		padding: 1rem 2rem;
-		border-radius: 20px;
-	}
-
 	.title{
 		display: block;
 		font-family: netron;
