@@ -44,7 +44,7 @@
 	}
 
 	.connexion-button > div {
-		margin-top: 1.5rem;
+		/* margin-top: 1.5rem; */
 	}
 
 	.connexion-button:hover{
@@ -66,5 +66,32 @@
 		0 0 120px #fbff22;
 
 	}
-	
+
+	@media (max-width: 1200px) {
+		.connexion-button {
+			font-size: 3rem;
+			padding: 1rem 3.5rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.connexion-button {
+			font-size: 2.5rem;
+			padding: 1rem 3rem;
+		}
+		.connexion-button > div {
+			margin-top: 0.8rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.connexion-button {
+			font-size: 2rem;
+			padding: 0.8rem 2rem;
+			width: auto;
+		}
+		.connexion-button > div {
+			margin-top: 0.5rem;
+		}
+	}
 </style>
