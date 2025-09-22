@@ -73,6 +73,9 @@ async function addFriend() {
 
 		console.log("addFriend: ajouteur =", ajouteur, ", ajoute =", ajoute);
 
+		if (ajouteur === ajoute)
+			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
+
 		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
 			method: 'POST',
 			credentials: 'include',
