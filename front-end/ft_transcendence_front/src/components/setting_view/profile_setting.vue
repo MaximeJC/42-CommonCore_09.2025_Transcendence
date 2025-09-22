@@ -1,6 +1,9 @@
 <script setup lang="ts">
 	import { ref, onMounted, nextTick, watch } from 'vue';
 	import axios from 'axios';
+	import { user } from '../../user';
+	
+	const { currentUser } = user();
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
@@ -17,7 +20,7 @@
 		login: string;
 	}
 		
-	const act: player = {email: "test@test.fr", login: "test" , avatar: "../../../images/default_avatar.png"};
+	// const act: player = {email: "test@test.fr", login: "test" , avatar: "../../../images/default_avatar.png"};
 
 	const avatarFile = ref<File | null>(null);
 	const uploadedAvatar = ref("");
@@ -71,8 +74,9 @@
 			console.log('Upload réussi:', result);
 
 			if (result.avatar_url) {
-				act.avatar = `http://${window.location.hostname}:3000${result.avatar_url}`;
-				uploadedAvatar.value = act.avatar;
+				// act.avatar = `http://${window.location.hostname}:3000${result.avatar_url}`;
+				// uploadedAvatar.value = act.avatar;
+				uploadedAvatar.value = `http://${window.location.hostname}:3000${result.avatar_url}`;
 			} else {
 				console.error("Erreur lors de l'upload");
 			}
@@ -87,10 +91,10 @@
 		<div title="profil_container" class="profil_container">
 			<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
 			<div tittle="avatar container" class="info_container">
-				<img :src="act.avatar"  class="set_avatar" />
+				<img :src="currentUser?.avatar_url"  class="set_avatar" />
 				<div>
-					<div title="act-mail" class="info_title">{{ act.login }}</div>
-					<div title="act-login" class="info_title">{{ act.email }}</div>
+					<div title="act-mail" class="info_title">{{ currentUser?.email }}</div>
+					<div title="act-login" class="info_title">{{ currentUser?.login }}</div>
 				</div>
 			</div>	
 			<div title="avatar_container" class="set_container" > 
@@ -164,7 +168,7 @@
 
 .set_avatar{
 	display: block;
-	background-image: url(../../../images/default_avatar.png);
+	/* background-image: url(../../../images/default_avatar.png); */
 	background-size:cover;
 	background-repeat: no-repeat;
 	border-radius: 50%;
