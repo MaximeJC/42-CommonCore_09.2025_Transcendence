@@ -96,7 +96,7 @@ function handleStartGame() {
 	const gameConfig: GameConfig = {
 		pseudo: currentUser.value?.login ?? "",
 		opponentPseudo: "", // Laisser vide pour un match public
-		avatarUrl: "includes/img/avatar1.jpg", // Laisser vide pour avatar defaut
+		avatarUrl: currentUser.value?.avatar_url ?? "",
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: "fr" //en, fr, es
 	};
