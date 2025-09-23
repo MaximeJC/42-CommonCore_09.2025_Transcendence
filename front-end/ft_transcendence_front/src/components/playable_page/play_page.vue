@@ -26,7 +26,7 @@ const handletypeplay = (isActive: boolean, type: string) => {
 </script>
 
 <template>
-	<div v-show="!isPlayActive">
+	<div v-if="!isPlayActive">
 		<selec_play
 			@show_play="emit('show_play')"
 			@typeplay="handletypeplay"
