@@ -169,7 +169,8 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
 					<button @click="showOtherPlayer(friend.name)" class="avatar_button">
-						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+						<img v-if=friend.avatar_src class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+						<img v-else class="friend-avatar" src="/images/default_avatar.png" alt="avatar">
 					</button>
 					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
