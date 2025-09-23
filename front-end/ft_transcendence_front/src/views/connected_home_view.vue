@@ -54,7 +54,7 @@ const toggleother_player = (login: string) => {
 			:selectedPlayerLogin="selectedPlayerLogin"
 			@showOtherPlayer="toggleother_player"
 		></otherplayer_frame>
-		<div v-show="!historic && !other_player" title="leader+friend" class="subpages">
+		<div v-if="!historic && !other_player" title="leader+friend" class="subpages">
 			<leaderbord @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
 			<friendlist @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
 		</div>

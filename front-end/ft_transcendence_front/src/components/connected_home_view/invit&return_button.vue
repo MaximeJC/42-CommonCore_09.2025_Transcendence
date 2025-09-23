@@ -3,39 +3,124 @@ import { ref } from 'vue';
 
 const emit = defineEmits(['showOtherPlayer']);
 
-const isconnect = ref(false);
+//const isconnect = ref(false);
 
-async function addFriend() { //todo A TESTER
+const props = defineProps<{
+		setLanguage: (lang: string) => void;
+		connect: number;
+		selectedPlayerLogin: string | null;
+}>();
+
+//async function addFriend() { //todo A TESTER
+//	try {
+//		//todo recuperer les logins dynamiquement
+//		// const ajouteur = 'Alice';
+//		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+//		if (!current.ok)
+//			throw new Error(`Erreur http: ${current.status}`);
+//		const currentUser = await current.json();
+//		const ajouteur = currentUser.user.login;
+
+//		const ajoute = 'Mauvais'; //todo recuperer le nom de l'ami
+
+//		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
+
+//		const result = await fetch(`http://${window.location.hostname}:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
+//		if (!result.ok)
+//			throw new Error(`${result.status}`);
+//		console.log("Ami ajoute avec succes.");
+//	} catch (err) {
+//		console.error("Erreur de creation d'amitie:", err);
+//	}
+//}
+
+import { user } from '../../user';
+const { currentUser } = user(); 
+
+
+interface Friend {
+	name: string;
+	avatar_src: string;
+	isconnected: boolean;
+}
+
+const friends = ref<Friend[]>([]);
+
+async function fetchFriends(currentUserLogin: string) {
 	try {
-		//todo recuperer les logins dynamiquement
-		// const ajouteur = 'Alice';
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const ajouteur = currentUser.user.login;
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		// const currentUserLogin = currentUser.user.login;
 
-		const ajoute = 'Mauvais'; //todo recuperer le nom de l'ami
+		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
-		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
-
-		const result = await fetch(`http://${window.location.hostname}:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		});
 		if (!result.ok)
-			throw new Error(`${result.status}`);
-		console.log("Ami ajoute avec succes.");
+			throw new Error(`Erreur http: ${result.status}`);
+		const friendList = await result.json();
+		friends.value = friendList;
 	} catch (err) {
-		console.error("Erreur de creation d'amitie:", err);
+		console.error("Erreur de recuperation des amis:", err);
 	}
 }
 
+
+async function addFriend() {
+	try {
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		const ajouteur = currentUser.value?.login ?? "";
+
+		const ajoute = props.selectedPlayerLogin ?? "";
+
+		console.log("addFriend: ajouteur =", ajouteur, ", ajoute =", ajoute);
+
+		if (ajouteur === ajoute)
+			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
+
+		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: ajouteur,
+				login2: ajoute
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami ajoute avec succes.");
+		fetchFriends(ajouteur);
+	} catch (err) {
+		console.error("Erreur de creation d'amitie:", err);
+	}
+	
+}
 </script>
 
 <template>
 	<div title="button container" class="button-container">
-		<button v-show="isconnect" title="invit-button" class="invit-button">
+		<button v-show="props.connect === 1" title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
-		<button v-show="!isconnect" title="invit-button" class="d-invit-button">
+		<button v-show="props.connect === 0" title="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">

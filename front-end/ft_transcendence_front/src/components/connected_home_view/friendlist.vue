@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, watch} from 'vue';
-
+import { ref, onMounted, watch, nextTick} from 'vue';
+import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
 const { currentUser } = user();
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
+
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
 
 const rootElement = ref<HTMLElement | null>(null);
 
