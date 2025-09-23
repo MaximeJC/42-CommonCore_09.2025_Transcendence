@@ -83,7 +83,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		const relativePath = `/uploads/${filename}`;
 
 		console.log(`[AVATAR] Mise a jour de la BDD pour l'utilisateur ${user.login} avec le chemin ${relativePath}`);
-		
+
 		await new Promise((resolve, reject) => {
 			db.run(
 				'UPDATE users SET avatar_url = ? WHERE login = ?',
@@ -103,8 +103,8 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		reply.send({ message: 'Avatar uploaded', avatar_url: relativePath });
 	} catch (error) {
 		console.error("!!! ERREUR INTERNE DANS /upload-avatar !!!", error);
-		return reply.status(500).send({ 
-			message: 'Internal Server Error', 
+		return reply.status(500).send({
+			message: 'Internal Server Error',
 			error: error.message
 		});
 	}
@@ -134,8 +134,8 @@ fastify.post('/upload-avatar', async (request, reply) => {
 				return cb(null, true);
 			}
 
-			if (origin.startsWith('http://10.') || origin.startsWith('http://192.') ||
-				origin.startsWith('https://10.') || origin.startsWith('https://192.'))
+			if (origin.startsWith('http://10.') || origin.startsWith('http://192.') || origin.startsWith('http://172.') ||
+				origin.startsWith('https://10.') || origin.startsWith('https://192.') || origin.startsWith('https://172.'))
 			{
 				return cb(null, true);
 			}
@@ -338,7 +338,7 @@ fastify.post('/login', async (request, reply)=>{
 		const passwordMatch = await bcrypt.compare(cleanPassword, user.password);
 
 		if (passwordMatch === true) {
-			
+
 			if (DEBUG_MODE)
 				console.log("User Ok");
 			request.session.set('user', user);
@@ -347,9 +347,9 @@ fastify.post('/login', async (request, reply)=>{
 		} else {
 			// Le mot de passe est incorrect
 			if (DEBUG_MODE) console.log("Mot de passe incorrect pour l'utilisateur:", user.login);
-			return reply.status(401).send({ 
-				success: false, 
-				message: "Invalid credentials.", 
+			return reply.status(401).send({
+				success: false,
+				message: "Invalid credentials.",
 				field: "password"
 			});
 		}
@@ -461,7 +461,7 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-		
+
 		const loserExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM users WHERE login = ?`, [login_loser], (err, row)=>{
@@ -473,10 +473,10 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-		
+
 		if (!winnerExists || !loserExists)
 			return reply.status(400).send({error: "Login not found in database."});
-		
+
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser) VALUES (?,?,?,?)`,
@@ -607,8 +607,8 @@ fastify.get('/leaderboard', async (request, reply)=>{
 		updateUserRanks();
 		const leaderboard = await new Promise((resolve, reject)=>{
 			db.all(
-				`SELECT login as name, nb_games as games, nb_won_games as victory, rank 
-				FROM users 
+				`SELECT login as name, nb_games as games, nb_won_games as victory, rank
+				FROM users
 				ORDER BY rank ASC
 				LIMIT 10`,
 				(err, rows)=>{
@@ -632,7 +632,7 @@ fastify.post('/friends', async (request, reply)=>{
 	const {login1, login2} = request.body;
 	if (DEBUG_MODE)
 		console.log("Logins recus: ", {login1, login2});
-	
+
 	let cleanLogin2;
 
 	cleanLogin2 = validator.trim(login2);
@@ -689,7 +689,7 @@ fastify.post('/friends', async (request, reply)=>{
 
 		if (relationExists)
 			return reply.status(400).send({error: "Friendship already exists."});
-		
+
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
@@ -728,8 +728,8 @@ fastify.get('/friends/me', async (request, reply)=>{
 					(u.connected = 1) as isconnected
 				FROM friends f
 				JOIN users u ON (u.login = f.login2)
-				WHERE f.login1 = ?`, 
-				[login_current], 
+				WHERE f.login1 = ?`,
+				[login_current],
 				(err, friends)=>{
 					if (err) reject(err);
 					else resolve(friends);
@@ -786,7 +786,7 @@ fastify.post('/friends/delete', async (request, reply)=>{
 			return reply.status(400).send({message: "Friendship doesn't exist."});
 		if (DEBUG_MODE)
 			console.log("La relation existe bien.\n");
-	
+
 		await new Promise((resolve, reject)=>{
 			db.run(
 				`DELETE FROM friends WHERE (login1 = ? AND login2 = ?)`,
