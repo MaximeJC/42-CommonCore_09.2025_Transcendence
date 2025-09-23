@@ -918,17 +918,85 @@ fastify.post('/users/change-login', async (request, reply)=>{
 
 	try {
 		const result = await new Promise((resolve, reject)=>{
-			db.run(
-				`UPDATE users SET login = ? WHERE id = ?`,
-				[cleanLogin, user.id],
-				function (err) {
-					if (err) {
-						if (DEBUG_MODE)
-							console.log("Erreur SQL:", err.message);
-						reject(err);
-					} else resolve(this);
-				}
-			);
+			db.serialize(()=>{
+				db.run(`BEGIN TRANSACTION`);
+
+				// table users:
+				db.run(
+					`UPDATE users SET login = ? WHERE id = ?`,
+					[cleanLogin, user.id],
+					function (err) {
+						if (err) {
+							if (DEBUG_MODE)
+								console.log("Erreur SQL change login: users:", err.message);
+							db.run(`ROLLBACK`);
+							reject(err);
+						} else {
+							db.run(
+								`UPDATE games SET login_winner = ? WHERE login_winner = ?`,
+								[cleanLogin, user.login],
+								function (err) {
+									if (err) {
+										if (DEBUG_MODE)
+											console.log("Erreur SQL change login: games, winner:", err.message);
+										db.run(`ROLLBACK`);
+										reject(err);
+									} else {
+										db.run(
+											`UPDATE games SET login_loser = ? WHERE login_loser = ?`,
+											[cleanLogin, user.login],
+											function (err) {
+												if (err) {
+													if (DEBUG_MODE)
+														console.log("Erreur SQL change login: games, loser:", err.message);
+													db.run(`ROLLBACK`);
+													reject(err);
+												} else {
+													db.run(
+														`UPDATE friends SET login1 = ? WHERE login1 = ?`,
+														[cleanLogin, user.login],
+														function (err) {
+															if (err) {
+																if (DEBUG_MODE)
+																	console.log("Erreur SQL change login: friends, login1:", err.message);
+																db.run(`ROLLBACK`);
+																reject(err);
+															} else {
+																db.run(
+																	`UPDATE friends SET login2 = ? WHERE login2 = ?`,
+																	[cleanLogin, user.login],
+																	function (err) {
+																		if (err) {
+																			if (DEBUG_MODE)
+																				console.log("Erreur SQL change login: friends, login2:", err.message);
+																			db.run(`ROLLBACK`);
+																			reject(err);
+																		} else {
+																			db.run(`commit`, function (err) {
+																				if (err) {
+																					if (DEBUG_MODE)
+																						console.log("Erreur SQL Commit:", err.message);
+																					reject(err);
+																				} else {
+																					resolve(this);
+																				}
+																			});
+																		}
+																	}
+																);
+															}
+														}
+													);
+												}
+											}
+										);
+									}
+								}
+							);
+						}
+					}
+				);
+			});
 		});
 		if (DEBUG_MODE)
 			console.log("New login successfully changed. ID =", result.lastID);
