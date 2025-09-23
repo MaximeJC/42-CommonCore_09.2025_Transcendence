@@ -8,6 +8,4 @@ RUN apt-get install -y npm && rm -rf /var/lib/apt/lists/*
 COPY ./server_files/* /app/
 RUN npm ci
 
-WORKDIR /app/front_end/ft_transcendence_front
-
 ENTRYPOINT ["npm", "run", "dev"]
