@@ -1,11 +1,17 @@
 <script setup lang="ts">
-	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
+	import { ref, watch, onUnmounted, onMounted, nextTick, computed } from 'vue';
+	import { setLanguage, updateText } from '../../service/translators';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		show_play: boolean;
 
 	}>();
+
+	onMounted(async () => {
+		await nextTick()
+		updateText() 
+	})
 
 
 	const emit = defineEmits(['show_play', 'typeplay']);
