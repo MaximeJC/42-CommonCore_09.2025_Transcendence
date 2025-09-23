@@ -100,9 +100,11 @@ function handleStartGame() {
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: "fr" //en, fr, es
 	};
-
-	if(props.activePlay === "2P_LOCAL")
-		gameConfig.opponentPseudo = "Player2"
+	
+	if (props.activePlay === "tournament") {
+		gameConfig.gameMode = "2P_LOCAL";
+		gameConfig.opponentPseudo = "PseudoAdversaireTournois"; // Player2
+	} 
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 	startMatchmaking(gameConfig);
 }
@@ -130,7 +132,7 @@ onUnmounted(() => {
 
 watch(() => props.activePlay, (newVal) => {
 	//todo gerer ce if...
-	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE"  ){
+	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE" || newVal === "tournament" ){
 		nextTick().then(() => {
 			handleStartGame();
 		});
