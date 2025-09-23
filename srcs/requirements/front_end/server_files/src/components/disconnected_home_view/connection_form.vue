@@ -1,4 +1,5 @@
 <script setup lang="ts"> // Vue 3, Typescript
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref, reactive, onMounted } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 // import axios from 'axios';
 
@@ -28,7 +29,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		message.value = "";
 
 		try {
-			const result = await fetch(`http://${window.location.hostname}:3000/login`, { // envoie une requete HTTP via cet URL (au port 3000)
+			const result = await fetch(`${USER_MANAGEMENT_URL}/login`, { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",
@@ -76,7 +77,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 }
 
 	async function fetchProfile() {
-		const res = await fetch(`http://${window.location.hostname}:3000/me`, {
+		const res = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 			credentials: 'include'
 		});
 	}

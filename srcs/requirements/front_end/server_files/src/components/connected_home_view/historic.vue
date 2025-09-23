@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+import { USER_MANAGEMENT_URL } from '@/config';
 import { ref, onMounted, nextTick } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 
@@ -36,7 +38,7 @@ function formatDate(date: string | number): string {
 
 async function fetchMyGames() {
 	try {
-		const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 			method: 'GET',
 			credentials: 'include'
 		});
@@ -47,7 +49,7 @@ async function fetchMyGames() {
 
 		console.log("Fonction fetchMyGames pour affichage de l'historique de l'utilisateur connecte", login);
 		
-		const result = await fetch(`http://${window.location.hostname}:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(login)}`);
 		if (!result.ok)
 			throw new Error(`Erreur http: ${result.status}`);
 		const games = await result.json();

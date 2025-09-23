@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref, onMounted, watch, nextTick} from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
@@ -40,7 +42,7 @@ const friends = ref<Friend[]>([]);
 
 async function fetchFriends(currentUserLogin: string) {
 	try {
-		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 		// 	method: 'GET',
 		// 	credentials: 'include'
 		// });
@@ -51,7 +53,7 @@ async function fetchFriends(currentUserLogin: string) {
 
 		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -69,7 +71,7 @@ async function fetchFriends(currentUserLogin: string) {
 
 async function addFriend() {
 	try {
-		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 		// 	method: 'GET',
 		// 	credentials: 'include'
 		// });
@@ -85,7 +87,7 @@ async function addFriend() {
 		if (ajouteur === ajoute)
 			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',
@@ -106,7 +108,7 @@ async function addFriend() {
 
 async function deleteFriend(unfriendLogin: string) {
 	try {
-		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 		// 	method: 'GET',
 		// 	credentials: 'include'
 		// });
@@ -117,7 +119,7 @@ async function deleteFriend(unfriendLogin: string) {
 
 		console.log("deleteFriend: supprimer =", supprimeur, ", supprime =", unfriendLogin);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends/delete`, {
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/delete`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',

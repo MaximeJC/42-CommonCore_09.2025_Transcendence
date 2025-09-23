@@ -1,4 +1,5 @@
 <script setup lang="ts"> // Vue 3, Typescript
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 
 	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
@@ -53,7 +54,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		}
 
 		try {
-			const result = await fetch(`http://${window.location.hostname}:3000/users`, { // envoie une requete HTTP via cet URL (au port 3000)
+			const result = await fetch(`${USER_MANAGEMENT_URL}/users`, { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

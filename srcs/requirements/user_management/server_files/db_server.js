@@ -36,7 +36,7 @@ await fastify.register(fastifySecureSession, {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const newdir = path.join(__dirname, '../..', 'front-end/ft_transcendence_front/');
+const newdir = path.join(__dirname, '../..', 'front_end/server_files/'); // revoir le bon chemin ou trasfert vers docker 
 
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyStatic, {

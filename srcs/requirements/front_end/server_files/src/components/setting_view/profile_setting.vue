@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import { USER_MANAGEMENT_URL } from '@/config.js';
 	import { ref, onMounted, nextTick, watch } from 'vue';
 	import axios from 'axios';
 	import { user } from '../../user';
@@ -34,7 +35,7 @@
 
 	const getUserLogin = async function userLogin() {
 		try {
-			const response = await fetch(`http://${window.location.hostname}:3000/me` , {
+			const response = await fetch(`${USER_MANAGEMENT_URL}/me` , {
 				method :'GET',
 				credentials: 'include',
 			});
@@ -63,7 +64,7 @@
 		const userLogin = getUserLogin();
 
 		try {
-			const response = await axios.post(`http://${window.location.hostname}:3000/upload-avatar`, formData, {
+			const response = await axios.post(`${USER_MANAGEMENT_URL}/upload-avatar`, formData, {
 				withCredentials: true,
 				headers: {
                 'Content-Type': undefined
@@ -74,7 +75,7 @@
 			console.log('Upload réussi:', result);
 
 			if (result.avatar_url) {
-				uploadedAvatar.value = `http://${window.location.hostname}:3000${result.avatar_url}`;
+				uploadedAvatar.value = `${result.avatar_url}?t=${new Date().getTime()}`;
 			} else {
 				console.error("Erreur lors de l'upload");
 			}
@@ -107,7 +108,7 @@
 		}
 
 		try {
-			const result = await fetch(`http://${window.location.hostname}:3000/users/change-email`, {
+			const result = await fetch(`${USER_MANAGEMENT_URL}/users/change-email`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -166,7 +167,7 @@
 		}
 
 		try {
-			const result = await fetch(`http://${window.location.hostname}:3000/users/change-login`, {
+			const result = await fetch(`${USER_MANAGEMENT_URL}/users/change-login`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -226,7 +227,7 @@
 		}
 
 		try {
-			const result = await fetch(`http://${window.location.hostname}:3000/users/change-password`, { // envoie une requete HTTP via cet URL (au port 3000)
+			const result = await fetch(`${USER_MANAGEMENT_URL}/users/change-password`, { // envoie une requete HTTP via cet URL (au port 3000)
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -256,7 +257,8 @@
 		<div title="profil_container" class="profil_container">
 			<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
 			<div tittle="avatar container" class="info_container">
-				<img :src="currentUser?.avatar_url"  class="set_avatar" />
+			<img v-if="uploadedAvatar" :key="uploadedAvatar" :src="uploadedAvatar" alt="Nouvel avatar" class="set_avatar"/>
+            <img v-else :key="currentUser?.avatar_url" :src="currentUser?.avatar_url" alt="Avatar actuel" class="set_avatar" />
 				<div>
 					<div title="act-mail" class="info_title">{{ currentUser?.email }}</div>
 					<div title="act-login" class="info_title">{{ currentUser?.login }}</div>
@@ -300,7 +302,7 @@
 					<div class="set_sub_password">
 						<div>
 							<input title="password_input" class="set_input" type="password" v-model="new_password" />
-							<label class="conf_password" data-i18n="Signup.conf_password"></label>
+							<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
 							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
 						</div>
 						<div class="pos_pass_button">
@@ -359,7 +361,7 @@
 	0 0 80px #ff69b4,
 	0 0 120px #dd0aba;
 	font-size: 1.3rem;
-	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
 .profil_container{
@@ -410,23 +412,7 @@
 	margin-top: 1rem;
 }
 
-.conf_password{
-	display: block;
-	margin-top: 0.5rem;
-	font-family: netron;
-	margin-left: 1rem;
-	color: white;
-	text-shadow: 
-	0 0 10px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba,
-	0 0 80px #ff69b4,
-	0 0 120px #dd0aba;
-	font-size: 1rem;
-	font-family: netron;
-	color: white;
-}
+
 
 .set_subtitle{
 	font-family: netron;
@@ -436,7 +422,7 @@
 	0 0 10px #dd0aba,
 	0 0 10px #dd0aba,
 	0 0 20px #dd0aba;
-	font-size: 1.3rem;
+	font-size: 1rem;
 	font-family: netron;
 	color: white;
 }

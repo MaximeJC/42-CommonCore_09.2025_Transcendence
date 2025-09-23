@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref, onMounted } from 'vue';
 import play_historic from "./play&historic_button.vue";
 import play_return from "./play&return_button.vue";
@@ -27,7 +28,7 @@ const playerData = ref({
 
 async function fetchOtherPlayerData(otherPlayerLogin: string) {
 	try {
-		const response = await fetch(`http://${window.location.hostname}:3000/users/specificlogin?login=${otherPlayerLogin}`);
+		const response = await fetch(`http://${USER_MANAGEMENT_URL}/users/specificlogin?login=${otherPlayerLogin}`);
 		if (!response.ok)
 			throw new Error('Player data fetch error');
 
@@ -59,7 +60,7 @@ watch(
 /* async function fetchPlayerData(retries = 5, delay = 1000) {
 	try {
 		for (let i = 0; i < retries; i++) {
-			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+			const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 				method: 'GET',
 				credentials: 'include'
 			});

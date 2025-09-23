@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref, onMounted, watch} from 'vue';
 
 import { user } from '../../user';
@@ -33,7 +34,7 @@ const players = ref<Player[]>([]);
 
 async function getPlayers() {
 	try {
-		const response = await fetch(`http://${window.location.hostname}:3000/leaderboard`);
+		const response = await fetch(`${USER_MANAGEMENT_URL}/leaderboard`);
 		if (!response.ok)
 			throw new Error(`HTTP error! status: ${response.status}`);
 		const data = await response.json();

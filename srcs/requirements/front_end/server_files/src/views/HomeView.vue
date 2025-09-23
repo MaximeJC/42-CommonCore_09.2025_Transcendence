@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue';
 
 // Components
+import { USER_MANAGEMENT_URL } from '../config.js';
 import Head from '../components/Header/Header.vue';
 import home from './disconnected_home_view.vue';
 import con_home_view from './connected_home_view.vue';
@@ -108,7 +109,7 @@ function syncFlagsToHash() {
 
 const checksession = async function session() {
   try {
-    const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+    const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
       method: 'GET',
       credentials: 'include'
     });

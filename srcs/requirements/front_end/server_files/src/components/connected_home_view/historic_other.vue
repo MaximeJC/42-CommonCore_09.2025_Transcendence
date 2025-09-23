@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref, onMounted } from 'vue';
 import { watch } from 'vue';
 
@@ -32,7 +34,7 @@ function formatDate(date: string | number): string {
 
 async function fetchGames(login: string) {
 	try {
-		const result = await fetch(`http://${window.location.hostname}:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(login)}`);
 		if (!result.ok)
 			throw new Error(`Erreur http: ${result.status}`);
 		const games = await result.json();

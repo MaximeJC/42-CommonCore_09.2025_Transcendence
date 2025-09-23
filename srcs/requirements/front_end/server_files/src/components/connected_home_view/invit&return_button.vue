@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { ref } from 'vue';
 
 const emit = defineEmits(['showOtherPlayer']);
@@ -15,7 +17,7 @@ const props = defineProps<{
 //	try {
 //		//todo recuperer les logins dynamiquement
 //		// const ajouteur = 'Alice';
-//		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+//		const current = await fetch(`${USER_MANAGEMENT_URL}/me`);
 //		if (!current.ok)
 //			throw new Error(`Erreur http: ${current.status}`);
 //		const currentUser = await current.json();
@@ -25,7 +27,7 @@ const props = defineProps<{
 
 //		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
 
-//		const result = await fetch(`http://${window.location.hostname}:3000/friends?login1=${ajouteur}&login2=${ajoute}`)
+//		const result = await fetch(`${USER_MANAGEMENT_URL}/friends?login1=${ajouteur}&login2=${ajoute}`)
 //		if (!result.ok)
 //			throw new Error(`${result.status}`);
 //		console.log("Ami ajoute avec succes.");
@@ -48,7 +50,7 @@ const friends = ref<Friend[]>([]);
 
 async function fetchFriends(currentUserLogin: string) {
 	try {
-		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 		// 	method: 'GET',
 		// 	credentials: 'include'
 		// });
@@ -59,7 +61,7 @@ async function fetchFriends(currentUserLogin: string) {
 
 		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -78,7 +80,7 @@ async function fetchFriends(currentUserLogin: string) {
 
 async function addFriend() {
 	try {
-		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 		// 	method: 'GET',
 		// 	credentials: 'include'
 		// });
@@ -94,7 +96,7 @@ async function addFriend() {
 		if (ajouteur === ajoute)
 			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
 
-		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',

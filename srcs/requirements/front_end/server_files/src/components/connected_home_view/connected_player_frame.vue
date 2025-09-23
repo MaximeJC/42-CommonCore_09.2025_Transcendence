@@ -27,13 +27,13 @@ const playerData = ref({
 	try {
 		//todo recuperer le login de l'utilisateur connecte
 		// const currentUserLogin = "Louise";
-		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		const current = await fetch(`${USER_MANAGEMENT_URL}/me`);
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
 		const currentUserLogin = currentUser.user.login;
 
-		const response = await fetch(`http://${window.location.hostname}:3000/users/specificlogin?login=${currentUserLogin}`);
+		const response = await fetch(`http://${USER_MANAGEMENT_URL}/users/specificlogin?login=${currentUserLogin}`);
 		if (!response.ok)
 			throw new Error('Player data fetch error');
 
@@ -53,7 +53,7 @@ onMounted(()=>{ fetchPlayerData(); });
 async function fetchPlayerData(retries = 5, delay = 1000) {
 	try {
 		for (let i = 0; i < retries; i++) {
-			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+			const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 				method: 'GET',
 				credentials: 'include'
 			});

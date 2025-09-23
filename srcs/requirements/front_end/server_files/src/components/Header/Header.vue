@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import { USER_MANAGEMENT_URL } from '@/config.js';
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
 	import setting from './setting_button.vue'
@@ -18,7 +19,7 @@
 
 	const logout = async function logoutUser() {
 		try {
-			const response = await fetch(`http://${window.location.hostname}:3000/logout` , {
+			const response = await fetch(`${USER_MANAGEMENT_URL}/logout` , {
 				method :'GET',
 				credentials: 'include'
 			});

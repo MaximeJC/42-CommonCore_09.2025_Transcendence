@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { USER_MANAGEMENT_URL } from '@/config.js';
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
 import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
@@ -46,7 +47,7 @@ async function addGameToDataBase(newGame: any) {
 		return;
 	}
 	try {
-		const response = await fetch(`http://${window.location.hostname}:3000/games`, {
+		const response = await fetch(`${USER_MANAGEMENT_URL}/games`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
