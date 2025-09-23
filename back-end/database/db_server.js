@@ -901,3 +901,85 @@ fastify.post('/users/change-email', async (request, reply)=>{
 		reply.status(500).send({ success: false, message: "Server error: " + err.message });
 	}
 });
+
+fastify.post('/users/change-login', async (request, reply)=>{
+	const {login} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!login) {
+		return reply.status(400).send({ success: false, message: "login is missing" });
+	}
+	let cleanLogin;
+
+	cleanLogin = validator.trim(login);
+	cleanLogin = validator.escape(cleanLogin);
+
+	const user = request.session.get('user');
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.run(
+				`UPDATE users SET login = ? WHERE id = ?`,
+				[cleanLogin, user.id],
+				function (err) {
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
+				}
+			);
+		});
+		if (DEBUG_MODE)
+			console.log("New login successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New login successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement de login", err.stack);
+		if (err.code === 'SQLITE_CONSTRAINT') {
+			if (err.message.includes('UNIQUE constraint failed: users.login'))
+				return reply.status(409).send({ success: false, message: "Login already used.", field: "login" });
+		}
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});
+
+fastify.post('/users/change-password', async (request, reply)=>{
+	const {id, password} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!password) {
+		return reply.status(400).send({ success: false, message: "password is missing" });
+	}
+	let cleanPassword;
+
+	cleanPassword = validator.escape(password);
+
+	const	hashedPassword = await bcrypt.hash(cleanPassword, 10);
+
+	// const user = request.session.get('user');
+	console.log("id: ", id);
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.run(
+				`UPDATE users SET password = ? WHERE id = ?`,
+				[hashedPassword, id],
+				function (err) {
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
+				}
+			);
+		});
+		if (DEBUG_MODE)
+			console.log("New password successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New password successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement de password", err.stack);
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});
