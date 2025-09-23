@@ -22,7 +22,7 @@ services:
     # depends_on:
     #   - game_management
     ports:
-      - "5173:443"
+      - "5173:5173"
     # volumes:
     #   - front_end_data:/var/www/html:ro
     networks:
