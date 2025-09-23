@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import selec_play from './selection-type-play.vue'
 import play from './playable_page.vue'
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;

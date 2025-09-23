@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, defineExpose, nextTick } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 
 const props = defineProps<{
