@@ -66,7 +66,7 @@
 			const response = await axios.post(`http://${window.location.hostname}:3000/upload-avatar`, formData, {
 				withCredentials: true,
 				headers: {
-                'Content-Type': undefined // ou 'multipart/form-data' si 'undefined' ne marche pas, mais c'est moins fiable
+                'Content-Type': undefined
 				},
 			});
 
@@ -74,14 +74,179 @@
 			console.log('Upload réussi:', result);
 
 			if (result.avatar_url) {
-				// act.avatar = `http://${window.location.hostname}:3000${result.avatar_url}`;
-				// uploadedAvatar.value = act.avatar;
 				uploadedAvatar.value = `http://${window.location.hostname}:3000${result.avatar_url}`;
 			} else {
 				console.error("Erreur lors de l'upload");
 			}
 		} catch (error) {
 			console.error("Erreur lors de la requete:", error);
+		}
+	}
+
+	// const login = ref("");
+	// const email = ref("");
+	// const password = ref("");
+	// const conf_password = ref("");
+	const message = ref("");
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_login_used = ref(false);
+	const error_email_used = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
+
+	async function handleEmail() {
+		error_email.value = false;
+		error_email_used.value = false;
+		message.value = "";
+
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(new_email.value)) {
+			error_email.value = true;
+			return;
+		}
+
+		try {
+			const result = await fetch(`http://${window.location.hostname}:3000/users/change-email`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: new_email.value, 
+				}),
+				credentials: 'include',
+			});
+			
+			console.log (" email = " + new_email.value);
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+				field?: 'email';
+			}
+
+			const data: ServerResponse = await result.json();
+			console.log("data Sever response: ", data);
+
+			// verifier si login ou email presente dans DB
+			if (!result.ok)
+			{
+				message.value = data.message || "An error occurred.";
+				 if (data.field === 'email') {
+					error_email_used.value = true;
+					console.error("email deja utilise!");			
+				}
+				console.error("message.value = " + message.value);
+				return;
+			}
+			
+			if (data.success) {
+				message.value = "Email successfully changed";
+				new_email.value = "";
+				console.log(message.value);
+			} else {
+				if (data.message?.includes("email"))
+					error_email.value = true;
+				message.value = data.message || "Email change error";
+				console.log(message.value);
+			}
+		} catch (err) {
+			message.value = "Cannot change email";
+			console.error("Fetch error:", err); 
+		}
+	}
+
+	async function handleLogin() {
+		error_login.value = false;
+		error_login_used.value = false;
+		message.value = "";
+
+		const loginLength = new_login.value.trim().length;
+		if (loginLength < 3 || loginLength > 13) {
+			error_login.value = true;
+			return;
+		}
+
+		try {
+			const result = await fetch(`http://${window.location.hostname}:3000/users/change-login`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					login: new_login.value, 
+				}),
+				credentials: 'include',
+			});
+			
+			console.log (" login = " + new_login.value);
+			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
+				success: boolean; // reussite de la requete
+				message?: string; // message optionnel
+				field?: 'login';
+			}
+
+			const data: ServerResponse = await result.json();
+			console.log("data Sever response: ", data);
+
+			// verifier si login ou email presente dans DB
+			if (!result.ok)
+			{
+				message.value = data.message || "An error occurred.";
+				 if (data.field === 'login') {
+					error_login_used.value = true;
+					console.error("login deja utilise!");			
+				}
+				console.error("message.value = " + message.value);
+				return;
+			}
+			
+			if (data.success) {
+				message.value = "Login successfully changed";
+				new_login.value = "";
+				console.log(message.value);
+			} else {
+				if (data.message?.includes("login"))
+					error_login.value = true;
+				message.value = data.message || "Login change error";
+				console.log(message.value);
+			}
+		} catch (err) {
+			message.value = "Cannot change email";
+			console.error("Fetch error:", err); 
+		}
+	}
+
+
+	async function handlePassword() {
+		error_password.value = false;
+		error_conf_password.value = false;
+		message.value = "";
+	
+		if (new_password.value !== conf_new_password.value) {
+			error_conf_password.value = true;
+			// message.value = "Passwords are not the same";
+			return;
+		}
+
+		try {
+			const result = await fetch(`http://${window.location.hostname}:3000/users/change-password`, { // envoie une requete HTTP via cet URL (au port 3000)
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					id: currentUser?.value?.id ?? "",
+					password: new_password.value,
+				}),
+			});
+			
+			const data = await result.json();
+			
+			if (data.success) { // afficher un message et reinitialiser les variables
+				message.value = "Password successfully changed";
+				new_password.value = "";
+				conf_new_password.value = "";
+			} else {
+				message.value = data.message || "Password error";
+			}
+		} catch (err) {
+			message.value = "Cannot change password";
+			console.error("Fetch error:", err); 
 		}
 	}
 
@@ -113,7 +278,7 @@
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
 						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
-						<button type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div class="set_error">email invalide</div>
 				</form>
@@ -123,7 +288,7 @@
 					<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
 					<div class="set_sub_inp">
 						<input title="login_input" class="set_input" type="login" id="login" v-model="new_login"></input>
-						<button type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<button @click="handleLogin" type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div class="set_error">login invalide</div>
 
@@ -139,7 +304,7 @@
 							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
 						</div>
 						<div class="pos_pass_button">
-							<button type="submit" class="set_button" data-i18n="Signup.submit"></button>
+							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
 					</div>
 					<div class="set_error">password invalide</div>
