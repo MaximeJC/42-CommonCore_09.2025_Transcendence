@@ -1,13 +1,17 @@
 <script setup lang="ts">
-
-	const emit = defineEmits(['show-historic', 'show_play']);
-
-
+import { defineProps, defineEmits } from 'vue';
+const props = defineProps({
+	playerId: {
+		type: String,
+		required: true,
+	},
+});
+const emit = defineEmits(['show-historic', 'invite-player']);
 </script>
 
 <template>
 	<div title="button container" class="button-container">
-		<button @click="emit('show_play')" title="play-button" class="play-button">
+		<button @click="emit('invite-player', props.playerId)" title="play-button" class="play-button">
 			<div data-i18n="home_player_button.play"></div>
 		</button>
 		<button @click="emit('show-historic')" title="return-button" class="return-button">
