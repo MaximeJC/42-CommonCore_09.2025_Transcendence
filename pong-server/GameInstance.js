@@ -8,7 +8,7 @@ import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './game/confi
 const TICK_RATE = 60;
 
 export class GameInstance {
-	constructor(clientInfos, gameMode) { // On recoit des 'infos' { socket, pseudo }
+	constructor(clientInfos, gameMode, opponentPseudo = null) { // On recoit des 'infos' { socket, pseudo }
 		// --- SUIVI DU TEMPS DE JEU ---
 		this.startTime = null; // Le moment ou le jeu commence reellement
 		this.gameDurationInSeconds = 0; // La duree totale du jeu
@@ -30,13 +30,13 @@ export class GameInstance {
 		this.readyPlayers = new Set();
 		
 		console.log("[Jeu " + this.gameId + " Creation d'une partie en mode " + gameMode + ".");
-		this.setupPlayers(clientInfos, gameMode);
+		this.setupPlayers(clientInfos, gameMode, opponentPseudo);
 
 		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
 		this.notifyClientsToPrepare();
 	}
 
-	setupPlayers(clientInfos, gameMode) { // Le parametre est 'clientInfos'
+	setupPlayers(clientInfos, gameMode, opponentPseudo = null) { // Le parametre est 'clientInfos'
 		const players = this.gameState.activePlayers;
 		let humanPlayerIndex = 0;
 		const { limitUp, limitDown } = this.gameState;
@@ -82,8 +82,9 @@ export class GameInstance {
 				break;
 
 			case '2P_LOCAL':
+				const player2Pseudo = opponentPseudo || "Player 2";
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN_LOCAL', '', 0));
-				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN_LOCAL', '', 0));
+				players.push(createPlayer(player2Pseudo, 'player_right_top', 'HUMAN_LOCAL', '', 0));
 				// On s'assure que les deux joueurs partagent le meme ID de socket
 				if (players.length === 2) {
 					players[1].id = players[0].id;

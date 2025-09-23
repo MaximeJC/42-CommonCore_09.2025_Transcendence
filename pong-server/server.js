@@ -63,7 +63,7 @@ app.register(async function (fastify) {
 						}
 						break;
 					case 'find_match':
-						handleMatchmaking(clientInfo, parsed.data.mode);
+						handleMatchmaking(clientInfo, parsed.data.mode, parsed.data.opponentPseudo);
 						break;
 					// Pour partie privee
 					case 'create_private_match':
@@ -141,7 +141,7 @@ app.register(async function (fastify) {
 	});
 });
 
-function handleMatchmaking(playerInfo, gameMode)
+function handleMatchmaking(playerInfo, gameMode, opponentPseudo = null)
 {
 	const isInQueue = matchmaking_1v1.some(p => p.socket.id === playerInfo.socket.id) || matchmaking_4p.some(p => p.socket.id === playerInfo.socket.id);
 	if (isInQueue) {
@@ -152,7 +152,7 @@ function handleMatchmaking(playerInfo, gameMode)
 	let game;
 	const modesInstants = ['1P_VS_AI', 'AI_VS_AI', '2AI_VS_2AI', '2P_LOCAL'];
 	if (modesInstants.includes(gameMode)) {
-		game = new GameInstance([playerInfo], gameMode);
+		game = new GameInstance([playerInfo], gameMode, opponentPseudo);
 	} else if (['1V1_ONLINE', '2P_ONLINE'].includes(gameMode)) {
 		matchmaking_1v1.push(playerInfo);
 		if (matchmaking_1v1.length >= 2) {

@@ -453,7 +453,8 @@ async function startMatchmaking(config) {
 				mode: gameState.gameMode,
 				pseudo: gameState.pseudo,
 				language: gameState.language,
-				avatarUrl: gameState.avatarUrl
+				avatarUrl: gameState.avatarUrl,
+				opponentPseudo: gameState.opponentPseudo
 			});
 		}
 
