@@ -1,8 +1,8 @@
-FROM node:22.19.0-trixie-slim AS hgp_game_management_server
+FROM node:22.19.0-trixie-slim
 
 WORKDIR /app
 
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y npm && rm -rf /var/lib/apt/lists/*
 
 COPY ./server_files/* /app/

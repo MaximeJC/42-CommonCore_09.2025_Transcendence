@@ -9,7 +9,7 @@ services:
     # depends_on:
     #   - game_management
     networks:
-      - transcendence_network
+      - hgp_network
     restart: unless-stopped
 
   front_end:
@@ -26,7 +26,7 @@ services:
     # volumes:
     #   - front_end_data:/var/www/html:ro
     networks:
-      - transcendence_network
+      - hgp_network
     restart: unless-stopped
 
   game_management:
@@ -39,20 +39,7 @@ services:
     # depends_on:
     #   - sqlite3
     networks:
-      - transcendence_network
-    restart: unless-stopped
-
-  sqlite3:
-    container_name: hgp_database
-    build:
-      context: ./requirements/database
-      dockerfile: Dockerfile
-    image: hgp_database_img
-    # env_file: ./.env
-    # volumes:
-    #   - sqlite_data:/var/lib/sqlite
-    networks:
-      - transcendence_network
+      - hgp_network
     restart: unless-stopped
 
   user_management:
@@ -67,7 +54,7 @@ services:
     # volumes:
     #   - sqlite_data:/var/lib/sqlite
     networks:
-      - transcendence_network
+      - hgp_network
     restart: unless-stopped
 
 volumes:
@@ -82,5 +69,5 @@ volumes:
       device: /home/mgouraud/data/front
 
 networks:
-  transcendence_network:
+  hgp_network:
     driver: bridge
