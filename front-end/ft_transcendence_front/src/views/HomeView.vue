@@ -216,7 +216,6 @@ onUnmounted(() => {
 
 <template>
 	<div>
-		<!-- <div v-show="!isPlayActive">-->
 		<div>
 			<Head :setLanguage="props.setLanguage" @show-form="isSignup" @show-setting="toggleissettnig" @show_setting="handleShowPage" :isConnect="isConnect"></Head>
 		</div>

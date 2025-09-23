@@ -110,7 +110,7 @@ onMounted(async()=>{ await fetchPlayerData(); }); */
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat" >{{ playerData.rank }}</div>
 		</div>
-		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :connect="playerData.connect" :setLanguage="props.setLanguage" ></invit_return>
+		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :selectedPlayerLogin="selectedPlayerLogin" :connect="playerData.connect" :setLanguage="props.setLanguage" ></invit_return>
 	</div>
 </template>
 

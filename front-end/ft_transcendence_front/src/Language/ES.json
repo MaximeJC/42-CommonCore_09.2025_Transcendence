@@ -69,5 +69,10 @@
     "tournament": "Torneo",
 	"4_players": "4 Juga-\ndores",
 	"8_players": "8 Juga-\ndores"
+	},
+
+	"invit":{
+    	"accept": "Aceptar",
+    	"refuse": "Rechazar"
 	}
 }

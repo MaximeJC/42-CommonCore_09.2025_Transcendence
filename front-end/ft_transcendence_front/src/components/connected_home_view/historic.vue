@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, defineExpose } from 'vue';
+import { ref, onMounted, defineExpose, nextTick } from 'vue';
+import { setLanguage, updateText } from '../../service/translators';
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
 
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
 
 interface Match{
 	win: boolean;
