@@ -71,5 +71,10 @@
 		"tournament": "Tournoi",
 		"4_players": "4 Joueurs",
 		"8_players": "8 Joueurs"
+	},
+
+	"invit":{
+		"accept": "Accepter",
+		"refuse": "Refuser"
 	}
 }
