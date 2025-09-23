@@ -1,4 +1,4 @@
-FROM node:22.19.0-trixie-slim AS HGP_front_server
+FROM node:22.19.0-trixie-slim AS hgp_front_server
 
 WORKDIR /app
 
