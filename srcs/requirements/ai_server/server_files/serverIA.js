@@ -83,7 +83,7 @@ fastify.post('/update', (request, reply) => {
 	}
 
 	if (DEBUG_MODE)
-		console.log(`${GREEN}[INFO] Etat du jeu mis a jour.`);
+		console.log(`${GREEN}[INFO] Etat du jeu mis a jour. ${RESET}`);
 
 	reply.send({
 		status: 'ok'
@@ -94,7 +94,7 @@ fastify.post('/update', (request, reply) => {
 fastify.get('/action', (request, reply) => { // definit une route GET a l'url /action
 	const action = decideIAAction(gameState, ballVision);
 	if (DEBUG_MODE)
-		console.log(`${RED}[INFO] Decision d\'action de l\'IA : ${JSON.stringify(action)}`)
+		console.log(`${RED}[INFO] Decision d\'action de l\'IA : ${JSON.stringify(action)} ${RESET}`)
 	reply.send({
 		action
 	}); // renvoie l'action au jeu
@@ -155,7 +155,7 @@ function decideIAAction(currentState, lastVision) {
 	// Choisir une cible (targetY)
 	let targetY;
 	if (isBallComingTowardsMe) {
-		if (DEBUG_MODE) console.log(`${BLUE}Mode: INTERCEPTION (base sur une vision vieille de ${((Date.now() - lastVision.timestamp)/1000).toFixed(1)}s)`);
+		if (DEBUG_MODE) console.log(`${BLUE}Mode: INTERCEPTION (base sur une vision vieille de ${((Date.now() - lastVision.timestamp)/1000).toFixed(1)}s) ${RESET}`);
 
 		const predictedY = predictBallLandingY(currentState, lastVision);
 		if (predictedY !== null) {
@@ -166,7 +166,7 @@ function decideIAAction(currentState, lastVision) {
 		}
 	} else {
 		// Si la balle s'eloigne, la cible est la position de depart.
-		if (DEBUG_MODE) console.log(`${BLUE}Mode: REPLACEMENT`);
+		if (DEBUG_MODE) console.log(`${BLUE}Mode: REPLACEMENT ${RESET}`);
 		targetY = homeY;
 	}
 
@@ -259,7 +259,7 @@ function predictBallLandingY(state, vision) {
 
 	// Afficher le resultat de la prediction en mode debug.
 	if (DEBUG_MODE) {
-		console.log(`${YELLOW}Prediction: la balle atterrira a y=${predictedY.toFixed(2)}`);
+		console.log(`${YELLOW}Prediction: la balle atterrira a y=${predictedY.toFixed(2)} ${RESET}`);
 	}
 
 	// On retourne la position Y finale apres avoir simule tous les rebonds.
@@ -277,7 +277,7 @@ const start = async () => {
 			host: '0.0.0.0'
 		});
 		if (DEBUG_MODE)
-			console.log(`${YELLOW}Serveur IA demarre sur http://localhost:3001`);
+			console.log(`${YELLOW}Serveur IA demarre sur http://localhost:3001 ${RESET}`);
 	} catch (err) {
 		console.error(err);
 		process.exit(1);

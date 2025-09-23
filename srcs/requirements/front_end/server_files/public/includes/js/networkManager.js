@@ -2,6 +2,7 @@
 
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
+import { returnToLobby } from './app.js'
 
 // On determine le protocole WebSocket. Si la page est en HTTPS, on utilise 'wss:', sinon 'ws:'.
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -11,7 +12,9 @@ const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const host = window.location.host;
 
 // On assemble l'URL complete du WebSocket.
-const WS_URL = `${protocol}//localhost:3003`;
+// const WS_URL = `${protocol}//localhost:3003`;
+const hostname = window.location.hostname;
+const WS_URL = `${protocol}//${hostname}:3003`;
 
 console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
@@ -23,7 +26,7 @@ let mainAppInitializer = null;
  * @param {function} initializer - La fonction a appeler quand le jeu doit demarrer.
  */
 export function setAppInitializer(initializer) {
-    mainAppInitializer = initializer;
+	mainAppInitializer = initializer;
 }
 
 
@@ -159,7 +162,15 @@ class NetworkManager {
 					console.log("- Vainqueur:", endData.winner);
 					console.log("- Perdant:", endData.loser);
 					console.log("- Duree:", endData.duration, "secondes");
+					console.log("gameMode:", endData.gameMode);
 					endGame(gameState, finalMessage);
+
+					//test partage donnees sur front
+					const gameResultEvent = new CustomEvent('gameresult', {
+					detail: message.data
+						});
+					window.dispatchEvent(gameResultEvent);
+					returnToLobby(true);
 					break;
 				
 				case 'error':

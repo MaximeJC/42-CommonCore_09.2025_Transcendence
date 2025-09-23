@@ -42,7 +42,7 @@
 <template>
 	<header class="header">
 		<h1 class="logo">FT_TRANSCENDENCE</h1>
-		<div class="end-button">
+		<div class="end-button" data-ignore-outside>
 			<button @click=handleButtonClick  class="my-button" title="sign_up" >
 				<div v-show="!isConnect" data-i18n="header.signUp"></div>
 				<div v-show="isConnect" data-i18n="header.signOut"></div>

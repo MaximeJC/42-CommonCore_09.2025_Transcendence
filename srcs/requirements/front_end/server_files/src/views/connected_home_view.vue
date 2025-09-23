@@ -1,28 +1,36 @@
 <script setup lang="ts">
-	import { ref, onMounted, nextTick, watch } from 'vue';
-	import player_frame from '../components/connected_home_view/connected_player_frame.vue'
-	import leaderbord from '../components/connected_home_view/leaderbord.vue';
-	import friendlist from '../components/connected_home_view/friendlist.vue';
-	import histo from '@/components/connected_home_view/historic.vue';
-	import histo_other from '@/components/connected_home_view/historic_other.vue'
+import { ref, onMounted, nextTick, watch } from 'vue';
+import { setLanguage, updateText } from '../service/translators';
+import player_frame from '../components/connected_home_view/connected_player_frame.vue'
+import otherplayer_frame from '../components/connected_home_view/connected_otherplayer_frame.vue'
+import leaderbord from '../components/connected_home_view/leaderbord.vue';
+import friendlist from '../components/connected_home_view/friendlist.vue';
+import histo from '@/components/connected_home_view/historic.vue';
+import histo_other from '@/components/connected_home_view/historic_other.vue'
 
-	const emit = defineEmits(['show_play']);
+const emit = defineEmits(['show_play']);
 
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
 
-	const historic = ref(false)
-	const other_player = ref(false)
-	
-	const props = defineProps<{
-		setLanguage: (lang: string) => void;
-	}>();
+const historic = ref(false);
+const other_player = ref(false);
+const selectedPlayerLogin = ref<string | null>(null);
 
-	const togglehistoric = () => {
-		historic.value = !historic.value;
-	}
+const props = defineProps<{
+	setLanguage: (lang: string) => void;
+}>();
 
-	const toggleother_player = () => {
-		other_player.value = !other_player.value;
-	}
+const togglehistoric = () => {
+	historic.value = !historic.value;
+}
+
+const toggleother_player = (login: string) => {
+	other_player.value = !other_player.value;
+	selectedPlayerLogin.value = login;
+}
 
 	
 
@@ -31,20 +39,35 @@
 <template>
 	<div class="page">
 		<player_frame
+		v-show="!other_player"
 		    :setLanguage="props.setLanguage"
 		    :other_player="other_player"
 		    :historic="historic"
-		    @show-other_player="toggleother_player"
+		    @showOtherPlayer="toggleother_player"
 		    @show-historic="togglehistoric"
 			@show_play="emit('show_play')">
 		</player_frame>
-		<div v-show="!historic && !other_player" title="leader+friend" class="subpages">
-			<leaderbord @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
-			<friendlist @show-other_player="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
+		<otherplayer_frame
+			v-show="other_player"
+			:setLanguage="props.setLanguage"
+			:other_player="other_player"
+			:selectedPlayerLogin="selectedPlayerLogin"
+			@showOtherPlayer="toggleother_player"
+		></otherplayer_frame>
+		<div v-if="!historic && !other_player" title="leader+friend" class="subpages">
+			<leaderbord @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
+			<friendlist @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
 		</div>
 		<div v-show="historic || other_player" title="historic" class="histo-container">
-			<histo v-show="historic" :setLanguage="props.setLanguage"></histo>
-			<histo_other v-show="other_player" :setLanguage="props.setLanguage"></histo_other>
+			<histo 
+				v-show="historic" 
+				:setLanguage="props.setLanguage">
+			</histo>
+			<histo_other 
+				v-show="other_player" 
+				:setLanguage="props.setLanguage"
+				:playerLogin="selectedPlayerLogin">
+			</histo_other>
 		</div>
 	</div>
 </template>

@@ -21,8 +21,6 @@ const error_password = ref(false);
 const message = ref("");
 const profile = reactive({ email: '' })
 
-
-
 async function handleConnection() { // fonction asynchrone appelee lors de la tentative de connexion d'un utilisateur
 		// reinitialiser les variables d'erreur et de message:
 		error_email.value = false;
@@ -43,10 +41,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 				success: boolean; // reussite de la requete
 				message?: string; // message optionnel
 				user?: User;
-				errors?: { // objet optionnel contenant les eventuelles erreurs d'email et de mdp
-					email?: string;
-					password?: string;
-				};
+				field?: 'email' | 'password'; 
 			}
 			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
 			
@@ -54,30 +49,31 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			console.log("Test data:");
 			console.log(data.success, data);
 			console.log("*****************************************");
-			if (data.success && data.user?.login) {
-				message.value = `Welcome ${data.user?.login}!` //todo langues
-				console.log(message.value, "*******************");
-				if (data.user)
-					setUser(data.user);
-				emit('isconnected'); // emission de l'evenement de connexion reussie
+			if (result.ok) { 
+			message.value = `Welcome ${data.user?.login}!` //todo langues
+			console.log(message.value, "*******************");
+			if (data.user)
+				setUser(data.user);
+			emit('isconnected'); // emission de l'evenement de connexion reussie
+		} else {
+			message.value = data.message || "Connexion error"; //todo langues
+			console.log(message.value, "2*******************");
+			if (data.field === 'email') { 
+				error_email.value = true;
+			} else if (data.field === 'password') {
+				error_password.value = true;
 			} else {
-				message.value = data.message || "Connexion error"; //todo langues
-				console.log(message.value, "2*******************");
-				if (data.errors) { // si erreurs specifiques
-					error_email.value = !!data.errors.email; // '!!' permet de conve`rtir en booleen (si pas d'erreur-> ! devient true et !! devient false, et inversement)
-					error_password.value = !!data.errors.password;
-				} else {
-					error_email.value = true;
-					error_password.value = true;
-				}
+				error_email.value = true;
+				error_password.value = true;
 			}
-			await fetchProfile();
-		} catch (err) {
-			message.value = "Cannot contact server";
-			error_email.value = true;
-			error_password.value = true;
 		}
+		await fetchProfile();
+	} catch (err) {
+		message.value = "Cannot contact server";
+		error_email.value = true;
+		error_password.value = true;
 	}
+}
 
 	async function fetchProfile() {
 		const res = await fetch(`http://${window.location.hostname}:3000/me`, {
@@ -104,7 +100,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			</label>
 			<input class="c-input" type="password" id="password" v-model="password" required>
 			<div  title="pasword-error" class="c-error"  >
-				<div v-show=" !error_password" data-i18n="Signup.mail_error"></div>
+				<div v-show=" error_password" data-i18n="Signup.password_invalid"></div>
 			</div>
 			<div title="c-line_button" class="c-line-button">
 				<div class="c-icon-button">

@@ -1,11 +1,17 @@
 <script setup lang="ts">
-	import { ref, watch, onUnmounted, nextTick,computed } from 'vue';
+	import { ref, watch, onUnmounted, onMounted, nextTick, computed } from 'vue';
+	import { setLanguage, updateText } from '../../service/translators';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		show_play: boolean;
 
 	}>();
+
+	onMounted(async () => {
+		await nextTick()
+		updateText() 
+	})
 
 
 	const emit = defineEmits(['show_play', 'typeplay']);
@@ -24,50 +30,53 @@
 	const offlineBox = ref<HTMLElement | null>(null);
 	const onlineBox =  ref<HTMLElement | null>(null);
 	const playBox =  ref<HTMLElement | null>(null);
-	//const handlePointerDownOutside = (e: PointerEvent) => {
-	//	const target = e.target as Node | null;
-	//	if (!target) return;
 
-	//	// Fermer offline seulement si ouvert et clic en dehors
-	//	if (offline_play.value && offlineBox.value && !offlineBox.value.contains(target)) {
-	//		offline_play.value = false;
-	//	}
+	const handlePointerDownOutside = (e: PointerEvent) => {
+		const target = e.target as Node | null;
+		if (!target) return;
 
-	//	// Fermer online seulement si ouvert et clic en dehors
-	//	if (online_play.value && onlineBox.value && !onlineBox.value.contains(target)) {
-	//		online_play.value = false;
-	//	}
+		if ((target as Element).closest && (target as Element).closest('[data-ignore-outside]')) return
 
-	//	// Gérer l'affichage du "play" uniquement quand rien d'autre n'est ouvert
-	//	if (!offline_play.value && !online_play.value && playBox.value && !playBox.value.contains(target)) {
-	//		if(props.show_play === true)
-	//			emit('show_play');
-	//	}
-	//};
+		// Fermer offline seulement si ouvert et clic en dehors
+		if (offline_play.value && offlineBox.value && !offlineBox.value.contains(target)) {
+			offline_play.value = false;
+		}
 
-	//const anyOpen = computed(() => offline_play.value || online_play.value|| playBox.value);
-	//watch(anyOpen, (newValue) => {
-	//	if (newValue) {
-	//		nextTick(() => {
-	//			document.addEventListener(
-	//				'pointerdown',
-	//				handlePointerDownOutside,
-	//				{ capture: true}
-	//			);
-	//		})
-	//	}	
-	//	else {
-	//		document.removeEventListener(
-	//			'pointerdown',
-	//			handlePointerDownOutside,
-	//			{ capture: true}
-	//		);
-	//	}
-	//});
+		// Fermer online seulement si ouvert et clic en dehors
+		if (online_play.value && onlineBox.value && !onlineBox.value.contains(target)) {
+			online_play.value = false;
+		}
 
-	//onUnmounted(() => {
-	//document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
-	//})
+		// Gérer l'affichage du "play" uniquement quand rien d'autre n'est ouvert
+		if (!offline_play.value && !online_play.value && playBox.value && !playBox.value.contains(target)) {
+			if(props.show_play === true)
+				emit('show_play');
+		}
+	};
+
+	const anyOpen = computed(() => offline_play.value || online_play.value|| playBox.value);
+	watch(anyOpen, (newValue) => {
+		if (newValue) {
+			nextTick(() => {
+				document.addEventListener(
+					'pointerdown',
+					handlePointerDownOutside,
+					{ capture: true}
+				);
+			})
+		}	
+		else {
+			document.removeEventListener(
+				'pointerdown',
+				handlePointerDownOutside,
+				{ capture: true}
+			);
+		}
+	});
+
+	onUnmounted(() => {
+	document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+	})
 
 	const typeplay = (connection: boolean, type: string ) => {
 		//console.log(pageName);
@@ -91,10 +100,10 @@
 	</div>
 	<div ref="offlineBox">
 		<div v-show="offline_play" class="select_offline_page">
-			<button @click="typeplay(false, 'vs_ia')" class="select_button">
+			<button @click="typeplay(false, '1P_VS_AI')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_ia"></div>
 			</button>
-			<button @click="typeplay(false, '1_vs_1')" class="select_button">
+			<button @click="typeplay(false, '2P_LOCAL')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_player"></div>
 			</button>
 			<button @click="typeplay(false, 'tournament')" class="select_button">
@@ -104,10 +113,10 @@
 	</div>
 	<div ref="onlineBox">
 		<div v-show="online_play" class="select_online_page">
-			<button @click="typeplay(true, '1_vs_1')" class="select_button">
+			<button @click="typeplay(true, '1V1_ONLINE')" class="select_button">
 				<div class="play_title" data-i18n="play.VS_player"></div>
 			</button>
-			<button @click="typeplay(true, '2_vs_2')" class="select_button">
+			<button @click="typeplay(true, '4P_ONLINE')" class="select_button">
 				<div class="play_title" data-i18n="play.2_VS_2"></div>
 			</button>
 		</div>
@@ -121,7 +130,7 @@
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -132,7 +141,7 @@
 	grid-template-columns: 1fr 1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -143,7 +152,7 @@
 	grid-template-columns:1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 50%;
+	top: 200%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -174,7 +183,7 @@
 	font-size: 3rem;
 	cursor: pointer;
 	transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-
+	word-wrap: break-word;
 }
 
 .select_button:hover{

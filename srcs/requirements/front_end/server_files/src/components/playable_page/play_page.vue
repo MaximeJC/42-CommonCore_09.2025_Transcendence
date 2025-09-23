@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import selec_play from './selection-type-play.vue'
 import play from './playable_page.vue'
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
@@ -21,10 +21,12 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
+
+
 </script>
 
 <template>
-	<div v-show="!isPlayActive">
+	<div v-if="!isPlayActive">
 		<selec_play
 			@show_play="emit('show_play')"
 			@typeplay="handletypeplay"
@@ -35,6 +37,8 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	<div v-show="isPlayActive">
 		<play
 		:activePlay="activePlay"
+		:set-language="props.setLanguage"
+		@gameisfinish="handletypeplay"
 		></play>
 	</div>
 </template>

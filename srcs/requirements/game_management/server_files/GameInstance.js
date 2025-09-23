@@ -110,7 +110,7 @@ export class GameInstance {
 				break;
 
 			default:
-				console.error("[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.");
+				console.error(`[Jeu ${this.gameId}] Mode de jeu '${gameMode}' inconnu. Creation d'une partie 1v1 par defaut.`);
 				players.push(createPlayer("Player 1", 'player_left_top', 'HUMAN', '', 0));
 				players.push(createPlayer("Player 2", 'player_right_top', 'HUMAN', '', 0));
 				break;
@@ -342,12 +342,14 @@ export class GameInstance {
 						loser: loserPseudo,
 						duration: this.gameDurationInSeconds,
 						score_left: score_left,
-						score_right: score_right
+						score_right: score_right,
+						gameMode: this.gameState.gameMode,
+						playerLeftTop: this.gameState.activePlayers.find(p => p.name === 'player_left_top').pseudo,
+						playerRightTop: this.gameState.activePlayers.find(p => p.name === 'player_right_top').pseudo
 					}
 				}));
 			}
 		});
-
 
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);

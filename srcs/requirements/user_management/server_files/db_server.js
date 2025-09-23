@@ -6,7 +6,16 @@ import dbModule from './db.js' // importer cette fonction du fichier db.js
 import bcrypt from 'bcrypt';
 import fastifyCookie from '@fastify/cookie';
 import fastifySecureSession from '@fastify/secure-session';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import validator from 'validator';
+import { dirname } from 'path';
+
 import crypto from 'crypto';
+import { pipeline } from 'stream/promises'; // Pour gérer les flux proprement
+import fs from 'fs'; // Pour créer le flux d'écriture
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { db, getUserByEmail } = dbModule;
 const fastify = Fastify({logger: true});
@@ -17,29 +26,125 @@ await fastify.register(fastifyCookie);
 await fastify.register(fastifySecureSession, {
   key: crypto.randomBytes(32), //generer une cle aleatoire
   cookie: {
-    path: '/',
-    httpOnly: true,
-    secure: false,
+	path: '/',
+	httpOnly: true,
+	secure: false,
 	sameSite: 'lax',
 	saveUninitialized: false
   }
 });
 
-async function configure() {
-	const allowedOrigin = ['http://localhost:5173','http://127.0.0.1:5173', 'http://192.168.122.1:5173','http://10.11.2.10:5173'];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const newdir = path.join(__dirname, '../..', 'front-end/ft_transcendence_front/');
 
-	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
+await fastify.register(fastifyMultipart);
+await fastify.register(fastifyStatic, {
+	root: path.join(newdir, 'uploads'),
+	prefix: '/uploads/',
+});
+
+fastify.post('/upload-avatar', async (request, reply) => {
+	try {
+		const data = await request.file();
+		if (!data) {
+			return reply.status(400).send({ error: 'No file uploaded' });
+		}
+
+		const user = request.session.get('user');
+		if (!user || !user.login) {
+			return reply.status(401).send({ error: 'User not logged in' });
+		}
+
+		const filename = `${user.login}-${data.filename}`;
+		const saveTo = path.join(newdir, 'uploads', filename); //TODO : Voir pour le bon chemin
+
+		try {
+
+			const fileToDelete = fs.readdirSync(`${newdir}/uploads`);
+			console.log("fileToDelete:", fileToDelete);
+			for (const file of fileToDelete) {
+				console.log("file:", file);
+				if (file.startsWith(`${user.login}-`)) {
+					fs.unlinkSync(path.join(`${newdir}/uploads`, file));
+				}
+			}
+
+			// Utiliser pipeline pour sauvegarder le fichier de maniere securisee et efficace
+			console.log(`[AVATAR] Sauvegarde dans: ${saveTo}`);
+			await pipeline(data.file, fs.createWriteStream(saveTo));
+			console.log(`[AVATAR] Fichier sauvegarde avec succes.`);
+
+		} catch (err) {
+			console.error("Erreur lors de la sauvegarde du fichier:", err);
+			return reply.status(500).send({ error: 'Could not save the file' });
+		}
+
+		const relativePath = `/uploads/${filename}`;
+
+		console.log(`[AVATAR] Mise a jour de la BDD pour l'utilisateur ${user.login} avec le chemin ${relativePath}`);
+		
+		await new Promise((resolve, reject) => {
+			db.run(
+				'UPDATE users SET avatar_url = ? WHERE login = ?',
+				[relativePath, user.login],
+					function (err) {
+					if (err) {
+						reject(err);
+					} else {
+						resolve();
+					}
+				}
+			);
+		});
+
+		console.log(`[AVATAR] BDD mise a jour avec succes.`);
+
+		reply.send({ message: 'Avatar uploaded', avatar_url: relativePath });
+	} catch (error) {
+		console.error("!!! ERREUR INTERNE DANS /upload-avatar !!!", error);
+		return reply.status(500).send({ 
+			message: 'Internal Server Error', 
+			error: error.message
+		});
+	}
+});
+
+
+// fastify.get('/upload-avatar', async (request, reply) => {
+// 	const data = await request.file();
+// 	if (!data)
+// 		return reply.send({ error: 'NO avatar'});
+// 	return reply.send({ data });
+
+// });
+
+	async function configure() {
+	const allowedOrigins = [
+		'http://localhost:5173',
+		'http://127.0.0.1:5173',
+	];
 
 	await fastify.register(cors, {
 		origin: (origin, cb) => {
-			if (!origin || allowedOrigin.includes(origin)) {
-				cb(null, true);
-			} else {
-				cb(new Error(`Not allowed by CORS: ${origin}`));
+			if (!origin) {
+				return cb(null, true);
 			}
+			if (allowedOrigins.includes(origin)) {
+				return cb(null, true);
+			}
+
+			if (origin.startsWith('http://10.') || origin.startsWith('http://192.') ||
+				origin.startsWith('https://10.') || origin.startsWith('https://192.'))
+			{
+				return cb(null, true);
+			}
+			cb(new Error(`Not allowed by CORS: ${origin}`));
 		},
 		credentials: true
-	}); // autoriser n'importe qui a appeler l'API de ce serveur
+	});
+
+	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
 
 	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
 
@@ -64,13 +169,23 @@ fastify.post('/users', async (request, reply)=>{
 	if (!login || !email || !password) {
 		return reply.status(400).send({ success: false, message: "Login, email and/or password is missing" });
 	}
-	const	hashedPassword = await bcrypt.hash(password, 10);
+	let cleanLogin, cleanEmail, cleanPassword;
+
+	cleanLogin = validator.trim(login);
+	cleanLogin = validator.escape(cleanLogin);
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	cleanPassword = validator.escape(password);
+
+	const	hashedPassword = await bcrypt.hash(cleanPassword, 10);
 
 	try {
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO users (login, email, password) VALUES (?, ?, ?)`,
-				[login, email, hashedPassword],
+				`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
+				[cleanLogin, cleanEmail, hashedPassword, '/images/default_avatar.png'],
 				function (err) {
 					if (err) {
 						if (DEBUG_MODE)
@@ -88,10 +203,10 @@ fastify.post('/users', async (request, reply)=>{
 		if (DEBUG_MODE)
 			console.log("Erreur d'ajout d'un utilisateur:", err.stack);
 		if (err.code === 'SQLITE_CONSTRAINT') {
-			if (err.message.includes('UNIQUE constraint failed: user.email'))
-				return reply.status(409).send({ success: false, message: "Email already used." });
-			else if (err.message.includes('UNIQUE constraint failed: users.login'))
-				return reply.status(409).send({ success: false, message: "Login already used." });
+			if (err.message.includes('UNIQUE constraint failed: users.login'))
+				return reply.status(409).send({ success: false, message: "Login already used.", field: "login" });
+			else if (err.message.includes('UNIQUE constraint failed: users.email'))
+				return reply.status(409).send({ success: false, message: "Email already used.", field: "email" });
 		}
 		reply.status(500).send({ success: false, message: "Server error: " + err.message });
 	}
@@ -167,7 +282,6 @@ fastify.post('/deleteuser', async (request, reply)=>{
 });
 
 // verifier les identifiants:
-
 function updateIsConnected(userId) {
 	db.serialize(async()=>{
 		try {
@@ -199,21 +313,45 @@ fastify.post('/login', async (request, reply)=>{
 		console.log("****************************************");
 	}
 
-	const user = await getUserByEmail(email);
+	// Validation de base
+	if (!email || !password) {
+		return reply.status(400).send({ success: false, message: "Email and password are required." });
+	}
+
+	let cleanEmail, cleanPassword;
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	cleanPassword = validator.escape(password);
+
+	const user = await getUserByEmail(cleanEmail);
 	if (DEBUG_MODE)
 		console.log("Utilisateur trouve: ", user);
+
 	if (user) {
 		if (DEBUG_MODE) {
 			console.log("****************************************");
 			console.log('user', user.password);
 			console.log("****************************************");
 		}
-		if (await bcrypt.compare(password, user.password) === true) {
+		const passwordMatch = await bcrypt.compare(cleanPassword, user.password);
+
+		if (passwordMatch === true) {
+			
 			if (DEBUG_MODE)
 				console.log("User Ok");
 			request.session.set('user', user);
 			updateIsConnected(user.id);
 			return reply.send({ success: true, user: user });
+		} else {
+			// Le mot de passe est incorrect
+			if (DEBUG_MODE) console.log("Mot de passe incorrect pour l'utilisateur:", user.login);
+			return reply.status(401).send({ 
+				success: false, 
+				message: "Invalid credentials.", 
+				field: "password"
+			});
 		}
 	} else {
 		if (DEBUG_MODE) {
@@ -221,17 +359,40 @@ fastify.post('/login', async (request, reply)=>{
 			console.log("Wrong user");
 			console.log("****************************************");
 		}
-		return reply.send({ success: false, message: "Wrong email and/or password" });
+		return reply.status(401).send({ success: false, message: "Invalid credentials.", field: "email"	});
 	}
 });
 
 fastify.get('/me', async (req, rep) => {
-	const user = req.session.get('user');
-	if (!user) {
+	const userMe = req.session.get('user');
+	if (!userMe) {
 		return rep.send({ error: 'Disconnected'});
 	}
+
+	const user = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT * FROM users WHERE login = ?`,
+				[userMe.login],
+				(err, row)=>{
+					if (err) {
+						reject(err);
+					} else {
+						resolve(row);
+					}
+				}
+			);
+		});
+
 	return rep.send({ user });
 });
+
+// fastify.get('/me', async (req, rep) => {
+// 	const user = req.session.get('user');
+// 	if (!user) {
+// 		return rep.send({ error: 'Disconnected'});
+// 	}
+// 	return rep.send({ user });
+// });
 
 function updateIsNotConnected(userId) {
 	db.serialize(async()=>{
@@ -265,7 +426,7 @@ fastify.get('/logout', async (request, reply) => {
 // 	});
 });
 
-// fastify.get('/users/current', async (request, reply)=>{
+// fastify.get('/users/specificlogin', async (request, reply)=>{
 // 	try {
 // 		const row = await new Promise((resolve, reject)=>{
 // 			db.all(
@@ -300,7 +461,7 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-
+		
 		const loserExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM users WHERE login = ?`, [login_loser], (err, row)=>{
@@ -312,10 +473,10 @@ fastify.post('/games', async (request, reply)=>{
 				}
 			);
 		});
-
+		
 		if (!winnerExists || !loserExists)
 			return reply.status(400).send({error: "Login not found in database."});
-
+		
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser) VALUES (?,?,?,?)`,
@@ -446,8 +607,8 @@ fastify.get('/leaderboard', async (request, reply)=>{
 		updateUserRanks();
 		const leaderboard = await new Promise((resolve, reject)=>{
 			db.all(
-				`SELECT login as name, nb_games as games, nb_won_games as victory, rank
-				FROM users
+				`SELECT login as name, nb_games as games, nb_won_games as victory, rank 
+				FROM users 
 				ORDER BY rank ASC
 				LIMIT 10`,
 				(err, rows)=>{
@@ -471,6 +632,11 @@ fastify.post('/friends', async (request, reply)=>{
 	const {login1, login2} = request.body;
 	if (DEBUG_MODE)
 		console.log("Logins recus: ", {login1, login2});
+	
+	let cleanLogin2;
+
+	cleanLogin2 = validator.trim(login2);
+	cleanLogin2 = validator.escape(cleanLogin2);
 
 	try {
 		const login1Exists = await new Promise((resolve, reject)=>{
@@ -492,7 +658,7 @@ fastify.post('/friends', async (request, reply)=>{
 
 		const login2Exists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM users WHERE login = ?`, [login2], (err, row)=>{
+				`SELECT 1 FROM users WHERE login = ?`, [cleanLogin2], (err, row)=>{
 					if (err) reject(err);
 					else {
 						if (row) resolve(true);
@@ -505,12 +671,12 @@ fastify.post('/friends', async (request, reply)=>{
 		if (!login2Exists)
 			return reply.status(400).send({error: "Login2 not found in database."});
 		if (DEBUG_MODE)
-			console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
+			console.log("Login2 a bien ete trouve dans la base de donnees: ", {cleanLogin2});
 
 		const relationExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM friends WHERE (login1 = ? AND login2 = ?) OR (login2 = ? AND login1 = ?)`,
-				[login1, login2, login2, login1],
+				[login1, cleanLogin2, cleanLogin2, login1],
 				(err, row)=>{
 					if (err) reject(err);
 					else {
@@ -523,16 +689,16 @@ fastify.post('/friends', async (request, reply)=>{
 
 		if (relationExists)
 			return reply.status(400).send({error: "Friendship already exists."});
-
+		
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[login1, login2],
+				[login1, cleanLogin2],
 				(err)=>{ if (err) reject(err); }
 			);
 			db.run(
 				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[login2, login1],
+				[cleanLogin2, login1],
 				(err)=>{
 					if (err) reject(err);
 					else resolve(this);
@@ -558,21 +724,15 @@ fastify.get('/friends/me', async (request, reply)=>{
 			db.all(
 				`SELECT DISTINCT
 					u.login as name,
-					u.avatar_url as avatar_src
+					u.avatar_url as avatar_src,
+					(u.connected = 1) as isconnected
 				FROM friends f
 				JOIN users u ON (u.login = f.login2)
-				WHERE f.login1 = ?`,
-				[login_current],
+				WHERE f.login1 = ?`, 
+				[login_current], 
 				(err, friends)=>{
 					if (err) reject(err);
-					else {
-						//todo a modifier pour que isconnected ne soit plus en dur
-						const friendsWithConnectionStatus = friends.map(friend=>({
-							...friend,
-							isconnected: true
-						}));
-						resolve(friendsWithConnectionStatus);
-					}
+					else resolve(friends);
 				}
 			);
 		});
@@ -626,7 +786,7 @@ fastify.post('/friends/delete', async (request, reply)=>{
 			return reply.status(400).send({message: "Friendship doesn't exist."});
 		if (DEBUG_MODE)
 			console.log("La relation existe bien.\n");
-
+	
 		await new Promise((resolve, reject)=>{
 			db.run(
 				`DELETE FROM friends WHERE (login1 = ? AND login2 = ?)`,
@@ -654,15 +814,15 @@ fastify.post('/friends/delete', async (request, reply)=>{
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILISATEURS CONNECTES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Informations sur l'utilisateur actuellement connecte, pour l'affichage par connected_player_frame.vue
-fastify.get('/users/current', async (request, reply)=>{
+// Informations sur un utilisateur en particulier, pour l'affichage par connected_player_frame.vue
+fastify.get('/users/specificlogin', async (request, reply)=>{
 	const login = request.query.login;
 	if (!login)
 		return reply.status(400).send({ error: "Missing login" });
 	try {
 		const user = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT login, nb_games, nb_won_games, rank FROM users WHERE login = ?`,
+				`SELECT login, avatar_url, nb_games, nb_won_games, connected, rank FROM users WHERE login = ?`,
 				[login],
 				(err, row)=>{
 					if (err) reject(err);
@@ -679,6 +839,7 @@ fastify.get('/users/current', async (request, reply)=>{
 	}
 });
 
+// envoyer tous les utilisateurs connectes:
 fastify.get('/users/connected', async (request, reply) => {
 	try {
 		const	rows = await new Promise((resolve, reject) => {
@@ -698,3 +859,195 @@ fastify.get('/users/connected', async (request, reply) => {
 		reply.status(500).send({ error: err.message });
 	}
 })
+
+fastify.post('/users/change-email', async (request, reply)=>{
+	const {email} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!email) {
+		return reply.status(400).send({ success: false, message: "email is missing" });
+	}
+	let cleanEmail;
+
+	cleanEmail = validator.trim(email);
+	cleanEmail = validator.escape(cleanEmail);
+
+	const user = request.session.get('user');
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.run(
+				`UPDATE users SET email = ? WHERE id = ?`,
+				[cleanEmail, user.id],
+				function (err) {
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
+				}
+			);
+		});
+		if (DEBUG_MODE)
+			console.log("New email successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New email successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement d'email", err.stack);
+		if (err.code === 'SQLITE_CONSTRAINT') {
+			if (err.message.includes('UNIQUE constraint failed: users.email'))
+				return reply.status(409).send({ success: false, message: "Email already used.", field: "email" });
+		}
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});
+
+fastify.post('/users/change-login', async (request, reply)=>{
+	const {login} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!login) {
+		return reply.status(400).send({ success: false, message: "login is missing" });
+	}
+	let cleanLogin;
+
+	cleanLogin = validator.trim(login);
+	cleanLogin = validator.escape(cleanLogin);
+
+	const user = request.session.get('user');
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.serialize(()=>{
+				db.run(`BEGIN TRANSACTION`);
+
+				// table users:
+				db.run(
+					`UPDATE users SET login = ? WHERE id = ?`,
+					[cleanLogin, user.id],
+					function (err) {
+						if (err) {
+							if (DEBUG_MODE)
+								console.log("Erreur SQL change login: users:", err.message);
+							db.run(`ROLLBACK`);
+							reject(err);
+						} else {
+							db.run(
+								`UPDATE games SET login_winner = ? WHERE login_winner = ?`,
+								[cleanLogin, user.login],
+								function (err) {
+									if (err) {
+										if (DEBUG_MODE)
+											console.log("Erreur SQL change login: games, winner:", err.message);
+										db.run(`ROLLBACK`);
+										reject(err);
+									} else {
+										db.run(
+											`UPDATE games SET login_loser = ? WHERE login_loser = ?`,
+											[cleanLogin, user.login],
+											function (err) {
+												if (err) {
+													if (DEBUG_MODE)
+														console.log("Erreur SQL change login: games, loser:", err.message);
+													db.run(`ROLLBACK`);
+													reject(err);
+												} else {
+													db.run(
+														`UPDATE friends SET login1 = ? WHERE login1 = ?`,
+														[cleanLogin, user.login],
+														function (err) {
+															if (err) {
+																if (DEBUG_MODE)
+																	console.log("Erreur SQL change login: friends, login1:", err.message);
+																db.run(`ROLLBACK`);
+																reject(err);
+															} else {
+																db.run(
+																	`UPDATE friends SET login2 = ? WHERE login2 = ?`,
+																	[cleanLogin, user.login],
+																	function (err) {
+																		if (err) {
+																			if (DEBUG_MODE)
+																				console.log("Erreur SQL change login: friends, login2:", err.message);
+																			db.run(`ROLLBACK`);
+																			reject(err);
+																		} else {
+																			db.run(`commit`, function (err) {
+																				if (err) {
+																					if (DEBUG_MODE)
+																						console.log("Erreur SQL Commit:", err.message);
+																					reject(err);
+																				} else {
+																					resolve(this);
+																				}
+																			});
+																		}
+																	}
+																);
+															}
+														}
+													);
+												}
+											}
+										);
+									}
+								}
+							);
+						}
+					}
+				);
+			});
+		});
+		if (DEBUG_MODE)
+			console.log("New login successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New login successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement de login", err.stack);
+		if (err.code === 'SQLITE_CONSTRAINT') {
+			if (err.message.includes('UNIQUE constraint failed: users.login'))
+				return reply.status(409).send({ success: false, message: "Login already used.", field: "login" });
+		}
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});
+
+fastify.post('/users/change-password', async (request, reply)=>{
+	const {id, password} = request.body;
+	if (DEBUG_MODE)
+		console.log("Donnees recues: ", request.body);
+	if (!password) {
+		return reply.status(400).send({ success: false, message: "password is missing" });
+	}
+	let cleanPassword;
+
+	cleanPassword = validator.escape(password);
+
+	const	hashedPassword = await bcrypt.hash(cleanPassword, 10);
+
+	// const user = request.session.get('user');
+	console.log("id: ", id);
+
+	try {
+		const result = await new Promise((resolve, reject)=>{
+			db.run(
+				`UPDATE users SET password = ? WHERE id = ?`,
+				[hashedPassword, id],
+				function (err) {
+					if (err) {
+						if (DEBUG_MODE)
+							console.log("Erreur SQL:", err.message);
+						reject(err);
+					} else resolve(this);
+				}
+			);
+		});
+		if (DEBUG_MODE)
+			console.log("New password successfully changed. ID =", result.lastID);
+		reply.status(201).send({ success: true, message: "New password successfully changed", userId: result.lastID });
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log("Erreur de changement de password", err.stack);
+		reply.status(500).send({ success: false, message: "Server error: " + err.message });
+	}
+});

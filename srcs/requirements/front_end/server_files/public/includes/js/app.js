@@ -24,7 +24,7 @@ let activeScene = null;
 /**
  * Nettoie la scene de jeu actuelle et retourne au lobby.
  */
-function returnToLobby() {
+function returnToLobby(endgame) {
 	console.log("Nettoyage de la scene et retour au lobby...");
 
 	// Arreter la boucle de rendu pour eviter les erreurs
@@ -54,7 +54,7 @@ function returnToLobby() {
 	gameState.activePlayers = [];
 	gameState.ball = null;
 	// ... (reinitialiser d'autres etats si besoin)
-	
+
 	// Reafficher le lobby HTML
 	const lobby = document.getElementById('lobby');
 	const canvas = document.getElementById('renderCanvas');
@@ -62,6 +62,8 @@ function returnToLobby() {
 		lobby.style.display = 'block';
 	if (canvas)
 		canvas.style.display = 'none';
+	if (endgame === false)
+		window.dispatchEvent(new CustomEvent('babylon-returned-to-lobby'));
 }
 
 /**
@@ -83,12 +85,53 @@ function showWaitingScreen() {
 	else
 		text.text = "Searching for game...";
 	text.color = "white";
-	// text.fontFamily = "Courier New, monospace";
+	text.fontFamily = "netron";
 	text.fontSize = 24;
 	ui.addControl(text);
 
+	// ------------------------------------
+
+	const cancelButton = BABYLON.GUI.Button.CreateSimpleButton("cancelButton", "ANNULER");
+	cancelButton.width = "200px";
+	cancelButton.height = "50px";
+	cancelButton.color = "#dd0aba";
+	cancelButton.fontSize = '20px';
+	cancelButton.background = "rgba(156, 50, 133, 0.5)";
+	cancelButton.cornerRadius = 5;
+	cancelButton.thickness = 1;
+
+	cancelButton.fontFamily = "netron";
+	 if (cancelButton.textBlock) {
+		cancelButton.textBlock.color = "white"; 
+	}
+	
+	cancelButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+	cancelButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+	cancelButton.top = "-50px";
+	const hoverBackgroundColor = "rgba(251, 255, 34, 0.5)";
+	const hoverBorderColor = "#fbff22";
+
+	cancelButton.onPointerEnterObservable.add(() => {
+		cancelButton.background = hoverBackgroundColor;
+		cancelButton.color = hoverBorderColor;
+	});
+
+	cancelButton.onPointerOutObservable.add(() => {
+		cancelButton.background = "rgba(156, 50, 133, 0.5)";
+		cancelButton.color = "#dd0aba";
+	});
+
+	cancelButton.onPointerUpObservable.add(() => {
+		console.log("Le bouton 'Quitter' a ete clique.");
+		returnToLobby();
+	});
+
+	ui.addControl(cancelButton);
+
+	// ------------------------------------
 	activeScene = waitingScene;
 }
+
 
 /**
  * Anime la camera de la scene de jeu sur une trajectoire predefinie.
@@ -345,76 +388,81 @@ setAppInitializer(initializeApp);
 
 // --- POINT D'ENTREE DE L'APPLICATION ---
 
-window.addEventListener('DOMContentLoaded', () => {
-    const lobby = document.getElementById('lobby');
-    const startButton = document.getElementById('start-game-button');
-    const pseudoInput = document.getElementById('pseudo-input');
-    const avatarInput = document.getElementById('avatar-input');
-    const gamemodeSelect = document.getElementById('gamemode-select');
-    const canvas = document.getElementById('renderCanvas');
-	const languageSelect = document.getElementById('language-select');
+/**
+ * Demarre le processus de matchmaking. C'est la fonction que le client (Vue.js) appellera.
+ * @param {object} config - L'objet de configuration du jeu.
+ * @param {string} config.pseudo - Le pseudo du joueur.
+ * @param {string} config.opponentPseudo - Le pseudo de l'adversaire pour un match prive.
+ * @param {string} config.avatarUrl - L'URL de l'avatar.
+ * @param {string} config.gameMode - Le mode de jeu selectionne.
+ * @param {string} config.language - La langue selectionnee.
+ */
+async function startMatchmaking(config) {
+	const lobby = document.getElementById('lobby');
+	const canvas = document.getElementById('renderCanvas');
 
-    startButton.addEventListener('click', async () => {
-        const pseudo = pseudoInput.value.trim();
-		// On recupere le pseudo de l'adversaire
-        const opponentPseudo = document.getElementById('opponent-pseudo-input').value.trim();
-        if (!pseudo) {
-            alert("Please enter a pseudo.");
-            return;
-        }
+	// if (!config.pseudo) {
+	//	 alert("Configuration error: pseudo is required.");
+	//	 return;
+	// }
 
-        gameState.pseudo = pseudo;
-        gameState.gameMode = gamemodeSelect.value;
-		gameState.language = languageSelect.value;
-		gameState.avatarUrl = avatarInput.value.trim(); //"includes/img/avatar1.jpg";
-		
-        lobby.style.display = 'none';
-		canvas.style.display = 'block';
+	// MAJ le gameState avec la configuration fournie
+	gameState.pseudo = config.pseudo;
+	gameState.gameMode = config.gameMode;
+	gameState.language = config.language;
+	gameState.avatarUrl = config.avatarUrl; // exemple "includes/img/avatar1.jpg";
+	gameState.opponentPseudo = config.opponentPseudo;
 
-		// On cree le moteur UNE SEULE FOIS.
+	// On cache le lobby et on affiche le canvas
+	lobby.style.display = 'none';
+	canvas.style.display = 'block';
+
+	// On cree le moteur UNE SEULE FOIS.
+	if (!engine) {
 		engine = initializeEngine();
 
-		// On lance la boucle de rendu principale.
+		// On lance la boucle de rendu principale
 		engine.runRenderLoop(() => {
 			if (activeScene) {
 				activeScene.render();
 			}
 		});
+	}
 
 		// On affiche un simple ecran d'attente.
-		showWaitingScreen();
+	showWaitingScreen();
 
-		// On contacte le serveur.
-		try {
-			await networkManager.connect(JwtToken);
-			if (opponentPseudo && gameState.gameMode === "1V1_ONLINE") {
-				// Si un adversaire est specifie, on cree une partie privee
-				console.log("Demande de partie privee contre ${opponentPseudo}");
-				networkManager.sendMessage('create_private_match', {
-					my_pseudo: gameState.pseudo,
-					opponent_pseudo: opponentPseudo,
-					mode: gameState.gameMode, // On envoie aussi le mode de jeu
-					language: gameState.language,
-					avatarUrl: gameState.avatarUrl
-				});
-			} else {
-				// Sinon, on rejoint le matchmaking public
-				console.log("Demande de partie publique.");
-				networkManager.sendMessage('find_match', {
-					mode: gameState.gameMode,
-					pseudo: gameState.pseudo,
-					language: gameState.language,
-					avatarUrl: gameState.avatarUrl
-				});
-			}
-
-		} catch (error) {
-			console.error("Echec de la connexion:", error);
-			lobby.style.display = 'block';
-			canvas.style.display = 'none';
-			alert("Connection to the server failed. Please try again.");
+	// On contacte le serveur.
+	try {
+		await networkManager.connect(JwtToken); // JwtToken a ajouter dans config si besoin aussi
+		
+		if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
+			// Si un adversaire est specifie, on cree une partie privee
+			console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
+			networkManager.sendMessage('create_private_match', {
+				my_pseudo: gameState.pseudo,
+				opponent_pseudo: config.opponentPseudo,
+				mode: gameState.gameMode, // On envoie aussi le mode de jeu
+				language: gameState.language,
+				avatarUrl: gameState.avatarUrl
+			});
+		} else {
+			// Sinon, on rejoint le matchmaking public
+			console.log("Demande de partie publique.");
+			networkManager.sendMessage('find_match', {
+				mode: gameState.gameMode,
+				pseudo: gameState.pseudo,
+				language: gameState.language,
+				avatarUrl: gameState.avatarUrl
+			});
 		}
-    });
-});
 
-export { returnToLobby };
+	} catch (error) {
+		console.error("Echec de la connexion:", error);
+		// En cas d'erreur, on nettoie et on retourne au lobby
+		returnToLobby();
+		alert("Connection to the server failed. Please try again.");
+	}
+}
+
+export { startMatchmaking, returnToLobby };

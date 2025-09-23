@@ -14,7 +14,10 @@
 		"conf_password": "Confirmación de la contraseña",
 		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
 		"mail_error": "Correo electrónico no válido.",
+		"login_used_error": "El nombre de usuario ya está en uso",
+		"mail_used_error": "El correo electrónico ya está en uso.",
 		"password_error": "Condiciones de la contraseña.",
+		"password_invalid": "Contraseña incorrecta.",
 		"conf_password_error": "Las dos contraseñas no son idénticas.",
 		"submit": "ENVIAR"
 	},
@@ -41,7 +44,7 @@
 	    "victory": "Victoria",
 	    "login": "Usuario",
 	    "my_score": "Mi puntuación",
-	    "time": "Tiempo de juego",
+	    "time": "Data",
 	    "o_score": "Puntuación adv. ",
 	    "o_login": "Adversario"
 	},
@@ -63,6 +66,13 @@
     "VS_ia": "Jugador vs IA",
     "VS_player": "Jugador vs Jugador",
     "2_VS_2": "Dos contra Dos",
-    "tournament": "Torneo"
+    "tournament": "Torneo",
+	"4_players": "4 Juga-\ndores",
+	"8_players": "8 Juga-\ndores"
+	},
+
+	"invit":{
+    	"accept": "Aceptar",
+    	"refuse": "Rechazar"
 	}
 }

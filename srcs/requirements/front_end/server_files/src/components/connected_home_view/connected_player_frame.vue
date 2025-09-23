@@ -1,20 +1,19 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted} from 'vue';
 import play_historic from "./play&historic_button.vue" 
 import play_return from "./play&return_button.vue" 
 import invit_return from "./invit&return_button.vue" 
 
 import { user } from '../../user';
 
-const emit = defineEmits(['show-other_player', 'show-historic', 'show_play']);
+const emit = defineEmits(['showOtherPlayer', 'show-historic', 'show_play']);
 
 const { currentUser } = user();
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		historic: boolean;
-		other_player: boolean;
 }>();
 
 const playerData = ref({
@@ -24,99 +23,73 @@ const playerData = ref({
 	rank: 0,
 });
 
-//async function fetchPlayerData() {
-//	try {
-//		//todo recuperer le login de l'utilisateur connecte
-//		const currentUserLogin = "Louise";
-//		// const current = await fetch('http://localhost:3000/me');
-//		// if (!current.ok)
-//		// 	throw new Error(`Erreur http: ${current.status}`);
-//		// const currentUser = await current.json();
-//		// const currentUserLogin = currentUser.login;
+/* async function fetchPlayerData() {
+	try {
+		//todo recuperer le login de l'utilisateur connecte
+		// const currentUserLogin = "Louise";
+		const current = await fetch(`http://${window.location.hostname}:3000/me`);
+		if (!current.ok)
+			throw new Error(`Erreur http: ${current.status}`);
+		const currentUser = await current.json();
+		const currentUserLogin = currentUser.user.login;
 
-//		const response = await fetch(`http://localhost:3000/users/current?login=${currentUserLogin}`);
-//		if (!response.ok)
-//			throw new Error('Player data fetch error');
+		const response = await fetch(`http://${window.location.hostname}:3000/users/specificlogin?login=${currentUserLogin}`);
+		if (!response.ok)
+			throw new Error('Player data fetch error');
 
-//		const data = await response.json();
-//		playerData.value = {
-//			login: data.login,
-//			nb_games: data.nb_games,
-//			nb_won_games: data.nb_won_games,
-//			rank: data.rank,
-//		};
-//	} catch (error) {
-//		console.log("Error:", error);
-//	}
-//}
-//onMounted(()=>{ fetchPlayerData(); });
-// import invit_return from "./invit&return_button.vue"
+		const data = await response.json();
+		playerData.value = {
+			login: data.login,
+			nb_games: data.nb_games,
+			nb_won_games: data.nb_won_games,
+			rank: data.rank,
+		};
+	} catch (error) {
+		console.log("Error:", error);
+	}
+}
+onMounted(()=>{ fetchPlayerData(); });
 
-// 	const props = defineProps<{
-// 			setLanguage: (lang: string) => void;
-// 			historic: boolean;
-// 			other_player: boolean;
-// 	}>();
-// 	const playerData = ref({
-// 		login: '',
-// 		nb_games: 0,
-// 		nb_won_games: 0,
-// 		rank: 0,
-// 	});
-
-
-// //TODO: optimiser le delai de response des fetch
-// async function fetchPlayerData(retries = 5, delay = 1000) {
-// 	try {
-// 		for (let i = 0; i < retries; i++) {
-// 			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
-// 				method: 'GET',
-// 				credentials: 'include'
-// 			});
-
-// 			if (response.ok) {
-// 				const data = await response.json();
-
-// 				// Si user est présent, on peut sortir
-// 				if (data.user && data.user.login) {
-// 					playerData.value = {
-// 						login: data.user.login,
-// 						nb_games: data.user.nb_games,
-// 						nb_won_games: data.user.nb_won_games,
-// 						rank: data.user.rank
-// 					};
-// 					return;
-// 				}
-// 			}
-
-// 			// Attendre avant de réessayer
-// 			await new Promise(res => setTimeout(res, delay));
-// 		}
-
-// 		// console.warn("User non trouvé après plusieurs tentatives.");
-// 		// playerData.value = null;
-
-// 	} catch (error) {
-// 		console.error("Erreur dans fetchPlayerData:", error);
-// 		// playerData.value = null;
-// 	}
-// }
-
-// 	onMounted(async()=>{
-
-// 		await fetchPlayerData();
-// 	});
-	
- 	//const emit = defineEmits(['show-other_player', 'show-historic']);
+async function fetchPlayerData(retries = 5, delay = 1000) {
+	try {
+		for (let i = 0; i < retries; i++) {
+			const response = await fetch(`http://${window.location.hostname}:3000/me`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+			if (response.ok) {
+				const data = await response.json();
+				// Si user est présent, on peut sortir
+				if (data.user && data.user.login) {
+					playerData.value = {
+						login: data.user.login,
+						nb_games: data.user.nb_games,
+						nb_won_games: data.user.nb_won_games,
+						rank: data.user.rank
+					};
+					return;
+				}
+			}
+			// Attendre avant de réessayer
+			await new Promise(res => setTimeout(res, delay));
+		}
+		// console.warn("User non trouvé après plusieurs tentatives.");
+		// playerData.value = null;
+	} catch (error) {
+		console.error("Erreur dans fetchPlayerData:", error);
+		// playerData.value = null;
+	}
+}
+onMounted(async()=>{ await fetchPlayerData(); }); */
 
 </script>
 
 <template>
 	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
-			<img src="../../../images/default_avatar.png" alt="Avatar" class="avatar">
+			<img v-if="currentUser?.login" :src="currentUser.avatar_url" alt="Avatar" class="avatar">
 			<div title="login" class="login">
-				<div v-if="currentUser?.login">{{ currentUser.login }}</div>
+				<div v-if="currentUser?.login">{{currentUser.login }}</div>
 			</div>
 		</div>
 		<div class="stat-container">
@@ -131,9 +104,8 @@ const playerData = ref({
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat" v-if="currentUser">{{ currentUser.rank }}</div>
 		</div>
-		<play_historic @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="!historic && !other_player"></play_historic>
+		<play_historic @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="!historic"></play_historic>
 		<play_return @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="historic"></play_return>
-		<invit_return @show-other_player="emit('show-other_player')" :setLanguage="props.setLanguage" v-show="other_player" ></invit_return>
 	</div>
 </template>
 

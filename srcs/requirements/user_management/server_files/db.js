@@ -1,9 +1,17 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 const sqlite = sqlite3.verbose();
 
-let db = new sqlite3.Database('./database.db');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dbPath = path.join(__dirname, 'database.db');
+console.log(`Chemin de la DB : ${dbPath}`);
+
+let db = new sqlite3.Database(dbPath);
 
 // creer table d'utilisateurs, table de parties et table d'amities
 db.serialize(()=>{
@@ -76,7 +84,7 @@ db.serialize(()=>{
 
 export async function getUserByEmail(email) {
 	db = await open({
-			filename: './database.db',
+			filename: dbPath,
 			driver: sqlite3.Database,
 		});
 		console.log('Base de données ouverte');
@@ -90,11 +98,27 @@ export async function getUserByEmail(email) {
 	}
 }
 
+export async function getUserByLogin(login) {
+	db = await open({
+			filename: dbPath,
+			driver: sqlite3.Database,
+		});
+		console.log('Base de données ouverte');
+	try {
+		const user = db.get("SELECT * FROM users WHERE login = ?", [login]);
+		console.log('login trouvé en base:', user);
+		return (user);
+	} catch (err) {
+		console.error('Erreur dans getUserByLogin:', err);
+		throw err;
+	}
+}
+
 // export async function getUsers() {
 // 	return db.all("SELECT login, email FROM users");
 // }
 
-export default { db, getUserByEmail }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
+export default { db, getUserByEmail, getUserByLogin }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
 
 //todo salt_key ? cle de cryptage des mdp
 

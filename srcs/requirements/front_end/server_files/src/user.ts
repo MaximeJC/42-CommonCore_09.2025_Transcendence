@@ -5,6 +5,7 @@ export interface User {
   id: number;
   login: string;
   email: string;
+  avatar_url: string;
   rank: number;
   nb_games: number;
   nb_won_games: number;

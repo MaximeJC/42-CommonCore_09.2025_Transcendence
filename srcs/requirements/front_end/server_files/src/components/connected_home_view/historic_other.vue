@@ -1,44 +1,62 @@
 <script setup lang="ts">
-	import { ref, onMounted, defineExpose } from 'vue';
-	const props = defineProps<{
-			setLanguage: (lang: string) => void;
-	}>();
+import { ref, onMounted } from 'vue';
+import { watch } from 'vue';
 
+const props = defineProps<{
+	setLanguage: (lang: string) => void;
+	playerLogin: string | null;
+}>();
 
-	interface Match{
-		win: boolean;
-		date : number;
-		c_login: string;
-		score_c: number;
-		o_login: string;
-		score_o: number;
+interface Match{
+	win: boolean;
+	date: string | number;
+	c_login: string;
+	score_c: number;
+	o_login: string;
+	score_o: number;
+}
+
+const matches = ref<Match[]>([]);
+
+function formatDate(date: string | number): string {
+	// Si `date` est un nombre (timestamp en secondes), le convertir en millisecondes
+	const dateObj = typeof date === 'number' ? new Date(date * 1000) : new Date(date);
+
+	const day = String(dateObj.getDate()).padStart(2, '0');
+	const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+	const hours = String(dateObj.getHours()).padStart(2, '0');
+	const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+	
+	return `${day}/${month} - ${hours}:${minutes}`;
+}
+
+async function fetchGames(login: string) {
+	try {
+		const result = await fetch(`http://${window.location.hostname}:3000/games/me?login_current=${encodeURIComponent(login)}`);
+		if (!result.ok)
+			throw new Error(`Erreur http: ${result.status}`);
+		const games = await result.json();
+
+		matches.value = games.map((game: any)=>({
+			win: game.login_winner === login,
+			date: game.created_at,
+			c_login: login,
+			score_c: game.login_winner === login? game.score_winner : game.score_loser,
+			score_o: game.login_winner === login? game.score_loser : game.score_winner,
+			o_login:  game.login_winner === login? game.login_loser : game.login_winner,
+		}));
+		console.log("Parties recuperees (historic_other.vue).");
+	} catch (err) {
+		console.error("Erreur de recuperation des parties:", err);
 	}
-	const matches = ref<Match[]>([]);
+}
 
-	async function fetchGames() {
-		try {
-			//todo : remplacer ce loginOfInterest en dur par celui sur lequel l'utilisateur a clique:
-			const loginOfInterest = "Louise";
+// appeler fetchGames lorsque playerLogin change:
+watch(()=>props.playerLogin, (newLogin)=>{
+	if (newLogin)
+		fetchGames(newLogin);
+}, { immediate: true });
 
-			const result = await fetch(`http://localhost:3000/games/me?login_current=${encodeURIComponent(loginOfInterest)}`);
-			if (!result.ok)
-				throw new Error(`Erreur http: ${result.status}`);
-			const games = await result.json();
-
-			matches.value = games.map((game: any)=>({
-				win: game.login_winner === loginOfInterest,
-				date: game.created_at,
-				c_login: loginOfInterest,
-				score_c: game.login_winner === loginOfInterest? game.score_winner : game.score_loser,
-				score_o: game.login_winner === loginOfInterest? game.score_loser : game.score_winner,
-				o_login:  game.login_winner === loginOfInterest? game.login_loser : game.login_winner,
-			}));
-			console.log("Parties recuperees.");
-		} catch (err) {
-			console.error("Erreur de recuperation des parties:", err);
-		}
-	}
-	onMounted(()=>{ fetchGames(); });
 </script>
 
 // const matches: match[] = [
@@ -61,8 +79,8 @@
 			<div data-i18n="historic.victory"></div>
 			<div data-i18n="historic.login"></div>
 			<div data-i18n="historic.my_score"></div>
-			<div data-i18n="historic.date"></div>
-			<div data-i18n="historic.score_o"></div>
+			<div data-i18n="historic.time"></div>
+			<div data-i18n="historic.o_score"></div>
 			<div data-i18n="historic.o_login"></div>
 		</div>
 		<div class="list-container">
@@ -73,7 +91,7 @@
 				</div>
 				<div>{{ match.c_login }}</div>
 				<div>{{ match.score_c }}</div>
-				<div>{{ match.date }} min </div>
+				<div>{{ formatDate(match.date) }} </div>
 				<div>{{ match.score_o }}</div>
 				<div>{{ match.o_login }}</div>
 			</div>
@@ -82,23 +100,6 @@
 </template>
 
 <style>
-	.historic-container{
-		display: grid;
-		grid-template-rows: min-content;
-		grid-template-columns: 1fr;
-		width:auto;
-		height: 26rem;
-		background-color: rgba(156, 50, 133, 0.5);
-		border: 2px solid #e251ca;
-		box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
-		padding: 1rem 2rem;
-		border-radius: 20px;
-	}
-
 	.title{
 		display: block;
 		font-family: netron;

@@ -5,6 +5,9 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 		}>();
 
+	const emit = defineEmits(['issignup']);
+	
+
 	// references reactives:
 	const login = ref("");
 	const email = ref("");
@@ -13,6 +16,8 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 	const message = ref("");
 	const error_login = ref(false);
 	const error_email = ref(false);
+	const error_login_used = ref(false);
+	const error_email_used = ref(false);
 	const error_password = ref(false);
 	const error_conf_password = ref(false);
 
@@ -20,6 +25,8 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		// reinitialiser les variables d'erreur et de message:
 		error_login.value = false;
 		error_email.value = false;
+		error_login_used.value = false;
+		error_email_used.value = false;
 		error_password.value = false;
 		error_conf_password.value = false;
 		message.value = "";
@@ -27,7 +34,21 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		// verifier que mdp est correctement repete:
 		if (password.value !== conf_password.value) {
 			error_conf_password.value = true;
-			message.value = "Passwords are not the same"; //todo langue
+			// message.value = "Passwords are not the same"; //todo langue
+			return;
+		}
+
+		// verifier taille pseudo
+		const loginLength = login.value.trim().length;
+		if (loginLength < 3 || loginLength > 13) {
+			error_login.value = true;
+			return;
+		}
+
+		//verification basique de l'email
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email.value)) {
+			error_email.value = true;
 			return;
 		}
 
@@ -41,14 +62,30 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 					password: password.value,
 				}),
 			});
-			if (!result.ok)
-				throw new Error(`HTTP error! status: ${result.status}`);
 			
 			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
 				success: boolean; // reussite de la requete
 				message?: string; // message optionnel
+				field?: 'login' | 'email';
 			}
+
 			const data: ServerResponse = await result.json();
+
+			// verifier si login ou email presente dans DB
+			if (!result.ok)
+			{
+				message.value = data.message || "An error occurred.";
+				if (data.field === 'login') {
+					error_login_used.value = true;
+					console.error("login deja utilise!");			
+
+				} else if (data.field === 'email') {
+					error_email_used.value = true;
+					console.error("email deja utilise!");			
+				}
+				console.error("message.value = " + message.value);
+				return;
+			}
 			
 			if (data.success) { // afficher un message et reinitialiser les variables
 				message.value = "Account successfully created"; //todo langue
@@ -56,8 +93,9 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 				email.value = "";
 				password.value = "";
 				conf_password.value = "";
+				emit('issignup');
 			} else {
-				if (data.message?.includes("login"))
+				if (data.message?.includes("login"))		
 					error_login.value = true;
 				if (data.message?.includes("email"))
 					error_email.value = true;
@@ -65,6 +103,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			}
 		} catch (err) {
 			message.value = "Cannot contact server"; //todo langue
+			console.error("Fetch error:", err); 
 		}
 	}
 </script>
@@ -78,19 +117,23 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			</label>
 			<input class="input" type="login" id="login" v-model="login" required>
 			<div  title="login-error" class="error"  >
-					<div v-show="!error_login" data-i18n="Signup.login_error"></div>
+					<div v-show="error_login" data-i18n="Signup.login_error"></div>
+					<div v-show="error_login_used" data-i18n="Signup.login_used_error"></div>
 			</div>
+
 			<label class="subtitle">Email</label>
 			<input class="input" type="email" id="email" v-model="email" required>
 			<div  title="mail-error" class="error" >
-				<div v-show=" !error_email" data-i18n="Signup.mail_error"></div>
+				<div v-show="error_email" data-i18n="Signup.mail_error"></div>
+				<div v-show="error_email_used" data-i18n="Signup.mail_used_error"></div>
 			</div>
+
 			<label class="subtitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
 			<input class="input" type="password" id="password" v-model="password" required>
 			<div title="pasword-error" class="error"  >
-				<div v-show=" !error_password" data-i18n="Signup.password_error"></div>
+				<div v-show="error_password" data-i18n="Signup.password_error"></div>
 
 			</div>
 			<label class="subtitle">
@@ -98,7 +141,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			</label>
 			<input class="input" type="password" id="conf_password" v-model="conf_password" required>
 			<div  title="conf_password-error" class="error" >
-				<div v-show=" !error_conf_password" data-i18n="Signup.conf_password_error"></div>
+				<div v-show="error_conf_password" data-i18n="Signup.conf_password_error"></div>
 
 			</div>
 			<div title="line_button" class="line-button">

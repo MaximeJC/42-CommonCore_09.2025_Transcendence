@@ -41,7 +41,7 @@ node db_server.js
 	# ajouter une partie:
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
-		-d '{"login_winner": "Louise", "login_loser": "axel", "score_winner": "6", "score_loser": "4"}' \
+		-d '{"login_winner": "Louise", "login_loser": "Bimo", "score_winner": "6", "score_loser": "4"}' \
 
 	curl -X POST http://localhost:3000/games \
 		-H "Content-Type: application/json" \
@@ -71,17 +71,17 @@ node db_server.js
 
 	curl -X POST http://localhost:3000/friends \
 		-H "Content-Type: application/json" \
-		-d '{"login1": "Cocotte", "login2": "Louise"}'
+		-d '{"login1": "axel", "login2": "Louise"}'
 
 	# supprimer une amitie:
 	curl -X POST http://localhost:3000/friends/delete \
 		-H "Content-Type: application/json" \
-		-d '{"login1": "Mauvais", "login2": "Louise"}'
+		-d '{"login1": "kalicem", "login2": "Louise"}'
 
 	# tester la recuperation d'infos sur l'utilisateur connecte:
 		npm install node-fetch # si besoin
 		# creer un fichier test.js a l'interieur duquel:
-		fetch('http://localhost:3000/users/current?login=Louise')    
+		fetch('http://localhost:3000/users/specificlogin?login=Louise')    
 			.then(response => response.json())
 			.then(data => console.log('Données utilisateur:', data))
 			.catch(error => console.error('Erreur:', error));
@@ -97,3 +97,4 @@ node db_server.js
 	curl -X POST http://localhost:3000/deleteuser \
 		-H "Content-Type: application/json" \
 		-d '{"login": "Louise", "email": "louise@example.com", "password": "bimo"}'
+

@@ -14,7 +14,10 @@
 		"conf_password": "Confirmation du mot de passe",
 		"login_error": "le Pseudo doit faire entre 3 et 13 caractères.",
 		"mail_error": "Email invalide.",
+		"login_used_error": "Le nom d'utilisateur est déjà utilisé",
+		"mail_used_error": "Email est déjà utilisé",
 		"password_error": "Condition du mot de passe.",
+		"password_invalid": "Mot de passe incorrect.",
 		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
 		"submit": "VALIDER"
 	},
@@ -42,7 +45,7 @@
 		"victory": "Victoire",
 		"login": "Utilisateur",
 		"my_score": "Mon score",
-		"time": "Temps de jeu",
+		"time": "Date",
 		"o_score": "Score adv.",
 		"o_login": "Adversaire"
 
@@ -65,6 +68,13 @@
 		"VS_ia": "Joueur VS IA",
 		"VS_player": "Un VS Un",
 		"2_VS_2": "Deux VS Deux",
-		"tournament": "Tournoi"
+		"tournament": "Tournoi",
+		"4_players": "4 Joueurs",
+		"8_players": "8 Joueurs"
+	},
+
+	"invit":{
+		"accept": "Accepter",
+		"refuse": "Refuser"
 	}
 }

@@ -1,8 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, nextTick} from 'vue';
+import { setLanguage, updateText } from '../../service/translators';
+import { user } from '../../user';
+const { currentUser } = user();
+
 const props = defineProps<{
-		setLanguage: (lang: string) => void;
+	setLanguage: (lang: string) => void;
 }>();
+
+onMounted(async () => {
+	await nextTick()
+	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+})
 
 const rootElement = ref<HTMLElement | null>(null);
 
@@ -10,7 +19,12 @@ defineExpose({
 	rootElement
 });
 
-const emit = defineEmits(['show-other_player']);
+const emit = defineEmits(['showOtherPlayer']);
+
+const showOtherPlayer = (loginToShow: string)=>{
+	console.log("Friend login:", loginToShow);
+	emit('showOtherPlayer', loginToShow);
+};
 
 const search_friends = ref("") // ami a ajouter
 
@@ -24,18 +38,20 @@ interface Friend {
 
 const friends = ref<Friend[]>([]);
 
-async function fetchFriends() {
+async function fetchFriends(currentUserLogin: string) {
 	try {
-		//todo remplacer ce currentUserLogin code en dur par le login de l'utilisateur connecte:
-		const currentUserLogin = "Louise";
-		// const current = await fetch('http://localhost:3000/me');
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
 		// if (!current.ok)
 		// 	throw new Error(`Erreur http: ${current.status}`);
 		// const currentUser = await current.json();
-		// const currentUserLogin = currentUser.login;
+		// const currentUserLogin = currentUser.user.login;
 
-		const result = await fetch(`http://localhost:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`,
-		{
+		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
+
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -53,19 +69,23 @@ async function fetchFriends() {
 
 async function addFriend() {
 	try {
-		//todo recuperer les logins dynamiquement
-		// const ajouteur = 'Louise';
-		const current = await fetch('http://localhost:3000/me');
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const ajouteur = currentUser.login;
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
+		// if (!current.ok)
+		// 	throw new Error(`Erreur http: ${current.status}`);
+		// const currentUser = await current.json();
+		const ajouteur = currentUser.value?.login ?? "";
 
 		const ajoute = search_friends.value;
 
-		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
+		console.log("addFriend: ajouteur =", ajouteur, ", ajoute =", ajoute);
 
-		const result = await fetch(`http://localhost:3000/friends`, {
+		if (ajouteur === ajoute)
+			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
+
+		const result = await fetch(`http://${window.location.hostname}:3000/friends`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',
@@ -78,7 +98,7 @@ async function addFriend() {
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami ajoute avec succes.");
-		fetchFriends();
+		fetchFriends(ajouteur);
 	} catch (err) {
 		console.error("Erreur de creation d'amitie:", err);
 	}
@@ -86,14 +106,18 @@ async function addFriend() {
 
 async function deleteFriend(unfriendLogin: string) {
 	try {
-		//todo recuperer les logins dynamiquement
-		const supprimeur = 'Louise';
-		// const current = await fetch('http://localhost:3000/me');
+		// const current = await fetch(`http://${window.location.hostname}:3000/me`, {
+		// 	method: 'GET',
+		// 	credentials: 'include'
+		// });
 		// if (!current.ok)
 		// 	throw new Error(`Erreur http: ${current.status}`);
 		// const currentUser = await current.json();
-		// const supprimeur = currentUser.login;
-		const result = await fetch(`http://localhost:3000/friends/delete`, {
+		const supprimeur = currentUser.value?.login ?? "";
+
+		console.log("deleteFriend: supprimer =", supprimeur, ", supprime =", unfriendLogin);
+
+		const result = await fetch(`http://${window.location.hostname}:3000/friends/delete`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json',
@@ -106,13 +130,22 @@ async function deleteFriend(unfriendLogin: string) {
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami supprime avec succes.");
-		fetchFriends();
+		fetchFriends(supprimeur);
 	} catch (err) {
 		console.error("Erreur de suppression d'amitie:", err);
 	}
 }
 
-onMounted(()=>{ fetchFriends(); });
+// onMounted(()=>{ fetchFriends(); });
+
+
+watch(() => currentUser.value?.login ?? "", (newLogin) => {
+	if (newLogin !== "") { 
+		fetchFriends(currentUser.value?.login ?? "");
+	} else {
+		friends.value = [];
+	}
+}, { immediate: true }); 
 
 </script>
 
@@ -140,10 +173,11 @@ onMounted(()=>{ fetchFriends(); });
 		<div  class="friendlist-container">
 			<ul class="friendlist" v-for="friend in friends" :key="friend.name">
 				<li class="friend">
-					<button @click="emit('show-other_player')" class="avatar_button">
-						<img class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+					<button @click="showOtherPlayer(friend.name)" class="avatar_button">
+						<img v-if=friend.avatar_src class="friend-avatar" :src="friend.avatar_src" alt="avatar">
+						<img v-else class="friend-avatar" src="/images/default_avatar.png" alt="avatar">
 					</button>
-					<button @click="emit('show-other_player')" title="friend-button" class="friend-button">{{ friend.name }}</button>
+					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
 						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
 						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
