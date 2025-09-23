@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, defineExpose } from 'vue';
+import { ref, onMounted } from 'vue';
 import { watch } from 'vue';
 
 const props = defineProps<{

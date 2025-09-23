@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineExpose, watch} from 'vue';
+import { ref, onMounted, watch} from 'vue';
 
 import { user } from '../../user';
 const { currentUser } = user();

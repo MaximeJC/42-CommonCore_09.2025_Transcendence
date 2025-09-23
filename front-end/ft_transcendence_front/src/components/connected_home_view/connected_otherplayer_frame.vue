@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted } from 'vue';
 import play_historic from "./play&historic_button.vue";
 import play_return from "./play&return_button.vue";
 import invit_return from "./invit&return_button.vue";
