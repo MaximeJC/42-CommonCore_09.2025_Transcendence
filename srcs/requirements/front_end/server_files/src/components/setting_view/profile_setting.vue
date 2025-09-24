@@ -35,16 +35,9 @@
 
 	const getUserLogin = async function userLogin() {
 		try {
-			// const response = await fetch(`${USER_MANAGEMENT_URL}/me` , {
-			// 	method :'GET',
-			// 	credentials: 'include',
-			// });
-			const response = await fetch(`${USER_MANAGEMENT_URL}/me?login_current=${encodeURIComponent(currentUser.value?.login ?? "")}`, {
-				method: 'GET',
+			const response = await fetch(`${USER_MANAGEMENT_URL}/me` , {
+				method :'GET',
 				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				}
 			});
 
 			if (response.ok) {

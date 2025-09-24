@@ -3,13 +3,10 @@
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, nextTick } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
-import { user } from '../../user';
-	
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
-
 
 onMounted(async () => {
 	await nextTick()
@@ -24,7 +21,6 @@ interface Match{
 	o_login: string;
 	score_o: number;
 }
-const { currentUser } = user();
 
 const matches = ref<Match[]>([]);
 
@@ -42,21 +38,14 @@ function formatDate(date: string | number): string {
 
 async function fetchMyGames() {
 	try {
-		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-		// 	method: 'GET',
-		// 	credentials: 'include'
-		// });
-		const current = await fetch(`${USER_MANAGEMENT_URL}/me?login_current=${encodeURIComponent(currentUser.value?.login ?? "")}`, {
+		const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 			method: 'GET',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			}
+			credentials: 'include'
 		});
 		if (!current.ok)
 			throw new Error(`Erreur http: ${current.status}`);
-		const currentUserLogin = await current.json();
-		const login = currentUserLogin.user.login;
+		const currentUser = await current.json();
+		const login = currentUser.user.login;
 
 		console.log("Fonction fetchMyGames pour affichage de l'historique de l'utilisateur connecte", login);
 		

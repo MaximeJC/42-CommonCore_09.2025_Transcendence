@@ -364,8 +364,7 @@ fastify.post('/login', async (request, reply)=>{
 });
 
 fastify.get('/me', async (req, rep) => {
-	// const userMe = req.session.get('user');
-	const userMe = req.query.login_current;
+	const userMe = req.session.get('user');
 	if (!userMe) {
 		return rep.send({ error: 'Disconnected'});
 	}

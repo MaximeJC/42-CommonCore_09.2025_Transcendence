@@ -13,7 +13,6 @@ import play_page from '../components/playable_page/play_page.vue';
 import { user } from '../user';
 import type { User } from '../user';
 const { setUser } = user();
-const { currentUser } = user();
 
 // Props
 const props = defineProps<{
@@ -109,18 +108,11 @@ function syncFlagsToHash() {
 }
 
 const checksession = async function session() {
-try {
-	const response = await fetch(`${USER_MANAGEMENT_URL}/me?login_current=${encodeURIComponent(currentUser.value?.login ?? "")}`, {
-		method: 'GET',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		}
-	});
-    // const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-    //   method: 'GET',
-    //   credentials: 'include'
-    // });
+  try {
+    const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
+      method: 'GET',
+      credentials: 'include'
+    });
     const data = await response.json();
     if (data.user?.login) {
       isConnect.value = true;
