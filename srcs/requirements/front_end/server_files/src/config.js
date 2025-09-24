@@ -1,1 +1,0 @@
-export const USER_MANAGEMENT_URL = `http://${window.location.hostname}:3000`; //TODO: a modifier, voir Reverse Proxy / API Gateway pour docker + .env

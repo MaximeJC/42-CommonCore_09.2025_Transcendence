@@ -21,8 +21,10 @@ services:
     # env_file: ./.env
     # depends_on:
     #   - game_management
-    ports:
-      - "5173:5173"
+    # ports:
+    #   - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=/api
     # volumes:
     #   - front_end_data:/var/www/html:ro
     networks:
@@ -56,6 +58,22 @@ services:
     networks:
       - hgp_network
     restart: unless-stopped
+
+  nginx_proxy:
+    container_name: hgp_gateway
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    image: hgp_gateway_img
+    ports:
+      - "5173:80"
+    networks:
+      - hgp_network
+    depends_on:
+      - front_end
+      - user_management
+      - game_management
+    restart: always
 
 volumes:
   sqlite_data:

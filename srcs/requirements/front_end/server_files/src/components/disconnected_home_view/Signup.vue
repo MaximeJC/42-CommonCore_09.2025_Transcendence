@@ -1,5 +1,5 @@
 <script setup lang="ts"> // Vue 3, Typescript
-import { USER_MANAGEMENT_URL } from '@/config.js';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 
 	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent

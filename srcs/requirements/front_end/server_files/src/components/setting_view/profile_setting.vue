@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { USER_MANAGEMENT_URL } from '@/config.js';
+	import { USER_MANAGEMENT_URL } from '@/config/config.js';
 	import { ref, onMounted, nextTick, watch } from 'vue';
 	import axios from 'axios';
 	import { user } from '../../user';

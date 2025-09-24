@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { USER_MANAGEMENT_URL } from '@/config.js';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted } from 'vue';
 import play_historic from "./play&historic_button.vue";
 import play_return from "./play&return_button.vue";

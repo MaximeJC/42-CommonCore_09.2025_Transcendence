@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue';
 
 // Components
-import { USER_MANAGEMENT_URL } from '../config.js';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import Head from '../components/Header/Header.vue';
 import home from './disconnected_home_view.vue';
 import con_home_view from './connected_home_view.vue';

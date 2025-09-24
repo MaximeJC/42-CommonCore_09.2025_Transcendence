@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { USER_MANAGEMENT_URL } from '@/config.js';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, watch} from 'vue';
 
 import { user } from '../../user';

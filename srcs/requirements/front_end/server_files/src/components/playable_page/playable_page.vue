@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { USER_MANAGEMENT_URL } from '@/config.js';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
 import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { USER_MANAGEMENT_URL } from '@/config';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, nextTick } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 

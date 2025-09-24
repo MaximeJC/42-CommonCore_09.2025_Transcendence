@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { USER_MANAGEMENT_URL } from '@/config.js';
+	import { USER_MANAGEMENT_URL } from '@/config/config.js';
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
 	import setting from './setting_button.vue'
