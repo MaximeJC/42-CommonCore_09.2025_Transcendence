@@ -46,6 +46,16 @@ class NetworkManager {
 			}
 
 			console.log("Tentative de connexion au serveur de jeu...");
+			// const netConfig = window.networkConfig;
+			// const WS_URL = netConfig.pongServerBaseUrl;
+
+			// if (!WS_URL) {
+			// 	const error = new Error("La configuration réseau (window.networkConfig.pongServerBaseUrl) est introuvable !");
+			// 	console.error(error);
+			// 	return reject(error);
+			// }
+
+			// console.log(`URL WebSocket absolue construite: ${WS_URL}`);
 			this.socket = new WebSocket(WS_URL);
 
 			this.socket.onopen = () => {

@@ -7,10 +7,17 @@ import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { GameInstance } from './GameInstance.js';
 
+// import fastifyCors from '@fastify/cors';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = fastify({ logger: true });
+
+// app.register(fastifyCors, {
+//   origin: "http://localhost:5173",
+//   credentials: true,
+// });
 const PORT = 3003;
 
 app.register(fastifyStatic, {

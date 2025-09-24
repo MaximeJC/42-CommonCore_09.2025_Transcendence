@@ -8,15 +8,15 @@ COMPOSE_FILE = srcs/docker-compose.yml
 all: up
 
 up:
-	@echo "Starting Inception services..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d
+	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
 build: up
 
 start: up
 
 down:
-	@echo "Stopping Inception services..."
+	@echo "Stopping $(COMPOSE_PROJECT_NAME)  services..."
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down
 
 stop: down

@@ -6,6 +6,9 @@ import { user } from '../../user';
 import tournament from "./tournament_page.vue";
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
+const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
+const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
+
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
@@ -105,6 +108,11 @@ function handleStartGame() {
 	if(props.activePlay === "2P_LOCAL")
 		gameConfig.opponentPseudo = "Player2"
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
+
+	(window as any).networkConfig = { 
+        pongServerBaseUrl: pongServerPath,
+        aiServerBaseUrl: aiServerPath
+    };
 	startMatchmaking(gameConfig);
 }
 

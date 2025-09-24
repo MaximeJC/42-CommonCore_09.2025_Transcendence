@@ -8,6 +8,8 @@ services:
     # env_file: ./.env
     # depends_on:
     #   - game_management
+    ports:
+      - "3001:3001"
     networks:
       - hgp_network
     restart: unless-stopped
@@ -25,11 +27,14 @@ services:
     #   - "5173:5173"
     environment:
       - VITE_API_BASE_URL=/api
-    # volumes:
-    #   - front_end_data:/var/www/html:ro
+      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
+      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
     networks:
       - hgp_network
     restart: unless-stopped
+    depends_on:
+      - user_management
+      - game_management
 
   game_management:
     container_name: hgp_game_management
@@ -40,6 +45,10 @@ services:
     # env_file: ./.env
     # depends_on:
     #   - sqlite3
+    ports:
+      - "3003:3003"
+    environment:
+      - AI_SERVER_URL=http://hgp_ai_server:3001
     networks:
       - hgp_network
     restart: unless-stopped
@@ -50,11 +59,13 @@ services:
       context: ./requirements/user_management
       dockerfile: Dockerfile
     image: hgp_user_management_img
-    # env_file: ./.env
-    # depends_on:
-    #   - sqlite3
-    # volumes:
-    #   - sqlite_data:/var/lib/sqlite
+      # env_file: ./.env
+      # depends_on:
+      #   - sqlite3
+      # volumes:
+      #   - sqlite_data:/var/lib/sqlite
+    # ports:
+    #   - "3000:3000"
     networks:
       - hgp_network
     restart: unless-stopped
@@ -72,7 +83,7 @@ services:
     depends_on:
       - front_end
       - user_management
-      - game_management
+      # - game_management
     restart: always
 
 volumes:
