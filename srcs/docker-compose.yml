@@ -23,10 +23,10 @@ services:
     # env_file: ./.env
     # depends_on:
     #   - game_management
-    # ports:
-    #   - "5173:5173"
+    ports:
+      - "5173:5173"
     environment:
-      - VITE_API_BASE_URL=/api
+      - VITE_API_BASE_URL=http://localhost:3000
       - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
       - VITE_AI_SERVER_BASE_URL=http://localhost:3001
     networks:
@@ -64,27 +64,27 @@ services:
       #   - sqlite3
       # volumes:
       #   - sqlite_data:/var/lib/sqlite
-    # ports:
-    #   - "3000:3000"
+    ports:
+      - "3000:3000"
     networks:
       - hgp_network
     restart: unless-stopped
 
-  nginx_proxy:
-    container_name: hgp_gateway
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-    image: hgp_gateway_img
-    ports:
-      - "5173:80"
-    networks:
-      - hgp_network
-    depends_on:
-      - front_end
-      - user_management
-      # - game_management
-    restart: always
+  # nginx_proxy:
+  #   container_name: hgp_gateway
+  #   build:
+  #     context: ./requirements/nginx
+  #     dockerfile: Dockerfile
+  #   image: hgp_gateway_img
+  #   ports:
+  #     - "5173:80"
+  #   networks:
+  #     - hgp_network
+  #   depends_on:
+  #     - front_end
+  #     - user_management
+  #     # - game_management
+  #   restart: always
 
 volumes:
   sqlite_data:
