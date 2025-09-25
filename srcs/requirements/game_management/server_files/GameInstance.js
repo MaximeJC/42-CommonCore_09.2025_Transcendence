@@ -346,7 +346,8 @@ export class GameInstance {
 						score_right: score_right,
 						gameMode: this.gameState.gameMode,
 						playerLeftTop: this.gameState.activePlayers.find(p => p.name === 'player_left_top').pseudo,
-						playerRightTop: this.gameState.activePlayers.find(p => p.name === 'player_right_top').pseudo
+						playerRightTop: this.gameState.activePlayers.find(p => p.name === 'player_right_top').pseudo,
+						gameId: this.gameId
 					}
 				}));
 			}

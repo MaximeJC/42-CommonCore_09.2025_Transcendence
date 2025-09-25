@@ -31,7 +31,8 @@ const gameResult = ref({
 	duration: 0,
 	gameMode: '1V1_ONLINE',
 	playerLeftTop: 'player1',
-	playerRightTop: 'player2'
+	playerRightTop: 'player2',
+	game_id: 'game_id'
 });
 
 // TODO : envoyer les vrai donnees
@@ -50,30 +51,22 @@ async function addGameToDataBase(newGame: any) {
 		return;
 	}
 	try {
-		const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-
-		if (currentUser === newGame.winner) {
-			const response = await fetch(`${USER_MANAGEMENT_URL}/games`, {
-				method: 'POST',
-				credentials: 'include',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					login_winner: newGame.winner,
-					login_loser: newGame.loser,
-					score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
-					score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right
-				})
-			});
-			if (!response.ok)
-				throw new Error(`Erreur http: ${response.status}`);
-			console.log("Partie enregistree dans la base de donnees avec succes.");
+		const response = await fetch(`${USER_MANAGEMENT_URL}/games`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				login_winner: newGame.winner,
+				login_loser: newGame.loser,
+				score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
+				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right,
+				game_id: newGame.gameId
+			})
 		}
+		);
+		if (!response.ok)
+			throw new Error(`Erreur http: ${response.status}`);
+		console.log("Partie enregistree dans la base de donnees avec succes.");
 	} catch (err) {
 		console.error("Erreur d'ajout de partie a la base de donnees:", err);
 	}

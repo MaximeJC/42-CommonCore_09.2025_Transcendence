@@ -173,6 +173,7 @@ class NetworkManager {
 					console.log("- Perdant:", endData.loser);
 					console.log("- Duree:", endData.duration, "secondes");
 					console.log("gameMode:", endData.gameMode);
+					console.log("game_id:", endData.gameId);
 					endGame(gameState, finalMessage);
 
 					//test partage donnees sur front
