@@ -163,30 +163,10 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 	});
 
-	function notifyAllsocket(eventSend, messageSend)
-	{
-		for (const [login, connection] of userSocketMap.entries()) {
-			console.log(`Traitement pour l'utilisateur ${login} avec le socket ID ${connection.id}`);
-			const targetSocket = userSocketMap.get(login);
-			if (targetSocket && targetSocket.readyState === 1) {			
-				const notification = {
-					event: eventSend,
-					payload: {
-						message: messageSend
-					}
-				};
-				targetSocket.send(JSON.stringify(notification));
-			}
-		}
-	}
-
-	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
-
 	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });	
 	fastify.get('/ws', { websocket: true }, (connection, req) => {
     
 		console.log("--- Handler WebSocket demarre pour une nouvelle connexion. ---");
-	
 		try {
 			let currentUserLogin = null;
 			
@@ -304,6 +284,7 @@ fastify.post('/users', async (request, reply)=>{
 		});
 		if (DEBUG_MODE)
 			console.log("New user successfully added. ID =", result.lastID);
+		notifyAllsocket('leaderboard_update', `Nouveau joueur`);
 		reply.status(201).send({ success: true, message: "New user successfully added.", userId: result.lastID });
 	} catch (err) {
 		if (DEBUG_MODE)
@@ -386,6 +367,23 @@ fastify.post('/deleteuser', async (request, reply)=>{
 		reply.status(500).send({ success: false, message: "Server error: " + err.message });
 	}
 });
+
+function notifyAllsocket(eventSend, messageSend)
+{
+	for (const [login, connection] of userSocketMap.entries()) {
+		console.log(`Traitement pour l'utilisateur ${login} avec le socket ID ${connection.id}`);
+		const targetSocket = userSocketMap.get(login);
+		if (targetSocket && targetSocket.readyState === 1) {			
+			const notification = {
+				event: eventSend,
+				payload: {						
+					message: messageSend
+				}
+			};
+			targetSocket.send(JSON.stringify(notification));
+			}		
+		}
+}
 
 // verifier les identifiants:
 function updateIsConnected(userId) {

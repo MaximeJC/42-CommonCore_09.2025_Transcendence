@@ -31,7 +31,7 @@ const isPlayActive = ref(false);
 const settingBox = ref<HTMLElement | null>(null);
 
 // ------------------------------
-// Méthodes
+// Methodes
 // ------------------------------
 
 // HASH
@@ -52,7 +52,7 @@ function getViewFromHash(): View {
   }
 }
 
-/** Met à jour le hash (ceci crée une entrée d’historique → bouton Retour OK) */
+/** Met à jour le hash (ceci cree une entree d’historique → bouton Retour OK) */
 function navigateTo(view: View) {
   const target =
     view === 'home'      ? '/':
@@ -61,7 +61,7 @@ function navigateTo(view: View) {
     view === 'settings'  ? '/settings':
     /* view === 'play'  */ '/play';
 
-  // évite la navigation inutile
+  // evite la navigation inutile
   const current = getViewFromHash();
   if (current !== view) {
     window.location.hash = target.startsWith('/') ? target : '/' + target;
@@ -117,7 +117,7 @@ const checksession = async function session() {
     if (data.user?.login) {
       isConnect.value = true;
       setUser(data.user as User);
-      // si l'utilisateur est connecté mais l'URL n'est pas cohérente, redirige vers /#/profil
+      // si l'utilisateur est connecte mais l'URL n'est pas coherente, redirige vers /#/profil
     if (!['profil', 'settings', 'play'].includes(getViewFromHash())) {
         navigateTo('profil');
       } else {
@@ -155,7 +155,7 @@ const handleShowPage = (pageName: string) => {
 
 const toggleisconnected = () => {
   isConnect.value = !isConnect.value;
-  // quand on (dé)connecte, ajuste l’URL
+  // quand on (de)connecte, ajuste l’URL
   syncFlagsToHash();
 };
 
@@ -180,7 +180,7 @@ const handlePointerDownOutside = (e: PointerEvent) => {
   if (settingBox.value && !settingBox.value.contains(target)) {
     if (issetting.value) {
       issetting.value = false;
-      // si on ferme le panneau via clic extérieur, retourne vers /#/profil
+      // si on ferme le panneau via clic exterieur, retourne vers /#/profil
       syncFlagsToHash();
     }
   }
@@ -199,13 +199,13 @@ watch(anyOpen, (newValue) => {
 });
 
 onMounted(() => {
-  // 1) Applique la vue au montage (si pas de hash, on laisse la logique de checksession décider)
+  // 1) Applique la vue au montage (si pas de hash, on laisse la logique de checksession decider)
   applyHashToFlags();
 
-  // 2) Écoute des retours/avances navigateur (hashchange)
+  // 2) ecoute des retours/avances navigateur (hashchange)
   window.addEventListener('hashchange', applyHashToFlags);
 
-  // 3) Vérifie la session (ajuste aussi l’URL si besoin)
+  // 3) Verifie la session (ajuste aussi l’URL si besoin)
   checksession();
 });
 

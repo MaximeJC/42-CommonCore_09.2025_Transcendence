@@ -12,12 +12,12 @@ const props = defineProps<{
 }>();
 
 // --- GESTION DE L'EVENT WEBSOCKET ---
-function handleFriendUpdate(payload: any) {
-	console.log("Maj liste d'amis recue via WebSocket !", payload);
-	if (currentUser.value?.login) {
-		fetchFriends(currentUser.value.login);
-	}
-}
+// function handleFriendUpdate(payload: any) {
+// 	console.log("Maj liste d'amis recue via WebSocket !", payload);
+// 	if (currentUser.value?.login) {
+// 		fetchFriends(currentUser.value.login);
+// 	}
+// }
 
 onMounted(async () => {
 	await nextTick();
