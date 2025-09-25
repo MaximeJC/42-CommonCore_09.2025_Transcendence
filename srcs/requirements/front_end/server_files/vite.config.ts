@@ -10,6 +10,10 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  // build: {
+  //   assetsDir: 'assets',
+  // },
+  // assetsInclude: ['**/*.png', '**/*.jpg', '**/*.svg', '**/*.gif', '**/*.jpeg'  ], // Ajouter d'autres ...
   server: {
     proxy: {
       '/api': {

@@ -13,8 +13,8 @@ const host = window.location.host;
 
 // On assemble l'URL complete du WebSocket.
 // const WS_URL = `${protocol}//localhost:3003`;
-const hostname = window.location.hostname;
-const WS_URL = `${protocol}//${hostname}:3003`;
+const hostname = window.location.host;
+const WS_URL = `${protocol}//${hostname}/game-api`;
 
 console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
