@@ -31,7 +31,8 @@ const gameResult = ref({
 	duration: 0,
 	gameMode: '1V1_ONLINE',
 	playerLeftTop: 'player1',
-	playerRightTop: 'player2'
+	playerRightTop: 'player2',
+	game_id: 'game_id'
 });
 
 // TODO : envoyer les vrai donnees
@@ -58,9 +59,11 @@ async function addGameToDataBase(newGame: any) {
 				login_winner: newGame.winner,
 				login_loser: newGame.loser,
 				score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
-				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right
+				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right,
+				game_id: newGame.gameId
 			})
-		});
+		}
+		);
 		if (!response.ok)
 			throw new Error(`Erreur http: ${response.status}`);
 		console.log("Partie enregistree dans la base de donnees avec succes.");

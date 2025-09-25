@@ -554,7 +554,7 @@ fastify.get('/logout', async (request, reply) => {
 
 // ajouter une partie:
 fastify.post('/games', async (request, reply)=>{
-	const {login_winner, login_loser, score_winner, score_loser} = request.body;
+	const {login_winner, login_loser, score_winner, score_loser, game_id} = request.body;
 	try {
 		const winnerExists = await new Promise((resolve, reject)=>{
 			db.get(
@@ -585,8 +585,8 @@ fastify.post('/games', async (request, reply)=>{
 
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser) VALUES (?,?,?,?)`,
-				[login_winner, login_loser, score_winner, score_loser],
+				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser, game_id) VALUES (?,?,?,?,?)`,
+				[login_winner, login_loser, score_winner, score_loser, game_id],
 				function(err) {
 					if (err) reject(err);
 					else resolve(this);
@@ -597,8 +597,8 @@ fastify.post('/games', async (request, reply)=>{
 		updateUserRanks();
 	} catch (err) {
 		if (DEBUG_MODE)
-			console.log("Erreur d'ajout de partie.\n");
-		reply.status(500).send({error: err.message});
+			console.log("Erreur d'ajout de partie.\n", err);
+		reply.send({error: err.message});
 	};
 });
 

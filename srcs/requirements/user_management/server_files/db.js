@@ -36,6 +36,7 @@ db.serialize(()=>{
 
 	db.run(`CREATE TABLE IF NOT EXISTS games (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				game_id TEXT UNIQUE NOT NULL,
 				login_winner TEXT NOT NULL,
 				login_loser TEXT NOT NULL,
 				score_winner INTEGER NOT NULL,
