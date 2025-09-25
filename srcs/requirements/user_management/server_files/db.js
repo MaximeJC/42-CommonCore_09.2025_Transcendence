@@ -115,13 +115,7 @@ export async function getUserByLogin(login) {
 	}
 }
 
-// export async function getUsers() {
-// 	return db.all("SELECT login, email FROM users");
-// }
-
 export default { db, getUserByEmail, getUserByLogin }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
-
-//todo salt_key ? cle de cryptage des mdp
 
 /* Fermeture de la base de donnee:
 db.close((err)=>{

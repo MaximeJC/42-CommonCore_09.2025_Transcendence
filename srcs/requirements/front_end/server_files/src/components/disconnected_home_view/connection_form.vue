@@ -51,13 +51,13 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			console.log(data.success, data);
 			console.log("*****************************************");
 			if (result.ok) { 
-			message.value = `Welcome ${data.user?.login}!` //todo langues
+			message.value = `Welcome ${data.user?.login}!`
 			console.log(message.value, "*******************");
 			if (data.user)
 				setUser(data.user);
 			emit('isconnected'); // emission de l'evenement de connexion reussie
 		} else {
-			message.value = data.message || "Connexion error"; //todo langues
+			message.value = data.message || "Connexion error";
 			console.log(message.value, "2*******************");
 			if (data.field === 'email') { 
 				error_email.value = true;

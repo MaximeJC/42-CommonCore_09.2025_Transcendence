@@ -25,7 +25,6 @@ const playerData = ref({
 
 /* async function fetchPlayerData() {
 	try {
-		//todo recuperer le login de l'utilisateur connecte
 		// const currentUserLogin = "Louise";
 		const current = await fetch(`${USER_MANAGEMENT_URL}/me`);
 		if (!current.ok)

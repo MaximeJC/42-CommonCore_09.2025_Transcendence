@@ -64,7 +64,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 
 		const filename = `${user.login}-${data.filename}`;
-		const saveTo = path.join(__dirname, 'uploads', filename); //TODO : Voir pour le bon chemin
+		const saveTo = path.join(__dirname, 'uploads', filename);
 
 		try {
 
