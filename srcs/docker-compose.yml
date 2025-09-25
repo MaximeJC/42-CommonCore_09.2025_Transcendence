@@ -58,6 +58,7 @@ services:
     # env_file: ./.env
     volumes:
       - user_management_db:/app/db
+      - front_avatars:/app/uploads
     ports:
       - "3000:3000"
     networks:
