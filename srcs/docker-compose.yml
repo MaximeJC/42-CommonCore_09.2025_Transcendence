@@ -6,27 +6,20 @@ services:
       dockerfile: Dockerfile
     image: hgp_ai_server_img
     # env_file: ./.env
-    ports:
-      - "3001:3001"
+    # ports:
+    #   - "3001:3001"
     networks:
       - hgp_network
     restart: unless-stopped
 
   front_end:
-    container_name: hgp_front_end
+    container_name: hgp_front_end_prod
     build:
       context: ./requirements/front_end
       dockerfile: Dockerfile
-    image: hgp_front_end_img
-    # env_file: ./.env
-    volumes:
-      - front_avatars:/app/uploads
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
-      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
+      # On mappe le port HTTPS 443 du conteneur au port 443 de notre machine
+      - "443:443"
     networks:
       - hgp_network
     restart: unless-stopped
@@ -41,8 +34,8 @@ services:
       dockerfile: Dockerfile
     image: hgp_game_management_img
     # env_file: ./.env
-    ports:
-      - "3003:3003"
+    # ports:
+    #   - "3003:3003"
     environment:
       - AI_SERVER_URL=http://hgp_ai_server:3001
     networks:
@@ -59,8 +52,8 @@ services:
     volumes:
       - user_management_db:/app/db
       - front_avatars:/app/uploads
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     networks:
       - hgp_network
     restart: unless-stopped
