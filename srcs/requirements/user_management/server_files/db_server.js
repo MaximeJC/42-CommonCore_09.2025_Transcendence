@@ -1197,6 +1197,19 @@ fastify.post('/users/change-login', async (request, reply)=>{
 		});
 		if (DEBUG_MODE)
 			console.log("New login successfully changed. ID =", result.lastID);
+		const targetSocket = userSocketMap.get(user.login);
+		if (targetSocket)
+		{
+			userSocketMap.delete(user.login)
+			userSocketMap.set(cleanLogin, targetSocket);
+			 const updatedUser = await new Promise((resolve, reject) => {
+				db.get(`SELECT * FROM users WHERE login = ?`, [cleanLogin], (err, row) => {
+					if (err) reject(err);
+					else resolve(row);
+				});
+			});
+			request.session.set('user', updatedUser);
+		}
 		reply.status(201).send({ success: true, message: "New login successfully changed", userId: result.lastID });
 	} catch (err) {
 		if (DEBUG_MODE)
