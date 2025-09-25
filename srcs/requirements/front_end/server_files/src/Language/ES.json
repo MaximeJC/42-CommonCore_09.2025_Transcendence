@@ -74,5 +74,9 @@
 	"invit":{
     	"accept": "Aceptar",
     	"refuse": "Rechazar"
+	},
+
+	"victory":{
+ 	   "text": "Victoria de"
 	}
 }

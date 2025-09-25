@@ -69,22 +69,13 @@ async function addGameToDataBase(newGame: any) {
 	}
 }
 
-// METTRE LA DUREE DANS UN FORMAT HH:MM:SS
-function formatDuration(seconds: number): string {
-	const hours = Math.floor(seconds / 3600);
-	const minutes = Math.floor((seconds % 3600) / 60);
-	const remainingSeconds = seconds % 60;
-	if (hours !== 0)
-		return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-	else
-		return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-}
-
 // GESTION DE L'EVENEMENT DE FIN DE PARTIE
-function handleGameResult(event: CustomEvent) {
+async function handleGameResult(event: CustomEvent) {
 	console.log("Evenement 'gameresult' capture par Vue!", event.detail);
 	gameResult.value = event.detail; // Met a jour nos donnees
 	showResultScreen.value = true;
+	await nextTick();  
+	updateText()
 	addGameToDataBase(gameResult.value);
 }
 
@@ -130,17 +121,16 @@ onMounted(() => {
 	}
 
 	window.addEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.addEventListener('gameresult', handleGameResult as EventListener);
+	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 })
 
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
 	window.removeEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.removeEventListener('gameresult', handleGameResult as EventListener);
+	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 });
 
 watch(() => props.activePlay, (newVal) => {
-	//todo gerer ce if...
 	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE" || newVal === "tournament" ){
 		nextTick().then(() => {
 			handleStartGame();
@@ -151,48 +141,27 @@ watch(() => props.activePlay, (newVal) => {
 </script>
 
 <template>
-	<div v-show="props.activePlay != 'tournament'" class="home_disconnect">
+	<div v-show="props.activePlay != 'tournament' && !showResultScreen" class="home_disconnect">		
 		<div id="lobby"></div>
-
 		<canvas id="renderCanvas"></canvas>
 	</div>
 	<div v-show="props.activePlay === 'tournament'">
 		<tournament :setLanguage="props.setLanguage"></tournament>
-		</div>
-		<div ref="rootElement" title="result frame" class="result-container" v-if="showResultScreen">
-			<div class="title-resultat" >Resultat</div>
-
-			<div class="h2">Vainqueur:</div>
-			<div class="winner">{{ gameResult.winner }}</div>
-
-			<div title="result-header" class="grid-header">
-				<div class="sub1" data-i18n="">Score gauche</div>
-				<div class="sub1" data-i18n="">Joueur gauche</div>
-				<div class="sub2" data-i18n="">Duree</div>
-				<div class="sub1" data-i18n="">Joueur droit</div>
-				<div class="sub2" data-i18n="">Score droite</div>
-			</div>
-			<div class="result-list-container">
-				<div class="grid-row">
-					<div class="stat1">{{ gameResult.score_left }}</div>
-					<!--<div class="stat1">{{ gameResult.loser }}</div>-->
-					<div class="stat2">{{ gameResult.playerLeftTop }}</div>
-					<div class="stat2">{{ formatDuration(gameResult.duration) }}</div>
-					<div class="stat2">{{ gameResult.playerRightTop }}</div>
-					<div class="stat2">{{ gameResult.score_right }}</div>
-
-					<!-- <div class="stat2">{{ gameResult.gameMode }}</div> -->
-				</div>
-			</div>
-
-		</div>
+	</div>
+	<div ref="rootElement" title="result frame" class="result-container" v-if="showResultScreen">
+		<label class="h2" data-i18n="victory.text"></label>
+		<div class="winner">{{ gameResult.winner }}</div>
+		<button @click="handleReturnToLobby" tittle="return-button" class="return-button">
+				<div data-i18n="home_player_button.return"></div>
+		</button>
+	</div>
 </template>
 
 <style scoped>
 
 .result-container{
 		display: grid;
-		grid-template-rows: min-content;
+		grid-template-rows: 0.5fr 0.5fr 0.5fr;
 		grid-template-columns: 1fr;
 		width: 30rem;
 		align-content: flex-start;
@@ -206,45 +175,10 @@ watch(() => props.activePlay, (newVal) => {
 		0 0 40px #dd0aba;
 		padding: 2rem 2rem;
 		border-radius: 20px;
-
 	}
 
-.title-resultat{
-		grid-column: 1 / -1;
-		text-align: center;
-		font-family: netron;
-		font-weight: bold;
-		color: white;
-		text-shadow:
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
-		font-size: 2rem;
-		margin-bottom: 0.5rem;
-	}
-
-.h1{
-		grid-column: 1 / -1;
-		text-align: center;
-		font-family: netron;
-		font-weight: bold;
-		color: white;
-		text-shadow:
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
-		font-size: 1.5rem;
-		margin-bottom: 0.5rem;
-	}
 
 .h2{
-		grid-column: 1 / -1;
 		text-align: center;
 		font-family: netron;
 		font-weight: bold;
@@ -256,7 +190,7 @@ watch(() => props.activePlay, (newVal) => {
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		font-size: 1.5rem;
+		font-size:3rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -270,7 +204,7 @@ watch(() => props.activePlay, (newVal) => {
 		0 0 10px #27cf18,
 		0 0 20px #27cf18,
 		0 0 40px #27cf18;
-		font-size: 1.5rem;
+		font-size: 3.5rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -363,5 +297,43 @@ watch(() => props.activePlay, (newVal) => {
 	position: relative;
 }
 
+
+.return-button{
+		width: fit-content;
+		height: auto;
+		justify-self: center;
+		align-self: center;
+		font-family: netron;
+		background-color: rgba(156, 50, 133, 0.5);
+		font-size: 1rem;
+		color: white;
+		border: 2px solid #e251ca;
+		text-shadow: 
+		0 0 10px #dd0aba,
+		0 0 30px #dd0aba;
+	
+		box-shadow: 
+		0 0 5px #dd0aba,
+		0 0 10px #dd0aba,
+		0 0 20px #dd0aba;
+		padding: 1rem 1rem;
+		border-radius: 20px;
+		cursor: pointer;
+		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+	}
+
+	.return-button:hover{
+		background-color: rgba(251, 255, 34, 0.5);
+		border: 2px solid #fbff22;
+		box-shadow:
+		0 0 5px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+
+		text-shadow: 
+		0 0 10px #fbff22,
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+	}
 
 </style>
