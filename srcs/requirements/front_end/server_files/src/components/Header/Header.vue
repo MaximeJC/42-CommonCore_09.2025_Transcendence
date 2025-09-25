@@ -178,7 +178,7 @@
 
 		}
 		.logo::after {
-			width: 32rem; /* Réduisez la longueur de la ligne */
+			width: 32rem; /* Reduisez la longueur de la ligne */
 		}
 	}
 
@@ -189,7 +189,7 @@
 			
     	}
     	.logo::after {
-    	    width: 24rem; /* Réduire la longueur de la ligne */
+    	    width: 24rem; /* Reduire la longueur de la ligne */
 		}
 	}
 	@media (max-width: 576px) {

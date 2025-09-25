@@ -175,14 +175,14 @@ export class GameInstance {
 	 * appelee par le serveur quand un client envoie 'client_ready'.
 	 */
 	handlePlayerReady(playerId) {
-		console.log('[Jeu ${this.gameId}] Le joueur ${playerId} est pret.');
+		console.log(`[Jeu ${this.gameId}] Le joueur ${playerId} est pret.`);
 		this.readyPlayers.add(playerId);
 
 		const totalClientCount = this.clientInfos.length;
 
 		// On verifie si TOUS les clients connectes a cette partie (joueurs ou spectateurs) sont prets.
 		if (this.readyPlayers.size === totalClientCount) {
-			console.log('[Jeu ${this.gameId}] Tous les joueurs/spectateurs sont prets. Lancement du jeu !');
+			console.log(`[Jeu ${this.gameId}] Tous les joueurs/spectateurs sont prets. Lancement du jeu !`);
 			this.beginGame();
 		}
 	}

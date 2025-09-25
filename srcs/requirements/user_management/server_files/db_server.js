@@ -12,8 +12,8 @@ import validator from 'validator';
 import { dirname } from 'path';
 
 import crypto from 'crypto';
-import { pipeline } from 'stream/promises'; // Pour gérer les flux proprement
-import fs from 'fs'; // Pour créer le flux d'écriture
+import { pipeline } from 'stream/promises'; // Pour gerer les flux proprement
+import fs from 'fs'; // Pour creer le flux d'ecriture
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fastifyWebsocket from '@fastify/websocket';
@@ -25,7 +25,6 @@ const fastify = Fastify({logger: true});
 // Cle: login, Valeur: socket.id
 const userSocketMap = new Map();
 //------------------------------------------------------
-
 const { db, getUserByEmail } = dbModule;
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SERVEUR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,33 +163,58 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 	});
 
+	function notifyAllsocket(eventSend, messageSend)
+	{
+		for (const [login, connection] of userSocketMap.entries()) {
+			console.log(`Traitement pour l'utilisateur ${login} avec le socket ID ${connection.id}`);
+			const targetSocket = userSocketMap.get(login);
+			if (targetSocket && targetSocket.readyState === 1) {			
+				const notification = {
+					event: eventSend,
+					payload: {
+						message: messageSend
+					}
+				};
+				targetSocket.send(JSON.stringify(notification));
+			}
+		}
+	}
+
 	//await fastify.register(cors, { origin: 'http://localhost:5173', credentials: true}); // autoriser n'importe qui a appeler l'API de ce serveur
 
-	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });
-
-	// try {
-		
+	fastify.get('/ping', async()=>{ return { msg: 'pong' }; });	
 	fastify.get('/ws', { websocket: true }, (connection, req) => {
     
-		console.log("--- Handler WebSocket démarré pour une nouvelle connexion. ---");
+		console.log("--- Handler WebSocket demarre pour une nouvelle connexion. ---");
 	
 		try {
 			let currentUserLogin = null;
 			
-			console.log(`Client connecté avec succès ! Attachement des listeners...`);
-	
+			console.log(`Client connecte avec succes ! Attachement des listeners...`);
 			connection.on('message', (message) => {
 				try {
 					const data = JSON.parse(message.toString());
-	
-					// On gère l'événement 'register'
+
 					if (data.event === 'register' && data.payload) {
 						currentUserLogin = data.payload;
-						console.log(`WebSocket enregistré pour l'utilisateur ${currentUserLogin}`);
+							try {
+						
+							db.run(
+								`UPDATE users SET connected = ? WHERE login = ?`,
+								[1, currentUserLogin],
+								(err) => {
+									if (err)
+										console.log("Erreur de mise a jour de connexion du joueur:", err);
+								}
+							);
+							notifyAllsocket('friend_update', `Ami connecte`);							
+							
+						} catch (err) {
+							console.log("WebSocket connecte error:", err);
+						}
+						console.log(`WebSocket enregistre pour l'utilisateur ${currentUserLogin}`);
 						userSocketMap.set(currentUserLogin, connection);
 					}
-					
-					// Vous pouvez ajouter d'autres événements ici si besoin (if, else if...)
 	
 				} catch (error) {
 					console.error('Erreur de message WebSocket:', error);
@@ -198,30 +222,40 @@ fastify.post('/upload-avatar', async (request, reply) => {
 			});
 
 			connection.on('close', () => {
-				console.log(`WebSocket déconnecté (événement 'close' reçu).`);
+				console.log(`WebSocket deconnecte (evenement 'close' reçu).`);
 				if (currentUserLogin) {
+						db.serialize(async()=>{
+						try {
+							
+							db.run(
+								`UPDATE users SET connected = ? WHERE login = ?`,
+								[0, currentUserLogin],
+								(err) => {
+									if (err)
+										console.log("Erreur de mise a jour de connexion du joueur:", err);
+								}
+							);
+							notifyAllsocket('friend_update', `Ami deconnecte`);	
+						} catch (err) {
+							console.log("WebSocket deconnecte error:", err);
+						}
+					});
 					userSocketMap.delete(currentUserLogin);
-					console.log(`Entrée pour ${currentUserLogin} supprimée.`);
+					console.log(`Entree pour ${currentUserLogin} supprimee.`);
 				}
 			});
 			
 			connection.on('error', (error) => {
-				console.error("--- Erreur explicite reçue sur le socket ---", error);
+				console.error("Erreur explicite reçue sur le socket", error);
 			});
-	
-			console.log("--- Listeners attachés avec succès. La connexion reste ouverte. ---");
+
+			console.log("Listeners attaches avec succes. La connexion reste ouverte.");
 	
 		} catch (err) {
-			// Si une erreur se produit PENDANT l'initialisation, on la verra ici
-			console.error("!!! ERREUR FATALE LORS DE L'INITIALISATION DU HANDLER WEBSOCKET !!!", err);
+			console.error("ERREUR FATALE LORS DE L'INITIALISATION DU HANDLER WEBSOCKET", err);
 		}
 	});
 		await fastify.listen({ port: 3000, host: '0.0.0.0' });
-	
-	// } catch (err) {
-	// 	fastify.log.error(err);
-	// 	process.exit(1);
-	// }
 }
 
 configure();
@@ -494,7 +528,7 @@ fastify.get('/logout', async (request, reply) => {
 	updateIsNotConnected(user.id);
 	request.session.delete('user');
 	reply.clearCookie('sessionId');
-	reply.send({ message: 'Deconnexion réussie'});
+	reply.send({ message: 'Deconnexion reussie'});
 // 	});
 });
 
@@ -778,7 +812,7 @@ fastify.post('/friends', async (request, reply)=>{
 			);
 		});
 
-				// --- WEBSOCKET ---
+		// --- WEBSOCKET ---
 		// On cherche le socket de l'utilisateur qui a ete ajoute (login2)
 		const targetSocket = userSocketMap.get(cleanLogin2);
 
