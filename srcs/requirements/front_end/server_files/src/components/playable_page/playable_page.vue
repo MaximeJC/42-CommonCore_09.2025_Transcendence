@@ -24,18 +24,17 @@ const { currentUser } = user();
 
 const showResultScreen = ref(false);
 const gameResult = ref({
-	winner: 'lewin',
-	loser: 'leperdant',
+	winner: '',
+	loser: '',
 	score_left: 0,
 	score_right: 0,
 	duration: 0,
-	gameMode: '1V1_ONLINE',
-	playerLeftTop: 'player1',
-	playerRightTop: 'player2',
-	game_id: 'game_id'
+	gameMode: '',
+	playerLeftTop: '',
+	playerRightTop: '',
+	game_id: ''
 });
 
-// TODO : envoyer les vrai donnees
 // definit la config du jeu ici, dans des variables.
 interface GameConfig {
 	pseudo: string;
@@ -143,7 +142,6 @@ onUnmounted(() => {
 });
 
 watch(() => props.activePlay, (newVal) => {
-	//todo gerer ce if...
 	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE" || newVal === "tournament" ){
 		nextTick().then(() => {
 			handleStartGame();

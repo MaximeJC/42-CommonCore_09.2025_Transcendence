@@ -242,8 +242,7 @@ export class GameInstance {
 			(winnerPseudo) => { this.endGame(winnerPseudo); }
 		);
 
-		//TODO : Si besoin pour recuperer position balle et joueurs
-		// Position et vitesse de la balle
+		// // Position et vitesse de la balle
 		// const ball = this.gameState.ball;
 		// console.log(`Balle: { y: ${ball.position.y.toFixed(2)}, z: ${ball.position.z.toFixed(2)} } | Vitesse: { vy: ${ball.vy.toFixed(2)}, vz: ${ball.vx.toFixed(2)} }`);
 
@@ -357,7 +356,6 @@ export class GameInstance {
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);
 		console.log(`[Jeu ${this.gameId}] Score final: ${score_left} - ${score_right}`);
 		console.log(`[Jeu ${this.gameId}] Duree: ${this.gameDurationInSeconds} secondes.`);
-		// TODO : Logique pour enregistrer les scores finaux dans une base de donnees.
 	}
 
 	broadcast(type, data) {

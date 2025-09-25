@@ -35,7 +35,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 		// verifier que mdp est correctement repete:
 		if (password.value !== conf_password.value) {
 			error_conf_password.value = true;
-			// message.value = "Passwords are not the same"; //todo langue
+			// message.value = "Passwords are not the same";
 			return;
 		}
 
@@ -89,7 +89,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			}
 			
 			if (data.success) { // afficher un message et reinitialiser les variables
-				message.value = "Account successfully created"; //todo langue
+				message.value = "Account successfully created";
 				login.value = "";
 				email.value = "";
 				password.value = "";
@@ -100,10 +100,10 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 					error_login.value = true;
 				if (data.message?.includes("email"))
 					error_email.value = true;
-				message.value = data.message || "Subscription error"; //todo langue
+				message.value = data.message || "Subscription error";
 			}
 		} catch (err) {
-			message.value = "Cannot contact server"; //todo langue
+			message.value = "Cannot contact server";
 			console.error("Fetch error:", err); 
 		}
 	}
