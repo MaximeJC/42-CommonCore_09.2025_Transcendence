@@ -44,11 +44,11 @@ await fastify.register(fastifySecureSession, {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const newdir = path.join(__dirname, '../..', 'front_end/server_files/'); // revoir le bon chemin ou trasfert vers docker 
+// const newdir = path.join(__dirname, '../..', 'front_end/server_files/'); // revoir le bon chemin ou trasfert vers docker 
 
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyStatic, {
-	root: path.join(newdir, 'uploads'),
+	root: path.join(__dirname, 'uploads'),
 	prefix: '/uploads/',
 });
 
@@ -65,16 +65,16 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 
 		const filename = `${user.login}-${data.filename}`;
-		const saveTo = path.join(newdir, 'uploads', filename); //TODO : Voir pour le bon chemin
+		const saveTo = path.join(__dirname, 'uploads', filename); //TODO : Voir pour le bon chemin
 
 		try {
 
-			const fileToDelete = fs.readdirSync(`${newdir}/uploads`);
+			const fileToDelete = fs.readdirSync(`${__dirname}/uploads`);
 			console.log("fileToDelete:", fileToDelete);
 			for (const file of fileToDelete) {
 				console.log("file:", file);
 				if (file.startsWith(`${user.login}-`)) {
-					fs.unlinkSync(path.join(`${newdir}/uploads`, file));
+					fs.unlinkSync(path.join(`${__dirname}/uploads`, file));
 				}
 			}
 
