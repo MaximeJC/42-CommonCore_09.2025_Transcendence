@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const emit = defineEmits(['showOtherPlayer']);
 
@@ -115,11 +115,40 @@ async function addFriend() {
 	}
 	
 }
+
+async function inviteFriend (isconnected: number){
+	try {
+		const inviteur = currentUser.value?.login ?? "";
+		const friend = props.selectedPlayerLogin ?? "";
+
+		if (isconnected === 1){
+			console.log("inviteFriend: inviteur =", inviteur, ", inviter =", friend);
+
+			const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json',
+				},
+					body: JSON.stringify({
+						login1: inviteur,
+						login2: friend
+				})
+			});
+			if (!result.ok)
+				throw new Error(`${result.status}`);
+			console.log("Ami invite avec succes.");
+		}
+
+	} catch (err) {
+		console.error("Erreur d'invitation':", err);
+	}
+}
+
 </script>
 
 <template>
 	<div title="button container" class="button-container">
-		<button v-show="props.connect === 1" title="invit-button" class="invit-button">
+		<button v-show="props.connect === 1" @click="inviteFriend(props.connect)"  title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<button v-show="props.connect === 0" title="invit-button" class="d-invit-button">

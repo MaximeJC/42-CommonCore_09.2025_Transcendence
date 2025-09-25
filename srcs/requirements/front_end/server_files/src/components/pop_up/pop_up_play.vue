@@ -1,25 +1,44 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
+// import { USER_MANAGEMENT_URL } from '@/config/config.js';
+// import { user } from '../../user';
+// import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
+// const { currentUser } = user();
+
+const props = defineProps<{
+  inviteur: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'accept'): void;
+  (e: 'refuse'): void;
+}>();
 
 onMounted(async () => {
 	await nextTick()
 	updateText() 
 })
 
+function handleAccept() {
+	emit('accept');
+}
 
+function handleRefuse() {
+	emit('refuse');
+}
 
 </script>
 
 <template>
 	<div title="pop_up_container" class="pop_up_container">
 		<div title="Pop_up_message" class="Pop_up_message">
-			<div>login</div>
+			<div>{{ inviteur }}</div>
 			<div>vous invite ajouer</div>
 		</div>
 		<div title="pop_up_button_container" class="pop_up_button_container">
-			<button title="pop_up_no" class="pop_up_no" data-i18n="invit.refuse"></button>
-			<button title="pop_up_yes" class="pop_up_yes" data-i18n="invit.accept"></button>
+			<button @click=handleRefuse title="pop_up_no" class="pop_up_no" data-i18n="invit.refuse"></button> <!-- fermer popup-->
+			<button @click=handleAccept title="pop_up_yes" class="pop_up_yes" data-i18n="invit.accept"></button> <!-- fermer popup et rejoindre game-->
 		</div>
 	</div>
 </template>
@@ -31,7 +50,7 @@ onMounted(async () => {
 	grid-template-rows: 1fr 0.5fr;
 	background-color: rgba(156, 50, 133, 0.9);
 	border: 2px solid #e251ca;
-	width: min-content;
+	width: max-content;
 	height: 10rem;
 	z-index: 9999;
 	box-shadow: 

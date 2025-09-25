@@ -6,6 +6,7 @@ import play_historic from "./play&historic_button.vue";
 import play_return from "./play&return_button.vue";
 import invit_return from "./invit&return_button.vue";
 import { watch } from 'vue';
+import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
 
 const emit = defineEmits(['showOtherPlayer']);
 
@@ -28,7 +29,7 @@ const playerData = ref({
 
 async function fetchOtherPlayerData(otherPlayerLogin: string) {
 	try {
-		const response = await fetch(`http://${USER_MANAGEMENT_URL}/users/specificlogin?login=${otherPlayerLogin}`);
+		const response = await fetch(`${USER_MANAGEMENT_URL}/users/specificlogin?login=${encodeURIComponent(otherPlayerLogin)}`);
 		if (!response.ok)
 			throw new Error('Player data fetch error');
 
@@ -88,6 +89,28 @@ watch(
 	}
 }
 onMounted(async()=>{ await fetchPlayerData(); }); */
+function handleServerMessage(event: MessageEvent) {
+	try {
+		const data = JSON.parse(event.data);
+		if (data.event === 'friend_update') {
+			console.log("Maj liste d'amis recue via WebSocket !", data.payload);
+			if (playerData.value.login) {
+				fetchOtherPlayerData(playerData.value.login);
+			}
+		}
+	} catch (error) {
+		console.error('Erreur de parsing du message WebSocket:', error);
+	}
+}
+
+watch(socket, (newSocket, oldSocket) => {
+	if (oldSocket) {
+		oldSocket.removeEventListener('message', handleServerMessage);
+	}
+	if (newSocket) {
+		newSocket.addEventListener('message', handleServerMessage);
+	}
+});
 
 </script>
 
