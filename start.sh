@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================================================
-# SCRIPT DE GESTION
+# SCRIPT DE GESTION ROBUSTE
 # ==============================================================================
 
 # --- CONFIGURATION DES COULEURS (syntaxe amelioree) ---
@@ -22,6 +22,7 @@ cleanup() {
     echo "Script arrete proprement."
 }
 
+# --- PIEGE ---
 # On dit au script d'executer la fonction 'cleanup' quand il recoit un de ces signaux :
 # EXIT: fin du script (normale ou sur erreur)
 # INT:  Interruption (Ctrl+C)
@@ -36,44 +37,16 @@ run_with_colored_errors() {
 
 # Fonction pour forcer la version de Node.js
 force_node_version() {
-  # Definit le chemin standard pour NVM et essaie de le charger s'il existe
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-  # Verifie si la commande 'nvm' est disponible
   if ! command -v nvm &> /dev/null; then
-    echo "NVM n'est pas installe. Lancement de l'installation..."
-    
-    # Telecharge et execute le script d'installation de NVM
-    if curl -s -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; then
-      echo "NVM a ete installe avec succes."
-      # Ligne cruciale : on doit recharger le script nvm.sh pour l'utiliser
-      # dans cette session de script actuelle.
-      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    else
-      echo -e "${RED}ERREUR: L'installation de NVM a echoue.${NC}"
-      return 1
-    fi
-    
-    # Verification finale apres l'installation
-    if ! command -v nvm &> /dev/null; then
-      echo -e "${RED}ERREUR: NVM installe, mais non charge. Veuillez relancer le script.${NC}"
-      return 1
-    fi
+    echo -e "${RED}ERREUR: NVM n'est pas installe ou n'a pas pu etre charge.${NC}"
+    return 1
   fi
   
   echo "Verification de la version de Node.js..."
-  # Installe la version 22 si elle n'est pas la. Ne fait rien si elle est deja installee.
-  nvm install 22
-  # Active la version 22 pour ce script
-  nvm use 22
-  
-  # Verification finale que node est bien la
-  if ! command -v node &> /dev/null; then
-    echo -e "${RED}ERREUR: Node.js n'a pas ete installe correctement par NVM.${NC}"
-    return 1
-  fi
-
+  nvm use 22 || nvm install 22
   echo "Utilisation de Node.js version $(node -v)"
 }
 
@@ -117,7 +90,7 @@ install_all_dependencies
 show_menu
 read -p "Faites votre choix : " choice
 
-# La logique pour les lancements multiples
+# La logique pour les lancements multiples est maintenant plus simple et plus sure.
 case $choice in
     1)
       echo "Lancement du front-end..."
