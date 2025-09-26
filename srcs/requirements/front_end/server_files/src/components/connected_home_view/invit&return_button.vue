@@ -2,8 +2,7 @@
 
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, watch } from 'vue';
-
-const emit = defineEmits(['showOtherPlayer']);
+import { playerInvited } from '@/gameInviteService';
 
 //const isconnect = ref(false);
 
@@ -13,9 +12,12 @@ const props = defineProps<{
 		selectedPlayerLogin: string | null;
 }>();
 
+const emit = defineEmits<{
+	(e: 'showOtherPlayer'): void
+}>()
+
 import { user } from '../../user';
 const { currentUser } = user(); 
-
 
 interface Friend {
 	name: string;
@@ -113,7 +115,8 @@ async function inviteFriend (isconnected: number){
 			});
 			if (!result.ok)
 				throw new Error(`${result.status}`);
-			console.log("Ami invite avec succes.");
+			console.log("Ami invite avec succes.", friend);
+			playerInvited.value = friend;
 		}
 
 	} catch (err) {

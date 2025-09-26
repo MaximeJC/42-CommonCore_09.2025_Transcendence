@@ -73,6 +73,7 @@
 
 	"invit":{
 		"accept": "Accept",
-		"refuse": "Decline"
+		"refuse": "Decline",
+		"cancel": "Cancel"
 	}
 }

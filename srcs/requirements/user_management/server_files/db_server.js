@@ -891,6 +891,162 @@ fastify.post('/friends/invite', async (request, reply)=>{
 	}
 });
 
+fastify.post('/friends/invite_cancel', async (request, reply)=>{
+	const {login1, login2} = request.body;
+	if (DEBUG_MODE)
+		console.log("Logins annul /friends/invite_cancel: ", {login1, login2});
+
+	try {
+		const login2Exists = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT 1 FROM users WHERE login = ?`, [login2], (err, row)=>{
+					if (err) reject(err);
+					else {
+						if (row) resolve(true);
+						else resolve(false);
+					}
+				}
+			);
+		});
+
+		if (!login2Exists)
+			return reply.status(400).send({error: "Login2 not found in database."});
+		if (DEBUG_MODE)
+			console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
+
+
+		// --- WEBSOCKET ---
+		const targetSocket = userSocketMap.get(login2);
+
+		if (targetSocket && targetSocket.readyState === 1) {
+			console.log(`Utilisateur ${login2} trouve, envoi de l'annulation d'invite'.`);
+			
+			const notification = {
+				event: 'friend_invite_cancel',
+				payload: {
+					message: `Vous avez une invite annule : ${login1}`,
+					loginInviteur: `${login1}`
+				}
+			};
+			
+			targetSocket.send(JSON.stringify(notification));
+		} else {
+			console.log(`L'utilisateur ${cleanLogin2} n'est pas connecte via WebSocket.`);
+		}
+		// --- FIN SOCKET ---
+
+		reply.send({message: "Invite cancel successfully."});
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.error("Erreur d'annulation d'invite ami.\n", err);
+		reply.status(500).send({error: err.message});
+	}
+});
+
+fastify.post('/friends/invite_decline', async (request, reply)=>{
+	const {login1, login2} = request.body;
+	if (DEBUG_MODE)
+		console.log("Logins annul /friends/invite_decline: ", {login1, login2});
+
+	try {
+		const login2Exists = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT 1 FROM users WHERE login = ?`, [login2], (err, row)=>{
+					if (err) reject(err);
+					else {
+						if (row) resolve(true);
+						else resolve(false);
+					}
+				}
+			);
+		});
+
+		if (!login2Exists)
+			return reply.status(400).send({error: "Login2 not found in database."});
+		if (DEBUG_MODE)
+			console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
+
+
+		// --- WEBSOCKET ---
+		const targetSocket = userSocketMap.get(login2);
+
+		if (targetSocket && targetSocket.readyState === 1) {
+			console.log(`Utilisateur ${login2} trouve, envoi de refus d'invite'.`);
+			
+			const notification = {
+				event: 'friend_invite_decline',
+				payload: {
+					message: `Vous avez une invite refuse : ${login1}`,
+					loginInviteur: `${login1}`
+				}
+			};
+			
+			targetSocket.send(JSON.stringify(notification));
+		} else {
+			console.log(`L'utilisateur ${cleanLogin2} n'est pas connecte via WebSocket.`);
+		}
+		// --- FIN SOCKET ---
+
+		reply.send({message: "Invite decline successfully."});
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.error("Erreur de refus d'invite ami.\n", err);
+		reply.status(500).send({error: err.message});
+	}
+});
+
+fastify.post('/friends/invite_accept', async (request, reply)=>{
+	const {login1, login2} = request.body;
+	if (DEBUG_MODE)
+		console.log("Logins annul /friends/invite_accept: ", {login1, login2});
+
+	try {
+		const login2Exists = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT 1 FROM users WHERE login = ?`, [login2], (err, row)=>{
+					if (err) reject(err);
+					else {
+						if (row) resolve(true);
+						else resolve(false);
+					}
+				}
+			);
+		});
+
+		if (!login2Exists)
+			return reply.status(400).send({error: "Login2 not found in database."});
+		if (DEBUG_MODE)
+			console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
+
+
+		// --- WEBSOCKET ---
+		const targetSocket = userSocketMap.get(login2);
+
+		if (targetSocket && targetSocket.readyState === 1) {
+			console.log(`Utilisateur ${login2} trouve, envoi de l'acceptation d'invite'.`);
+			
+			const notification = {
+				event: 'friend_invite_accepted',
+				payload: {
+					message: `Vous avez une invite accepte : ${login1}`,
+					loginInviteur: `${login1}`
+				}
+			};
+			
+			targetSocket.send(JSON.stringify(notification));
+		} else {
+			console.log(`L'utilisateur ${cleanLogin2} n'est pas connecte via WebSocket.`);
+		}
+		// --- FIN SOCKET ---
+
+		reply.send({message: "Invite accepted successfully."});
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.error("Erreur d'acceptation d'invite ami.\n", err);
+		reply.status(500).send({error: err.message});
+	}
+});
+
 // afficher les amis d'un utilisateur en particulier:
 fastify.get('/friends/me', async (request, reply)=>{
 	try {

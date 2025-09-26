@@ -5,11 +5,16 @@ import { ref, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
 import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
+import { playerInvited } from '@/gameInviteService';
 const { currentUser } = user();
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
+
+const emit = defineEmits<{
+	(e: 'showOtherPlayer', loginToShow: string): void
+}>()
 
 onMounted(async () => {
 	await nextTick();
@@ -21,8 +26,6 @@ const rootElement = ref<HTMLElement | null>(null);
 defineExpose({
 	rootElement
 });
-
-const emit = defineEmits(['showOtherPlayer']);
 
 const showOtherPlayer = (loginToShow: string)=>{
 	console.log("Friend login:", loginToShow);
@@ -176,7 +179,8 @@ async function inviteFriend (friend: string, isconnected: boolean){
 			});
 			if (!result.ok)
 				throw new Error(`${result.status}`);
-			console.log("Ami invite avec succes.");
+			console.log("Ami invite avec succes.", friend);
+			playerInvited.value = friend;
 		}
 
 	} catch (err) {
