@@ -1,0 +1,90 @@
+services:
+  front_end_prod:
+    container_name: hgp_front_end_prod
+    build:
+      context: ./requirements/front_end
+      dockerfile: Dockerfile.prod
+    image: hgp_front_end_prod_img
+    volumes:
+      - prod_front_avatars:/app/uploads
+    ports:
+      - "5000:5000"
+    environment:
+      - API_TARGET=http://hgp_user_management:3000
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - user_management
+      - game_management
+
+  user_management:
+    container_name: hgp_user_management
+    build:
+      context: ./requirements/user_management
+      dockerfile: Dockerfile
+    image: hgp_user_management_img
+    volumes:
+      - user_management_db:/app/db
+      - user_avatars:/app/server_files/uploads
+    ports:
+      - "3000:3000"
+    environment:
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=transcendence
+      - DATABASE_URL=postgresql://postgres:root@localhost:5432/transcendence
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
+  game_management:
+    container_name: hgp_game_management
+    build:
+      context: ./requirements/game_management
+      dockerfile: Dockerfile
+    image: hgp_game_management_img
+    ports:
+      - "3003:3003"
+    environment:
+      - AI_SERVER_URL=http://hgp_ai_server:3001
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - ai_server
+
+  ai_server:
+    container_name: hgp_ai_server
+    build:
+      context: ./requirements/ai_server
+      dockerfile: Dockerfile
+    image: hgp_ai_server_img
+    ports:
+      - "3001:3001"
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
+networks:
+  hgp_network:
+    driver: bridge
+
+volumes:
+  user_management_db:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/database
+      o: bind
+  user_avatars:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/avatars
+      o: bind
+  prod_front_avatars:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/avatars
+      o: bind

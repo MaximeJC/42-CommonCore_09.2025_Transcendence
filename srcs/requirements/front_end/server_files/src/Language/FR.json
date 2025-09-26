@@ -3,7 +3,7 @@
 	  "signUp": "INSCRIPTION",
 	  "signOut": "DÉCONNEXION",
 	  "language": "FR",
-	  "icon_lang": "../images/flag/france.png"
+	  "icon_lang": "/images/flag/france.png"
 	},
 	"home": {
 	  "connection": "CONNEXION"

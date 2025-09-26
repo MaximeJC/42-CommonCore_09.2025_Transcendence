@@ -12,11 +12,16 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "start": "node production-server.js",
+    "prod": "npm run build && npm start"
   },
   "dependencies": {
     "@fastify/websocket": "^11.2.0",
     "axios": "^1.12.2",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
     "vue": "^3.5.21"
   },
   "devDependencies": {

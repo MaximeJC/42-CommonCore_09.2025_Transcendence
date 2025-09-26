@@ -49,6 +49,13 @@ async function addGameToDataBase(newGame: any) {
 		console.error("Donnees de partie incompletes", newGame);
 		return;
 	}
+	
+	// Ne sauvegarder que les parties 1V1 en ligne (entre vrais joueurs)
+	if (newGame.gameMode !== "1V1_ONLINE") {
+		console.log(`Partie en mode ${newGame.gameMode} - pas de sauvegarde dans la BDD`);
+		return;
+	}
+	
 	try {
 		const response = await fetch(`${USER_MANAGEMENT_URL}/games`, {
 			method: 'POST',

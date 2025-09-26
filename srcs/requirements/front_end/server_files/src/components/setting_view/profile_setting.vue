@@ -21,7 +21,7 @@
 		login: string;
 	}
 		
-	// const act: player = {email: "test@test.fr", login: "test" , avatar: "../../../images/default_avatar.png"};
+	// const act: player = {email: "test@test.fr", login: "test" , avatar: "..//images/default_avatar.png"};
 
 	const avatarFile = ref<File | null>(null);
 	const uploadedAvatar = ref("");
@@ -335,7 +335,7 @@
 
 .set_avatar{
 	display: block;
-	/* background-image: url(../../../images/default_avatar.png); */
+	/* background-image: url(..//images/default_avatar.png); */
 	background-size:cover;
 	background-repeat: no-repeat;
 	border-radius: 50%;

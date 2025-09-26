@@ -3,7 +3,7 @@
 	  "signUp": "Sign up",
 	  "signOut": "SIGN OUT",
 	  "language": "EN",
-	  "icon_lang": "../images/flag/united-kingdom.png"
+	  "icon_lang": "/images/flag/united-kingdom.png"
 	},
 	"home": {
 	  "connection": "Login"

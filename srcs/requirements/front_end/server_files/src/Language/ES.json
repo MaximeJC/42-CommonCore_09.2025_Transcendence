@@ -3,7 +3,7 @@
 	  "signUp": "Registro",
 	  "signOut": "CERRAR SESIÓN",
 	  "language": "ES",
-	  "icon_lang": "../images/flag/Espana.png"
+	  "icon_lang": "/images/flag/Espana.png"
 	},
 	"home": {
 	  "connection": "conexión"

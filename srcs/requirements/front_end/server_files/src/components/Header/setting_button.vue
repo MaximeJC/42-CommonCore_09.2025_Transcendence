@@ -15,8 +15,8 @@
 <template>
 	<div class="option_container">
 		<button title="setting_button" class="setting_button">
-			<img src="../../../images/setting_pink.png" alt="setting_button"></img>
-			<img src="../../../images/setting_yellow.png" alt="setting_button"></img>
+			<img src="/images/setting_pink.png" alt="setting_button"></img>
+			<img src="/images/setting_yellow.png" alt="setting_button"></img>
 		</button>
 		<ul class="option-page">
 			<li>

@@ -1,0 +1,31 @@
+services:
+  front_end:
+    container_name: hgp_front_end_dev
+    build:
+      context: ./requirements/front_end
+      dockerfile: Dockerfile
+    image: hgp_front_end_img
+    volumes:
+      - front_avatars:/app/uploads
+      - ./requirements/front_end/server_files:/app  # Mount en développement pour hot-reload
+    ports:
+      - "5173:5173"  # Port de développement
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=/api
+      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
+      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - user_management
+      - game_management
+
+networks:
+  hgp_network:
+    driver: bridge
+
+volumes:
+  front_avatars:
+    driver: local

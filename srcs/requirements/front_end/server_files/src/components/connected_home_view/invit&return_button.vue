@@ -178,7 +178,7 @@ async function addFriend() {
 
 	.i-add-friends{
 		display: block;
-		background-image:  url("../../images/add_button.png");
+		background-image:  url("/images/add_button.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -196,7 +196,7 @@ async function addFriend() {
 	}
 
 	.i-add-friends:hover{
-		background-image:  url("../../../images/add_button_alt.png");
+		background-image:  url("..//images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
 		box-shadow: 

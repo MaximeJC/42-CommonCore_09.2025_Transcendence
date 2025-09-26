@@ -184,16 +184,16 @@ watch(socket, (newSocket, oldSocket) => {
 </script>
 
 // const friends: Friend[] = [
-// 	{ name: "Micka", avatar_src: "../../images/default_avatar.png", isconnected: true},
-// 	{ name: "Louise", avatar_src: "../../images/default_avatar.png", isconnected: false},
-// 	{ name: "Maxime", avatar_src: "../../images/default_avatar.png", isconnected: false},
-// 	{ name: "Axel", avatar_src: "../../images/default_avatar.png", isconnected: true},
-// 	{ name: "Nico", avatar_src: "../../images/default_avatar.png", isconnected: false},
-// 	{ name: "Thomas", avatar_src: "../../images/default_avatar.png", isconnected: true},
-// 	{ name: "Anas", avatar_src: "../../images/default_avatar.png", isconnected: true},
-// 	{ name: "Arthur", avatar_src: "../../images/default_avatar.png", isconnected: true},
-// 	{ name: "Dorina", avatar_src: "../../images/default_avatar.png", isconnected: false},
-// 	{ name: "Wictor", avatar_src: "../../images/default_avatar.png", isconnected: true},
+// 	{ name: "Micka", avatar_src: "/images/default_avatar.png", isconnected: true},
+// 	{ name: "Louise", avatar_src: "/images/default_avatar.png", isconnected: false},
+// 	{ name: "Maxime", avatar_src: "/images/default_avatar.png", isconnected: false},
+// 	{ name: "Axel", avatar_src: "/images/default_avatar.png", isconnected: true},
+// 	{ name: "Nico", avatar_src: "/images/default_avatar.png", isconnected: false},
+// 	{ name: "Thomas", avatar_src: "/images/default_avatar.png", isconnected: true},
+// 	{ name: "Anas", avatar_src: "/images/default_avatar.png", isconnected: true},
+// 	{ name: "Arthur", avatar_src: "/images/default_avatar.png", isconnected: true},
+// 	{ name: "Dorina", avatar_src: "/images/default_avatar.png", isconnected: false},
+// 	{ name: "Wictor", avatar_src: "/images/default_avatar.png", isconnected: true},
 // ]
 
 <template>
@@ -213,13 +213,13 @@ watch(socket, (newSocket, oldSocket) => {
 					</button>
 					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
-						<img v-show="friend.isconnected" src="../../../images/green-play-button.png" alt="play button">
-						<img v-show="!friend.isconnected" src="../../../images/red-play-button.png" alt="play button">
-						<img src="../../../images/yelow-play-button.png" alt="play button">
+						<img v-show="friend.isconnected" src="/images/green-play-button.png" alt="play button">
+						<img v-show="!friend.isconnected" src="/images/red-play-button.png" alt="play button">
+						<img src="/images/yelow-play-button.png" alt="play button">
 					</button>
 					<button title="delete-button" class="delete-button" @click="deleteFriend(friend.name)">
-						<img src="../../../images/trash_can.png" alt="trash can">
-						<img src="../../../images/trash_can_yellow.png" alt="trash can">
+						<img src="/images/trash_can.png" alt="trash can">
+						<img src="/images/trash_can_yellow.png" alt="trash can">
 					</button>
 				</li>
 			</ul>
@@ -272,7 +272,7 @@ watch(socket, (newSocket, oldSocket) => {
 
 	.input-add-friends > button{
 		display: block;
-		background-image:  url("../../images/add_button.png");
+		background-image:  url("/images/add_button.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -289,7 +289,7 @@ watch(socket, (newSocket, oldSocket) => {
 	}
 
 	.input-add-friends > button:hover{
-		background-image:  url("../../../images/add_button_alt.png");
+		background-image:  url("..//images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
 		box-shadow: 
