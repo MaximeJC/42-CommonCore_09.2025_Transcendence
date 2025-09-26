@@ -6,11 +6,11 @@ import pop_up_invite from '@/components/pop_up/pop_up_invite.vue';
 import pop_up_cancel from '@/components/pop_up/pop_up_play.vue';
 import { playerInvited } from '@/gameInviteService';
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
-
 import { user } from '../src/user';
 import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
 const { currentUser } = user();
 const currentInvite = ref('');
+const opponentLoginToStart = ref<string | null>(null)
 
 const inviteurLogin = ref<string | null>(null);
 const inviteLogin = playerInvited;
@@ -19,6 +19,8 @@ const props = defineProps<{
 	setinviteur: (inviteur: string) => void;
 	setinvite: (invite: string) => void;
 }>();
+
+const emit = defineEmits(['start-online-game']);
 
 onMounted(async () => {
 	await nextTick()
@@ -46,12 +48,11 @@ function handleServerMessage(event: MessageEvent) {
 		}
 		if (data.event === 'friend_invite_accepted') {
 			console.log("invite jeu accepte via WebSocket !", data.payload);
-			inviteLogin.value = "";
-			console.log("invite jeu accepte :", inviteurLogin.value);
-
+			console.log("invite jeu accepte :", inviteLogin.value);
+			
 			//rediriger vers playable_page
-			//user = currentUser.value?.login
-			//opponent = inviteLogin.value
+			opponentLoginToStart.value = inviteLogin.value
+			inviteLogin.value = "";
 		}
 	} catch (error) {
 		console.error('Erreur de parsing du message WebSocket:', error);
@@ -76,8 +77,7 @@ async function onInvitationAccepted() {
 	console.log("Ami invite accepte avec succes.", inviteLogin.value);
 
 	//rediriger vers playable_page
-	//user = currentUser.value?.login
-	//opponent = inviteurLogin.value
+	opponentLoginToStart.value = inviteurLogin.value;
 
 	inviteurLogin.value = null;
 }
@@ -122,8 +122,12 @@ async function onInvitationCancel() {
 }
 
 function handleInvite(friendLogin: string) {
-    console.log(`Event 'invite' recu pour le joueur : ${friendLogin}`);
-    inviteLogin.value = friendLogin;
+	console.log(`Event 'invite' recu pour le joueur : ${friendLogin}`);
+	inviteLogin.value = friendLogin;
+}
+
+function onGameStarted() {
+  opponentLoginToStart.value = null;
 }
 
 watch(socket, (newSocket, oldSocket) => {
@@ -143,13 +147,16 @@ watch(socket, (newSocket, oldSocket) => {
 	@refuse="onInvitationRefused"></pop_up_invite>
 
 	<pop_up_cancel v-if="inviteLogin"
-	:invite="inviteLogin"
-	@cancel="onInvitationCancel"></pop_up_cancel>
+		:invite="inviteLogin"
+		@cancel="onInvitationCancel"></pop_up_cancel>
 
 	<div class="inviteLogin">{{ inviteLogin}}</div>
-	<div class="home-container"> 
-		<HomeView :setLanguage="setLanguage" 
-		 @invite="handleInvite"></HomeView>
+	<div class="home-container">
+		<HomeView
+			:setLanguage="setLanguage"
+			@invite="handleInvite"
+			:opponent-for-online-game="opponentLoginToStart"
+			@game-started="onGameStarted"></HomeView>
 	</div>
 
 </template>

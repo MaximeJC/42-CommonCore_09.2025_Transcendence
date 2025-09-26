@@ -12,6 +12,7 @@ const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
+	opponentLogin?: string | null;
 }>();
 
 onMounted(async () => {
@@ -101,7 +102,7 @@ function handleStartGame() {
 	showResultScreen.value = false;
 	const gameConfig: GameConfig = {
 		pseudo: currentUser.value?.login ?? "",
-		opponentPseudo: "", // Laisser vide pour un match public
+		opponentPseudo: props.opponentLogin || "", // Laisser vide pour un match public
 		avatarUrl: currentUser.value?.avatar_url ?? "",
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: "fr" //en, fr, es
@@ -110,13 +111,15 @@ function handleStartGame() {
 	if (props.activePlay === "tournament") {
 		gameConfig.gameMode = "2P_LOCAL";
 		gameConfig.opponentPseudo = "PseudoAdversaireTournois"; // Player2
+	} else if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {
+		gameConfig.opponentPseudo = props.opponentLogin;
 	}
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 
 	(window as any).networkConfig = {
-        pongServerBaseUrl: pongServerPath,
-        aiServerBaseUrl: aiServerPath
-    };
+		pongServerBaseUrl: pongServerPath,
+		aiServerBaseUrl: aiServerPath
+	};
 	startMatchmaking(gameConfig);
 }
 
@@ -147,14 +150,13 @@ watch(() => props.activePlay, (newVal) => {
 			handleStartGame();
 		});
 	 }
-})
+}, { immediate: true });
 
 </script>
 
 <template>
 	<div v-show="props.activePlay != 'tournament'" class="home_disconnect">
 		<div id="lobby"></div>
-
 		<canvas id="renderCanvas"></canvas>
 	</div>
 	<div v-show="props.activePlay === 'tournament'">

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import selec_play from './selection-type-play.vue'
 import play from './playable_page.vue'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		show_play: boolean;
+		activePlay: string;
+		opponentLogin: string | null;
 	}>();
 
 const emit = defineEmits(['show_play', 'isPlayActive']);
@@ -21,7 +23,14 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
-
+watch(() => props.activePlay, (newVal) => {
+	if (newVal && newVal !== '') {
+		console.log(`[play_page.vue] Recu le mode de jeu '${newVal}', lancement direct du jeu.`);
+		isPlayActive.value = true;
+		activePlay.value = newVal;
+		
+	}
+}, { immediate: true });
 
 </script>
 
@@ -37,6 +46,7 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	<div v-show="isPlayActive">
 		<play
 		:activePlay="activePlay"
+		:opponentLogin="props.opponentLogin"
 		:set-language="props.setLanguage"
 		@gameisfinish="handletypeplay"
 		></play>
