@@ -37,21 +37,21 @@ db.serialize(()=>{
 	db.run(`CREATE TABLE IF NOT EXISTS games (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				game_id TEXT UNIQUE NOT NULL,
-				login_winner TEXT NOT NULL,
-				login_loser TEXT NOT NULL,
+				login_winner_id INTEGER NOT NULL,
+				login_loser_id INTEGER NOT NULL,
 				score_winner INTEGER NOT NULL,
 				score_loser INTEGER NOT NULL,
 				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-				FOREIGN KEY (login_winner) REFERENCES users(login) ON DELETE CASCADE,
-				FOREIGN KEY (login_loser) REFERENCES users(login) ON DELETE CASCADE
+				FOREIGN KEY (login_winner_id) REFERENCES users(login) ON DELETE CASCADE,
+				FOREIGN KEY (login_loser_id) REFERENCES users(login) ON DELETE CASCADE
 			)`);
 
 	db.run(`CREATE TABLE IF NOT EXISTS friends (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				login1 TEXT NOT NULL,
-				login2 TEXT NOT NULL,
-				FOREIGN KEY (login1) REFERENCES users(login) ON DELETE CASCADE,
-				FOREIGN KEY (login2) REFERENCES users(login) ON DELETE CASCADE
+				id_1 INTEGER NOT NULL,
+				id_2 INTEGER NOT NULL,
+				FOREIGN KEY (id_1) REFERENCES users(id) ON DELETE CASCADE,
+				FOREIGN KEY (id_2) REFERENCES users(id) ON DELETE CASCADE
 			)`);
 });
 
@@ -106,7 +106,7 @@ export async function getUserByLogin(login) {
 		});
 		console.log('Base de données ouverte');
 	try {
-		const user = db.get("SELECT * FROM users WHERE login = ?", [login]);
+		const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
 		console.log('login trouvé en base:', user);
 		return (user);
 	} catch (err) {

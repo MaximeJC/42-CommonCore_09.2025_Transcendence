@@ -25,7 +25,7 @@ const fastify = Fastify({logger: true});
 // Cle: login, Valeur: socket.id
 const userSocketMap = new Map();
 //------------------------------------------------------
-const { db, getUserByEmail } = dbModule;
+const { db, getUserByEmail, getUserByLogin } = dbModule;
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SERVEUR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -59,11 +59,11 @@ fastify.post('/upload-avatar', async (request, reply) => {
 		}
 
 		const user = request.session.get('user');
-		if (!user || !user.login) {
+		if (!user || !user.id) {
 			return reply.status(401).send({ error: 'User not logged in' });
 		}
 
-		const filename = `${user.login}-${data.filename}`;
+		const filename = `${user.id}-${data.filename}`;
 		const saveTo = path.join(__dirname, 'uploads', filename);
 
 		try {
@@ -72,7 +72,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 			console.log("fileToDelete:", fileToDelete);
 			for (const file of fileToDelete) {
 				console.log("file:", file);
-				if (file.startsWith(`${user.login}-`)) {
+				if (file.startsWith(`${user.id}-`)) {
 					fs.unlinkSync(path.join(`${__dirname}/uploads`, file));
 				}
 			}
@@ -89,12 +89,12 @@ fastify.post('/upload-avatar', async (request, reply) => {
 
 		const relativePath = `/uploads/${filename}`;
 
-		console.log(`[AVATAR] Mise a jour de la BDD pour l'utilisateur ${user.login} avec le chemin ${relativePath}`);
+		console.log(`[AVATAR] Mise a jour de la BDD pour l'utilisateur ${user.id} avec le chemin ${relativePath}`);
 
 		await new Promise((resolve, reject) => {
 			db.run(
-				'UPDATE users SET avatar_url = ? WHERE login = ?',
-				[relativePath, user.login],
+				'UPDATE users SET avatar_url = ? WHERE id = ?',
+				[relativePath, user.id],
 					function (err) {
 					if (err) {
 						reject(err);
@@ -170,7 +170,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
     
 		console.log("--- Handler WebSocket demarre pour une nouvelle connexion. ---");
 		try {
-			let currentUserLogin = null;
+			let currentUserId = null;
 			
 			console.log(`Client connecte avec succes ! Attachement des listeners...`);
 			connection.on('message', (message) => {
@@ -178,12 +178,12 @@ fastify.post('/upload-avatar', async (request, reply) => {
 					const data = JSON.parse(message.toString());
 
 					if (data.event === 'register' && data.payload) {
-						currentUserLogin = data.payload;
+						currentUserId = data.payload;
 							try {
 						
 							db.run(
-								`UPDATE users SET connected = ? WHERE login = ?`,
-								[1, currentUserLogin],
+								`UPDATE users SET connected = ? WHERE id = ?`,
+								[1, currentUserId],
 								(err) => {
 									if (err)
 										console.log("Erreur de mise a jour de connexion du joueur:", err);
@@ -194,8 +194,8 @@ fastify.post('/upload-avatar', async (request, reply) => {
 						} catch (err) {
 							console.log("WebSocket connecte error:", err);
 						}
-						console.log(`WebSocket enregistre pour l'utilisateur ${currentUserLogin}`);
-						userSocketMap.set(currentUserLogin, connection);
+						console.log(`WebSocket enregistre pour l'utilisateur ${currentUserId}`);
+						userSocketMap.set(currentUserId, connection);
 					}
 	
 				} catch (error) {
@@ -205,13 +205,13 @@ fastify.post('/upload-avatar', async (request, reply) => {
 
 			connection.on('close', () => {
 				console.log(`WebSocket deconnecte (evenement 'close' reçu).`);
-				if (currentUserLogin) {
+				if (currentUserId) {
 						db.serialize(async()=>{
 						try {
 							
 							db.run(
-								`UPDATE users SET connected = ? WHERE login = ?`,
-								[0, currentUserLogin],
+								`UPDATE users SET connected = ? WHERE id = ?`,
+								[0, currentUserId],
 								(err) => {
 									if (err)
 										console.log("Erreur de mise a jour de connexion du joueur:", err);
@@ -222,8 +222,8 @@ fastify.post('/upload-avatar', async (request, reply) => {
 							console.log("WebSocket deconnecte error:", err);
 						}
 					});
-					userSocketMap.delete(currentUserLogin);
-					console.log(`Entree pour ${currentUserLogin} supprimee.`);
+					userSocketMap.delete(currentUserId);
+					console.log(`Entree pour ${currentUserId} supprimee.`);
 				}
 			});
 			
@@ -477,8 +477,8 @@ fastify.get('/me', async (req, rep) => {
 
 	const user = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT * FROM users WHERE login = ?`,
-				[userMe.login],
+				`SELECT * FROM users WHERE id = ?`,
+				[userMe.id],
 				(err, row)=>{
 					if (err) {
 						reject(err);
@@ -556,12 +556,18 @@ fastify.get('/logout', async (request, reply) => {
 fastify.post('/games', async (request, reply)=>{
 	const {login_winner, login_loser, score_winner, score_loser, game_id} = request.body;
 	try {
+		let winner_id;
+		let loser_id;
 		const winnerExists = await new Promise((resolve, reject)=>{
 			db.get(
 				`SELECT 1 FROM users WHERE login = ?`, [login_winner], (err, row)=>{
 					if (err) reject(err);
 					else {
-						if (row) resolve(true);
+						if (row)
+						{
+							resolve(true);
+							winner_id = row.id;
+						}
 						else resolve(false);
 					}
 				}
@@ -573,7 +579,11 @@ fastify.post('/games', async (request, reply)=>{
 				`SELECT 1 FROM users WHERE login = ?`, [login_loser], (err, row)=>{
 					if (err) reject(err);
 					else {
-						if (row) resolve(true);
+						if (row)
+						{
+							resolve(true);
+							loser_id = row.id;
+						}
 						else resolve(false);
 					}
 				}
@@ -585,8 +595,8 @@ fastify.post('/games', async (request, reply)=>{
 
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO games (login_winner, login_loser, score_winner, score_loser, game_id) VALUES (?,?,?,?,?)`,
-				[login_winner, login_loser, score_winner, score_loser, game_id],
+				`INSERT INTO games (login_winner_id, login_loser_id, score_winner, score_loser, game_id) VALUES (?,?,?,?,?)`,
+				[winner_id, loser_id, score_winner, score_loser, game_id],
 				function(err) {
 					if (err) reject(err);
 					else resolve(this);
@@ -624,16 +634,19 @@ fastify.get('/games', async (request, reply)=>{
 // afficher les parties qu'a joue un utilisateur particulier:
 fastify.get('/games/me', async (request, reply)=>{
 	const { login_current } = request.query;
+	let login_current_id;
 	if (!login_current)
 		return reply.status(400).send({ error: "Missing login." });
 
 	try {
+		let user_current = await getUserByLogin(login_current);
+		login_current_id = user_current.id;
 		const games = await new Promise((resolve, reject)=>{
 			db.all(
 				`SELECT * FROM games
-				WHERE login_winner = ? OR login_loser = ?
+				WHERE login_current_id = ? OR login_current_id = ?
 				ORDER BY created_at DESC`,
-				[login_current, login_current],
+				[login_current_id, login_current_id],
 				(err, games)=>{
 					if (err) reject(err);
 					else resolve(games);
@@ -736,18 +749,28 @@ fastify.get('/leaderboard', async (request, reply)=>{
 // ajouter un ami:
 fastify.post('/friends', async (request, reply)=>{
 	const {login1, login2} = request.body;
+	
 	if (DEBUG_MODE)
 		console.log("Logins recus: ", {login1, login2});
-
+	
 	let cleanLogin2;
-
+	
 	cleanLogin2 = validator.trim(login2);
 	cleanLogin2 = validator.escape(cleanLogin2);
 
+	let user_1 = await getUserByLogin(login1);
+	let id_1 = user_1.id;
+	let user_2 = await getUserByLogin(cleanLogin2);
+	let id_2 = user_2.id;
+
+	console.log("*******************************************");
+	console.log("id_1: ", id_1, "id_2: ", id_2);
+	console.log("*******************************************");
+
 	try {
-		const login1Exists = await new Promise((resolve, reject)=>{
+		const id1Exists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM users WHERE login = ?`, [login1], (err, row)=>{
+				`SELECT 1 FROM users WHERE id = ?`, [id_1], (err, row)=>{
 					if (err) reject(err);
 					else {
 						if (row) resolve(true);
@@ -757,14 +780,14 @@ fastify.post('/friends', async (request, reply)=>{
 			);
 		});
 
-		if (!login1Exists)
-			return reply.status(400).send({error: "Login1 not found in database."});
+		if (!id1Exists)
+			return reply.status(400).send({error: "id_1 not found in database."});
 		if (DEBUG_MODE)
 			console.log("Login1 a bien ete trouve dans la base de donnees: ", {login1});
 
-		const login2Exists = await new Promise((resolve, reject)=>{
+		const id2Exists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM users WHERE login = ?`, [cleanLogin2], (err, row)=>{
+				`SELECT 1 FROM users WHERE id = ?`, [id_2], (err, row)=>{
 					if (err) reject(err);
 					else {
 						if (row) resolve(true);
@@ -774,15 +797,15 @@ fastify.post('/friends', async (request, reply)=>{
 			);
 		});
 
-		if (!login2Exists)
+		if (!id2Exists)
 			return reply.status(400).send({error: "Login2 not found in database."});
 		if (DEBUG_MODE)
 			console.log("Login2 a bien ete trouve dans la base de donnees: ", {cleanLogin2});
 
 		const relationExists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM friends WHERE (login1 = ? AND login2 = ?) OR (login2 = ? AND login1 = ?)`,
-				[login1, cleanLogin2, cleanLogin2, login1],
+				`SELECT 1 FROM friends WHERE (id_1 = ? AND id_2 = ?) OR (id_2 = ? AND id_1 = ?)`,
+				[id_1, id_2, id_2, id_1],
 				(err, row)=>{
 					if (err) reject(err);
 					else {
@@ -798,13 +821,13 @@ fastify.post('/friends', async (request, reply)=>{
 
 		const result = await new Promise((resolve, reject)=>{
 			db.run(
-				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[login1, cleanLogin2],
+				`INSERT INTO friends (id_1, id_2) VALUES (?,?)`,
+				[id_1, id_2],
 				(err)=>{ if (err) reject(err); }
 			);
 			db.run(
-				`INSERT INTO friends (login1, login2) VALUES (?,?)`,
-				[cleanLogin2, login1],
+				`INSERT INTO friends (id_1, id_2) VALUES (?,?)`,
+				[id_2, id_1],
 				(err)=>{
 					if (err) reject(err);
 					else resolve(this);
@@ -900,16 +923,20 @@ fastify.get('/friends/me', async (request, reply)=>{
 			if (!login_current)
 		return reply.status(400).send({ error: "Missing login." });
 
+		let user_1 = await getUserByLogin(login_current);
+		let id_current = user_1.id;
+
 		const friends = await new Promise((resolve, reject)=>{
 			db.all(
 				`SELECT DISTINCT
 					u.login as name,
+					u.id as id,
 					u.avatar_url as avatar_src,
 					(u.connected = 1) as isconnected
 				FROM friends f
-				JOIN users u ON (u.login = f.login2)
-				WHERE f.login1 = ?`,
-				[login_current],
+				JOIN users u ON (u.id = f.id_2)
+				WHERE f.id_1 = ?`,
+				[id_current],
 				(err, friends)=>{
 					if (err) reject(err);
 					else resolve(friends);
@@ -948,10 +975,15 @@ fastify.post('/friends/delete', async (request, reply)=>{
 	try {
 		const {login1, login2} = request.body;
 
+		let user_1 = await getUserByLogin(login1);
+		let id_1 = user_1.id;
+		let user_2 = await getUserByLogin(login2);
+		let id_2 = user_2.id;
+
 		const relationExists = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT 1 FROM friends WHERE (login1 = ? AND login2 = ?) OR (login2 = ? AND login1 = ?)`,
-				[login1, login2, login2, login1],
+				`SELECT 1 FROM friends WHERE (id_1 = ? AND id_2 = ?) OR (id_2 = ? AND id_1 = ?)`,
+				[id_1, id_2, id_2, id_1],
 				(err, row)=>{
 					if (err) reject(err);
 					else {
@@ -969,15 +1001,15 @@ fastify.post('/friends/delete', async (request, reply)=>{
 
 		await new Promise((resolve, reject)=>{
 			db.run(
-				`DELETE FROM friends WHERE (login1 = ? AND login2 = ?)`,
-				[login1, login2],
+				`DELETE FROM friends WHERE (id_1 = ? AND id_2 = ?)`,
+				[id_1, id_2],
 				(err)=>{
 					if (err) reject(err);
 				}
 			);
 			db.run(
-				`DELETE FROM friends WHERE (login1 = ? AND login2 = ?)`,
-				[login2, login1],
+				`DELETE FROM friends WHERE (id_1 = ? AND id_2 = ?)`,
+				[id_2, id_1],
 				(err)=>{
 					if (err) reject(err);
 					else resolve(this);
@@ -1016,13 +1048,18 @@ fastify.post('/friends/delete', async (request, reply)=>{
 // Informations sur un utilisateur en particulier, pour l'affichage par connected_player_frame.vue
 fastify.get('/users/specificlogin', async (request, reply)=>{
 	const login = request.query.login;
+
+	let user_1 = await getUserByLogin(login);
+	let id = user_1.id;
+
+
 	if (!login)
 		return reply.status(400).send({ error: "Missing login" });
 	try {
 		const user = await new Promise((resolve, reject)=>{
 			db.get(
-				`SELECT login, avatar_url, nb_games, nb_won_games, connected, rank FROM users WHERE login = ?`,
-				[login],
+				`SELECT login, avatar_url, nb_games, nb_won_games, connected, rank FROM users WHERE id = ?`,
+				[id],
 				(err, row)=>{
 					if (err) reject(err);
 					else resolve(row);
@@ -1130,68 +1167,6 @@ fastify.post('/users/change-login', async (request, reply)=>{
 								console.log("Erreur SQL change login: users:", err.message);
 							db.run(`ROLLBACK`);
 							reject(err);
-						} else {
-							db.run(
-								`UPDATE games SET login_winner = ? WHERE login_winner = ?`,
-								[cleanLogin, user.login],
-								function (err) {
-									if (err) {
-										if (DEBUG_MODE)
-											console.log("Erreur SQL change login: games, winner:", err.message);
-										db.run(`ROLLBACK`);
-										reject(err);
-									} else {
-										db.run(
-											`UPDATE games SET login_loser = ? WHERE login_loser = ?`,
-											[cleanLogin, user.login],
-											function (err) {
-												if (err) {
-													if (DEBUG_MODE)
-														console.log("Erreur SQL change login: games, loser:", err.message);
-													db.run(`ROLLBACK`);
-													reject(err);
-												} else {
-													db.run(
-														`UPDATE friends SET login1 = ? WHERE login1 = ?`,
-														[cleanLogin, user.login],
-														function (err) {
-															if (err) {
-																if (DEBUG_MODE)
-																	console.log("Erreur SQL change login: friends, login1:", err.message);
-																db.run(`ROLLBACK`);
-																reject(err);
-															} else {
-																db.run(
-																	`UPDATE friends SET login2 = ? WHERE login2 = ?`,
-																	[cleanLogin, user.login],
-																	function (err) {
-																		if (err) {
-																			if (DEBUG_MODE)
-																				console.log("Erreur SQL change login: friends, login2:", err.message);
-																			db.run(`ROLLBACK`);
-																			reject(err);
-																		} else {
-																			db.run(`commit`, function (err) {
-																				if (err) {
-																					if (DEBUG_MODE)
-																						console.log("Erreur SQL Commit:", err.message);
-																					reject(err);
-																				} else {
-																					resolve(this);
-																				}
-																			});
-																		}
-																	}
-																);
-															}
-														}
-													);
-												}
-											}
-										);
-									}
-								}
-							);
 						}
 					}
 				);

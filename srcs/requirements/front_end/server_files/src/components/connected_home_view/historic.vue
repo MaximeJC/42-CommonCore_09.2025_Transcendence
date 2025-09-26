@@ -32,7 +32,7 @@ function formatDate(date: string | number): string {
 	const month = String(dateObj.getMonth() + 1).padStart(2, '0');
 	const hours = String(dateObj.getHours()).padStart(2, '0');
 	const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-	
+
 	return `${day}/${month} - ${hours}:${minutes}`;
 }
 
@@ -46,10 +46,11 @@ async function fetchMyGames() {
 			throw new Error(`Erreur http: ${current.status}`);
 		const currentUser = await current.json();
 		const login = currentUser.user.login;
+		const id = currentUser.user.id;
 
 		console.log("Fonction fetchMyGames pour affichage de l'historique de l'utilisateur connecte", login);
-		
-		const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(login)}`);
+
+		const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(id)}`);
 		if (!result.ok)
 			throw new Error(`Erreur http: ${result.status}`);
 		const games = await result.json();
@@ -120,7 +121,7 @@ onMounted(()=>{ fetchMyGames() });
 		height: 26rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
-		box-shadow: 
+		box-shadow:
 		0 0 5px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
@@ -134,7 +135,7 @@ onMounted(()=>{ fetchMyGames() });
 		font-family: netron;
 		font-weight: bold;
 		color: white;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
@@ -150,14 +151,14 @@ onMounted(()=>{ fetchMyGames() });
 	.historic-container > div:not(.title) {
 		color: white;
 		font-size: 1.5rem;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba;
 	}
 
 	.list-container{
-		overflow: auto;	
+		overflow: auto;
 		border-bottom: 1px solid #ddd;
 		scrollbar-color: #dd0aba transparent;
 	}
@@ -169,11 +170,11 @@ onMounted(()=>{ fetchMyGames() });
 		align-items: start;
 		border-bottom: 1px solid #ddd;
 		padding: 3px;
-	}	
+	}
 	.h-grid-header > div{
 		color: white;
 		font-size: 1rem;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #18c3cf,
 		0 0 20px #18c3cf,
 		0 0 40px #18c3cf;
@@ -188,7 +189,7 @@ onMounted(()=>{ fetchMyGames() });
 		align-items: center;
 		justify-content: center;
 	}
-	
+
 	.h-v-icon{
 		width: 1.5rem;
 		height: 1.5rem;

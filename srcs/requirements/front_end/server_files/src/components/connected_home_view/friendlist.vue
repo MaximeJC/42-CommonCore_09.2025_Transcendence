@@ -88,6 +88,13 @@ async function addFriend() {
 		if (ajouteur === ajoute)
 			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
 
+    console.log("Valeur de currentUser.value?.login :", currentUser.value?.login);
+    console.log("Valeur de search_friends.value :", search_friends.value);
+    console.log("Requête envoyée :", JSON.stringify({
+      login1: currentUser.value?.login ?? "",
+      login2: search_friends.value
+    }));
+
 		const result = await fetch(`${USER_MANAGEMENT_URL}/friends`, {
 			method: 'POST',
 			credentials: 'include',
@@ -98,8 +105,10 @@ async function addFriend() {
 				login2: ajoute
 			})
 		});
-		if (!result.ok)
-			throw new Error(`${result.status}`);
+		if (!result.ok) {
+        const errorBody = await result.text();
+        throw new Error(`Erreur ${result.status} : ${errorBody}`);
+    }
 		console.log("Ami ajoute avec succes.");
 		fetchFriends(ajouteur);
 	} catch (err) {
@@ -194,7 +203,7 @@ watch(socket, (newSocket, oldSocket) => {
 });
 
 watch(() => currentUser.value?.login ?? "", (newLogin) => {
-	if (newLogin !== "") { 
+	if (newLogin !== "") {
 		fetchFriends(currentUser.value?.login ?? "");
 	} else {
 		friends.value = [];
@@ -257,7 +266,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		width: auto;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
-		box-shadow: 
+		box-shadow:
 		0 0 5px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
@@ -269,7 +278,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	.add-friends{
 		color: white;
 		font-size: 1rem;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #18c3cf,
 		0 0 20px #18c3cf;
 	}
@@ -300,7 +309,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		width: 2rem;
 		border-radius: 50%;
 		border: 1px solid #fbff22;
-		box-shadow: 
+		box-shadow:
 		0 0 10px #fbff22,
 		0 0 20px #fbff22;
 		transition:background-image 0.3s ease-in-out background-color 0.3s ease-in-out, background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;
@@ -312,7 +321,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		background-image:  url("../../../images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
-		box-shadow: 
+		box-shadow:
 			0 0 10px #dd0aba,
 			0 0 10px #dd0aba,
 			0 0 20px #dd0aba,
@@ -341,7 +350,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		margin-right: 1rem;
 		align-content: center;
 		border-radius: 12px;
-	
+
 	}
 
 	.friendlist{
@@ -355,13 +364,13 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		list-style-type: none;
 	}
 
-	
+
 
 	.friend-button{
 		border: none;
 		color: white;
 		font-size: 1.5rem;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
@@ -375,10 +384,10 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	}
 
 	.friend-button:hover{
-		text-shadow: 
+		text-shadow:
 		0 0 10px #fbff22,
 		0 0 20px #fbff22;
-	
+
 	}
 
 	.avatar_button {
@@ -389,14 +398,14 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		border-radius: 50%;
 		width: 2rem;
 		height: 2rem;
-		box-shadow: 
+		box-shadow:
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba;
 		cursor: pointer;
 	}
 
 	.avatar_button:hover {
-		box-shadow: 
+		box-shadow:
 		0 0 10px #fbff22,
 		0 0 20px #fbff22;
 	}
@@ -426,7 +435,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	}
 
 	.inv-play-button.can-hover:hover{
-		box-shadow: 
+		box-shadow:
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
 		0 0 40px #fbff22,
@@ -462,12 +471,12 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		cursor: pointer;
 	}
 	.delete-button :hover{
-		box-shadow: 
+		box-shadow:
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
 		0 0 40px #fbff22,
 		0 0 80px #fbff22;
-	
+
 	}
 
 	.delete-button > img{
@@ -487,5 +496,5 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 		background-color: rgba(251, 255, 34, 0.5);
 
 	}
-	
+
 </style>
