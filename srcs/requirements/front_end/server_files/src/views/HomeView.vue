@@ -39,7 +39,7 @@ const currentOpponent = ref<string | null>(null);
 // ------------------------------
 
 // HASH
-type View = 'home' | 'connexion' | 'profil' | 'settings' | 'play';
+type View = 'home' | 'connexion' | 'profil' | 'settings' | 'play' | 'playinvite';
 
 /** Retourne la vue courante à partir du hash (#/profil, #/settings, …) */
 function getViewFromHash(): View {
@@ -50,6 +50,7 @@ function getViewFromHash(): View {
 		case '/profil':		return 'profil';
 		case '/settings': 	return 'settings';
 		case '/play':	 	return 'play';
+		case '/playinvite': return 'playinvite';
 		case '/':
 		case '':
 		default:			return 'home';
@@ -63,6 +64,7 @@ function navigateTo(view: View) {
 		view === 'connexion' 	? '/connexion':
 		view === 'profil'		? '/profil':
 		view === 'settings'		? '/settings':
+		view === 'playinvite' ? '/playinvite':
 		/* view === 'play'	*/ '/play';
 
 	// evite la navigation inutile
@@ -76,7 +78,7 @@ function navigateTo(view: View) {
 function applyHashToFlags() {
 	const view = getViewFromHash();
 
-	if (view === 'play' && !isPlayActive.value && !currentOpponent.value) {
+	if (view === 'playinvite' && !isPlayActive.value && !currentOpponent.value) {
 		navigateTo('profil');
 		return;
 	}
@@ -93,7 +95,7 @@ function applyHashToFlags() {
 		issetting.value = true;
 		show_play.value = false;
 	handleShowPage("profil")
-	} else if (view === 'play') {
+	} else if (view === 'play'|| view === 'playinvite') {
 		isConnect.value = true;
 		issetting.value = false;
 		show_play.value = true;
@@ -197,7 +199,7 @@ const handlePointerDownOutside = (e: PointerEvent) => {
 const handleStartOnlineGame = (opponentLogin: string) => {
 	console.log(`Lancement de la partie 1V1_ONLINE contre ${opponentLogin}`);
 	currentOpponent.value = opponentLogin;
-	navigateTo('play');
+	navigateTo('playinvite');
 	emit('game-started');
 };
 
