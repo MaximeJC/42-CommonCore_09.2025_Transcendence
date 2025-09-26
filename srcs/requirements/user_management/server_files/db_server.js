@@ -1097,6 +1097,58 @@ fastify.get('/friends', async (request, reply)=>{
 	}
 });
 
+//check si ami
+fastify.post('/friends/check', async (request, reply)=>{
+	try {
+		const {login1, login2} = request.body;
+		
+		const relationExists = await new Promise((resolve, reject)=>{
+			db.get(
+				`SELECT 1 FROM friends WHERE (login1 = ? AND login2 = ?) OR (login2 = ? AND login1 = ?)`,
+				[login1, login2, login2, login1],
+				(err, row)=>{
+					if (err) reject(err);
+					else {
+						if (row) resolve(true);
+						else resolve(false);
+					}
+				}
+			);
+		});
+
+		if (relationExists == false)
+			return reply.status(400).send({message: "Friendship doesn't exist."});
+		if (DEBUG_MODE)
+			console.log("La relation existe bien.\n");
+
+		
+		// --- WEBSOCKET ---
+		// On cherche le socket de l'utilisateur qui a ete ajoute (login2)
+		const targetSocket = userSocketMap.get(login2);
+
+		if (targetSocket && targetSocket.readyState === 1) {
+			console.log(`Utilisateur ${login2} trouve.`);
+			
+			const notification = {
+				event: 'friend_check',
+				payload: {
+					message: `Vous etes ami : ${login1}`
+				}
+			};
+			
+			targetSocket.send(JSON.stringify(notification));
+		} else {
+			console.log(`L'utilisateur ${login2} n'est pas connecte via WebSocket.`);
+		}
+		// --- FIN SOCKET ---
+		reply.send({message: "Friendship successfully check."});
+	} catch (err) {
+		if (DEBUG_MODE)
+			console.log(`Erreur de check d'ami! : ${err.message}\n`);
+		reply.status(500).send({error: err.message});
+	}
+});
+
 // supprimer un ami:
 fastify.post('/friends/delete', async (request, reply)=>{
 	try {
