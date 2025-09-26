@@ -57,11 +57,11 @@
 <style>
 	@font-face {
 	font-family: "netron";
-	src: url("../../fonts/netron.regular.otf") format("opentype");
+	src: url("/fonts/netron.regular.woff2") format("woff2");
 	}
 	@font-face {
 	font-family: "neon";
-	src: url("../../fonts/neon-shine.italic.otf") format("opentype");
+	src: url("/fonts/neon-shine.italic.woff2") format("woff2");
 	}
 
 	.header{

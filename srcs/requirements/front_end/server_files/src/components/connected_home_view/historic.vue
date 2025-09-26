@@ -98,8 +98,8 @@ onMounted(()=>{ fetchMyGames() });
 		<div class="list-container">
 			<div v-for="match in matches" :key="match.score_c" class="h-grid-row">
 				<div class="v-icon">
-					<img class="h-v-icon" v-show="match.win" src="../../../images/v-green.png"></img>
-					<img class="h-d-icon" v-show="!match.win" src="../../../images/cross-red.png"></img>
+					<img class="h-v-icon" v-show="match.win" src="/images/v-green.png"></img>
+					<img class="h-d-icon" v-show="!match.win" src="/images/cross-red.png"></img>
 				</div>
 				<div>{{ match.c_login }}</div>
 				<div>{{ match.score_c }}</div>

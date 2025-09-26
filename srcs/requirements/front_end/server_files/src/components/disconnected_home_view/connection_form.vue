@@ -118,7 +118,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 <style>
 @font-face {
 	font-family: "netron";
-	src: url("../../fonts/netron.regular.otf") format("opentype");
+	src: url("/fonts/netron.regular.woff2") format("woff2");
 	}
 	.frame-connection{
 		width: 25rem;
@@ -245,7 +245,7 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 
 	.c-ft-button{
 		display:block;
-		background: url("../../images/42logo.png");
+		background: url("/images/42logo.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;

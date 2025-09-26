@@ -160,7 +160,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 <style>
 	@font-face {
 	font-family: "netron";
-	src: url("../../fonts/netron.regular.otf") format("opentype");
+	src: url("/fonts/netron.regular.woff2") format("woff2");
 	}
 
 	.frame-signup{
@@ -273,7 +273,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 
 	.ft-button{
 		display:block;
-		background: url("../../images/42logo.png");
+		background: url("/images/42logo.png");
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
