@@ -98,3 +98,31 @@ node db_server.js
 		-H "Content-Type: application/json" \
 		-d '{"login": "Louise", "email": "louise@example.com", "password": "bimo"}'
 
+
+
+
+
+
+
+
+//////////////////////////
+
+
+import { getUserByEmail } from './db.js';
+
+async function test() {
+  const user = await getUserByEmail('merge@merge.com');
+  console.log('Résultat final:', user);
+}
+
+test();
+
+
+////////////////////////////
+
+
+
+fetch('http://localhost:3000/users/specificlogin?login=Alice')    
+  .then(response => response.json())
+  .then(data => console.log('Données utilisateur:', data))
+  .catch(error => console.error('Erreur:', error));
