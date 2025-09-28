@@ -12,6 +12,7 @@ const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
+	opponentLogin?: string | null;
 }>();
 
 onMounted(async () => {
@@ -24,17 +25,17 @@ const { currentUser } = user();
 
 const showResultScreen = ref(false);
 const gameResult = ref({
-	winner: 'lewin',
-	loser: 'leperdant',
+	winner: '',
+	loser: '',
 	score_left: 0,
 	score_right: 0,
 	duration: 0,
-	gameMode: '1V1_ONLINE',
-	playerLeftTop: 'player1',
-	playerRightTop: 'player2'
+	gameMode: '',
+	playerLeftTop: '',
+	playerRightTop: '',
+	game_id: ''
 });
 
-// TODO : envoyer les vrai donnees
 // definit la config du jeu ici, dans des variables.
 interface GameConfig {
 	pseudo: string;
@@ -65,9 +66,11 @@ async function addGameToDataBase(newGame: any) {
 				login_winner: newGame.winner,
 				login_loser: newGame.loser,
 				score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
-				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right
+				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right,
+				game_id: newGame.gameId
 			})
-		});
+		}
+		);
 		if (!response.ok)
 			throw new Error(`Erreur http: ${response.status}`);
 		console.log("Partie enregistree dans la base de donnees avec succes.");
@@ -97,7 +100,7 @@ function handleStartGame() {
 	showResultScreen.value = false;
 	const gameConfig: GameConfig = {
 		pseudo: currentUser.value?.login ?? "",
-		opponentPseudo: "", // Laisser vide pour un match public
+		opponentPseudo: props.opponentLogin || "", // Laisser vide pour un match public
 		avatarUrl: currentUser.value?.avatar_url ?? "",
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: "fr" //en, fr, es
@@ -106,13 +109,15 @@ function handleStartGame() {
 	if (props.activePlay === "tournament") {
 		gameConfig.gameMode = "2P_LOCAL";
 		gameConfig.opponentPseudo = "PseudoAdversaireTournois"; // Player2
+	} else if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {
+		gameConfig.opponentPseudo = props.opponentLogin;
 	}
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 
 	(window as any).networkConfig = {
-        pongServerBaseUrl: pongServerPath,
-        aiServerBaseUrl: aiServerPath
-    };
+		pongServerBaseUrl: pongServerPath,
+		aiServerBaseUrl: aiServerPath
+	};
 	startMatchmaking(gameConfig);
 }
 
@@ -143,7 +148,7 @@ watch(() => props.activePlay, (newVal) => {
 			handleStartGame();
 		});
 	 }
-})
+}, { immediate: true });
 
 </script>
 

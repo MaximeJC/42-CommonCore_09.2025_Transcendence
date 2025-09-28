@@ -5,19 +5,16 @@ import { ref, onMounted, onUnmounted, watch, nextTick} from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
 import { user } from '../../user';
 import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
+import { playerInvited } from '@/gameInviteService';
 const { currentUser } = user();
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
 
-// --- GESTION DE L'EVENT WEBSOCKET ---
-function handleFriendUpdate(payload: any) {
-	console.log("Maj liste d'amis recue via WebSocket !", payload);
-	if (currentUser.value?.login) {
-		fetchFriends(currentUser.value.login);
-	}
-}
+const emit = defineEmits<{
+	(e: 'showOtherPlayer', loginToShow: string): void
+}>()
 
 onMounted(async () => {
 	await nextTick();
@@ -29,8 +26,6 @@ const rootElement = ref<HTMLElement | null>(null);
 defineExpose({
 	rootElement
 });
-
-const emit = defineEmits(['showOtherPlayer']);
 
 const showOtherPlayer = (loginToShow: string)=>{
 	console.log("Friend login:", loginToShow);
@@ -163,14 +158,35 @@ function handleServerMessage(event: MessageEvent) {
 	}
 }
 
+async function inviteFriend (friend: string, isconnected: boolean){
+	try {
+		const inviteur = currentUser.value?.login ?? "";
 
-watch(() => currentUser.value?.login ?? "", (newLogin) => {
-	if (newLogin !== "") { 
-		fetchFriends(currentUser.value?.login ?? "");
-	} else {
-		friends.value = [];
+		// const friend = search_friends.value;
+
+		if (isconnected){
+			console.log("inviteFriend: inviteur =", inviteur, ", inviter =", friend);
+
+			const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json',
+				},
+					body: JSON.stringify({
+						login1: inviteur,
+						login2: friend
+				})
+			});
+			if (!result.ok)
+				throw new Error(`${result.status}`);
+			console.log("Ami invite avec succes.", friend);
+			playerInvited.value = friend;
+		}
+
+	} catch (err) {
+		console.error("Erreur d'invitation':", err);
 	}
-}, { immediate: true });
+}
 
 watch(socket, (newSocket, oldSocket) => {
 	if (oldSocket) {
@@ -180,6 +196,14 @@ watch(socket, (newSocket, oldSocket) => {
 		newSocket.addEventListener('message', handleServerMessage);
 	}
 });
+
+watch(() => currentUser.value?.login ?? "", (newLogin) => {
+	if (newLogin !== "") { 
+		fetchFriends(currentUser.value?.login ?? "");
+	} else {
+		friends.value = [];
+	}
+}, { immediate: true });
 
 </script>
 
@@ -212,7 +236,7 @@ watch(socket, (newSocket, oldSocket) => {
 						<img v-else class="friend-avatar" src="/images/default_avatar.png" alt="avatar">
 					</button>
 					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>
-					<button title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
+					<button @click="inviteFriend(friend.name, friend.isconnected)" title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">
 						<img v-show="friend.isconnected" src="/images/green-play-button.png" alt="play button">
 						<img v-show="!friend.isconnected" src="/images/red-play-button.png" alt="play button">
 						<img src="/images/yelow-play-button.png" alt="play button">

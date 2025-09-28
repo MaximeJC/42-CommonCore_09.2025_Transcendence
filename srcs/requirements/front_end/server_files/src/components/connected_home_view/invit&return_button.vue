@@ -1,11 +1,13 @@
 <script setup lang="ts">
 
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
-import { ref } from 'vue';
-
-const emit = defineEmits(['showOtherPlayer']);
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { playerInvited } from '@/gameInviteService';
+import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
 
 //const isconnect = ref(false);
+const itsFriend = ref(false);
+let currentUserFriend;
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
@@ -13,32 +15,12 @@ const props = defineProps<{
 		selectedPlayerLogin: string | null;
 }>();
 
-//async function addFriend() { //todo A TESTER
-//	try {
-//		//todo recuperer les logins dynamiquement
-//		// const ajouteur = 'Alice';
-//		const current = await fetch(`${USER_MANAGEMENT_URL}/me`);
-//		if (!current.ok)
-//			throw new Error(`Erreur http: ${current.status}`);
-//		const currentUser = await current.json();
-//		const ajouteur = currentUser.user.login;
-
-//		const ajoute = 'Mauvais'; //todo recuperer le nom de l'ami
-
-//		console.log("Tentative d'ajout d'ami:", ajouteur, ajoute);
-
-//		const result = await fetch(`${USER_MANAGEMENT_URL}/friends?login1=${ajouteur}&login2=${ajoute}`)
-//		if (!result.ok)
-//			throw new Error(`${result.status}`);
-//		console.log("Ami ajoute avec succes.");
-//	} catch (err) {
-//		console.error("Erreur de creation d'amitie:", err);
-//	}
-//}
+const emit = defineEmits<{
+	(e: 'showOtherPlayer'): void
+}>()
 
 import { user } from '../../user';
 const { currentUser } = user(); 
-
 
 interface Friend {
 	name: string;
@@ -77,7 +59,6 @@ async function fetchFriends(currentUserLogin: string) {
 	}
 }
 
-
 async function addFriend() {
 	try {
 		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
@@ -109,24 +90,138 @@ async function addFriend() {
 		if (!result.ok)
 			throw new Error(`${result.status}`);
 		console.log("Ami ajoute avec succes.");
+		itsFriend.value = true;
 		fetchFriends(ajouteur);
 	} catch (err) {
 		console.error("Erreur de creation d'amitie:", err);
 	}
 	
 }
+
+async function inviteFriend (isconnected: number){
+	try {
+		const inviteur = currentUser.value?.login ?? "";
+		const friend = props.selectedPlayerLogin ?? "";
+		if (isconnected === 1){
+			console.log("inviteFriend: inviteur =", inviteur, ", inviter =", friend);
+
+			const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json',
+				},
+					body: JSON.stringify({
+						login1: inviteur,
+						login2: friend
+				})
+			});
+			if (!result.ok)
+				throw new Error(`${result.status}`);
+			console.log("Ami invite avec succes.", friend);
+			playerInvited.value = friend;
+		}
+
+	} catch (err) {
+		console.error("Erreur d'invitation':", err);
+	}
+}
+
+async function checkFriend() {
+	try {
+		const checkeur = currentUser.value?.login ?? "";
+		const friendLogin = props.selectedPlayerLogin ?? "";
+
+		console.log("checkFriend: checkeur =", checkeur, ", checked =", friendLogin);
+
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/check`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: checkeur,
+				login2: friendLogin
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami checked avec succes.");
+		itsFriend.value = true;
+	} catch (err) {
+		console.error("Erreur de check d'amitie:", err);
+		itsFriend.value = false;
+	}
+}
+
+async function deleteFriend() {
+	try{
+		const supprimeur = currentUser.value?.login ?? "";
+		const unfriendLogin = props.selectedPlayerLogin ?? ""
+
+		console.log("deleteFriend: supprimer =", supprimeur, ", supprime =", unfriendLogin);
+
+		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/delete`, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				login1: supprimeur,
+				login2: unfriendLogin
+			})
+		});
+		if (!result.ok)
+			throw new Error(`${result.status}`);
+		console.log("Ami supprime avec succes.");
+		itsFriend.value = false;
+		fetchFriends(supprimeur);
+	} catch (err) {
+		console.error("Erreur de suppression d'amitie:", err);
+	}
+}
+
+function handleServerMessage(event: MessageEvent) {
+	try {
+		const data = JSON.parse(event.data);
+		if (data.event === 'friend_check') {
+			console.log("Check d'amis recue via WebSocket !", data.payload);
+			if (currentUser.value?.login) {
+				itsFriend.value = true;
+			}
+		}
+	} catch (error) {
+		console.error('Erreur de parsing du message WebSocket:', error);
+	}
+}
+
+watch(socket, (newSocket, oldSocket) => {
+	if (oldSocket) {
+		oldSocket.removeEventListener('message', handleServerMessage);
+	}
+	if (newSocket) {
+		newSocket.addEventListener('message', handleServerMessage);
+	}
+});
+
+watch(() => props.selectedPlayerLogin ?? "", (newLoginFriend) => {
+	if (newLoginFriend !== "") { 
+		checkFriend();
+	} 
+}, { immediate: true });
+
 </script>
 
 <template>
 	<div title="button container" class="button-container">
-		<button v-show="props.connect === 1" title="invit-button" class="invit-button">
+		<button v-show="props.connect === 1" @click="inviteFriend(props.connect)"  title="invit-button" class="invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<button v-show="props.connect === 0" title="invit-button" class="d-invit-button">
 			<div data-i18n="home_player_button.invit"></div>
 		</button>
 		<div class="i-button-container">
-			<button @click="addFriend" class="i-add-friends"></button>
+			<button v-if="!itsFriend" @click="addFriend" class="i-add-friends"></button>
+			<button v-else @click="deleteFriend" class="delete-friends"></button>
 			<button @click="emit('showOtherPlayer')" tittle="return-button" class="return-button">
 				<div data-i18n="home_player_button.return"></div>
 			</button>
@@ -179,7 +274,7 @@ async function addFriend() {
 	.i-add-friends{
 		display: block;
 		background-image:  url("/images/add_button.png");
-		background-size: cover;
+		background-size: 1.5rem;
 		background-position: center;
 		background-repeat: no-repeat;
 		height: 2.5rem;
@@ -195,9 +290,41 @@ async function addFriend() {
 		margin-right: 1rem;
 	}
 
+	.delete-friends{
+		display: block;
+		background-image:  url("../../images/trash_can.png");
+		background-size: 1.5rem;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-color: transparent;
+		height: 2.5rem;
+		width: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid #fbff22;
+		box-shadow: 
+		0 0 10px #fbff22,
+		0 0 20px #fbff22;
+		/* transition:background-image 0.3s ease-in-out background-color 0.3s ease-in-out, background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out; */
+		cursor: pointer;
+		margin-bottom: 0.5rem;
+		margin-right: 1rem;
+	}
+	
 	.i-add-friends:hover{
 		background-image:  url("..//images/add_button_alt.png");
 
+		border: 1px solid #dd0aba;
+		box-shadow: 
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 120px #dd0aba;
+	}
+
+	.delete-friends:hover{
+		background-image:  url("../../../images/trash_can_yellow.png");
+  		background-color: transparent;
 		border: 1px solid #dd0aba;
 		box-shadow: 
 			0 0 10px #dd0aba,

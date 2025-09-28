@@ -75,7 +75,8 @@
 
 	"invit":{
 		"accept": "Accepter",
-		"refuse": "Refuser"
+		"refuse": "Refuser",
+		"cancel": "Annuler"
 	},
 
 	"victory":{

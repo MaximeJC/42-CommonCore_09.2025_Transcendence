@@ -36,6 +36,7 @@ db.serialize(()=>{
 
 	db.run(`CREATE TABLE IF NOT EXISTS games (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				game_id TEXT UNIQUE NOT NULL,
 				login_winner TEXT NOT NULL,
 				login_loser TEXT NOT NULL,
 				score_winner INTEGER NOT NULL,
@@ -114,13 +115,7 @@ export async function getUserByLogin(login) {
 	}
 }
 
-// export async function getUsers() {
-// 	return db.all("SELECT login, email FROM users");
-// }
-
 export default { db, getUserByEmail, getUserByLogin }; // exporter la dase de donnee pour pouvoir l'importer dans db_server.js
-
-//todo salt_key ? cle de cryptage des mdp
 
 /* Fermeture de la base de donnee:
 db.close((err)=>{

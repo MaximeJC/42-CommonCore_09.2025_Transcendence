@@ -7,11 +7,12 @@ import { setLanguage, updateText } from '../../service/translators';
 // const { currentUser } = user();
 
 const props = defineProps<{
-	invite: string;
+  inviteur: string;
 }>();
 
 const emit = defineEmits<{
-	(e: 'cancel'): void;
+  (e: 'accept'): void;
+  (e: 'refuse'): void;
 }>();
 
 onMounted(async () => {
@@ -19,8 +20,12 @@ onMounted(async () => {
 	updateText() 
 })
 
-function handleCancel() {
-	emit('cancel');
+function handleAccept() {
+	emit('accept');
+}
+
+function handleRefuse() {
+	emit('refuse');
 }
 
 </script>
@@ -28,11 +33,12 @@ function handleCancel() {
 <template>
 	<div title="pop_up_container" class="pop_up_container">
 		<div title="Pop_up_message" class="Pop_up_message">
-			<div>Invitation envoye a</div>  <!-- TODO : ajouter a langue-->
-			<div>{{ invite }}</div>
+			<div>{{ inviteur }}</div>
+			<div> vous invite ajouer</div> <!-- TODO : ajouter a langue-->
 		</div>
 		<div title="pop_up_button_container" class="pop_up_button_container">
-			<button @click=handleCancel title="pop_up_cancel" class="pop_up_cancel" data-i18n="invit.cancel"></button>
+			<button @click=handleRefuse title="pop_up_no" class="pop_up_no" data-i18n="invit.refuse"></button> <!-- fermer popup-->
+			<button @click=handleAccept title="pop_up_yes" class="pop_up_yes" data-i18n="invit.accept"></button> <!-- fermer popup et rejoindre game-->
 		</div>
 	</div>
 </template>
@@ -88,7 +94,7 @@ function handleCancel() {
 	justify-content: space-between;
 	gap: 2rem;
 }
-.pop_up_cancel{
+.pop_up_no{
 	font-family: netron;
 		align-items: center;
 		background-color: rgba(189, 28, 28, 0.7);
@@ -108,7 +114,6 @@ function handleCancel() {
 		border-radius: 20px;
 		cursor: pointer;
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-		margin-left: 7rem;
 	
 }
 

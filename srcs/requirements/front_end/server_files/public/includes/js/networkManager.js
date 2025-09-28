@@ -167,12 +167,15 @@ class NetworkManager {
 					}
 					const endData = message.data;
 					const finalMessage = message.data.end_message;
+					if (!endData.winner)
+						returnToLobby(false);
 					// On peut maintenant afficher ou utiliser les autres donnees
 					console.log("Partie terminee. Stats :");
 					console.log("- Vainqueur:", endData.winner);
 					console.log("- Perdant:", endData.loser);
 					console.log("- Duree:", endData.duration, "secondes");
 					console.log("gameMode:", endData.gameMode);
+					console.log("game_id:", endData.gameId);
 					endGame(gameState, finalMessage);
 
 					//test partage donnees sur front

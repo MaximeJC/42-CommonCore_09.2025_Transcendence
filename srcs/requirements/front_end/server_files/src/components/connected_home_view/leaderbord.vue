@@ -2,6 +2,8 @@
 
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, watch} from 'vue';
+import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
+
 
 import { user } from '../../user';
 const { currentUser } = user();
@@ -62,9 +64,32 @@ async function getPlayers() {
 }
 // onMounted(()=>{ getPlayers() });
 
+function handleServerMessage(event: MessageEvent) {
+	try {
+		const data = JSON.parse(event.data);
+		if (data.event === 'leaderboard_update') {
+			console.log("Maj leaderboard_update recue via WebSocket !", data.payload);
+			if (currentUser.value?.login) {
+				getPlayers();
+			}
+		}
+	} catch (error) {
+		console.error('Erreur de parsing du message WebSocket:', error);
+	}
+}
+
 watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	getPlayers();
-}, { immediate: true }); 
+}, { immediate: true });
+
+watch(socket, (newSocket, oldSocket) => {
+	if (oldSocket) {
+		oldSocket.removeEventListener('message', handleServerMessage);
+	}
+	if (newSocket) {
+		newSocket.addEventListener('message', handleServerMessage);
+	}
+});
 
 </script>
 
