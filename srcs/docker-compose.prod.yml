@@ -19,10 +19,14 @@ services:
     image: hgp_front_end_prod_img
     volumes:
       - prod_front_avatars:/app/public/uploads
+      - ./certs:/app/certs:ro 
     ports:
-      - "5000:5000"
+      - "80:80"
+      - "443:443"
     environment:
+      - NODE_ENV=production 
       - API_TARGET=http://hgp_user_management:3000
+      - GAME_MANAGEMENT_TARGET=http://hgp_game_management:3003
     networks:
       - hgp_network
     restart: unless-stopped
@@ -36,10 +40,13 @@ services:
       context: ./requirements/game_management
       dockerfile: Dockerfile
     image: hgp_game_management_img
+    volumes:
+      - ./certs:/app/certs:ro 
     ports:
       - "3003:3003"
     environment:
       - AI_SERVER_URL=http://hgp_ai_server:3001
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
     depends_on:
       - ai_server
     networks:

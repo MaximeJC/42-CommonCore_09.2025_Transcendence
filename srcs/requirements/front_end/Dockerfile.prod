@@ -1,18 +1,42 @@
-FROM node:22.19.0-trixie-slim
+# Dockerfile de production
+FROM node:22-alpine AS builder
+
+# On definit le repertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY ./server_files/package*.json ./
+RUN npm ci
+
+# On copie TOUT le reste du code source de l'application
+COPY ./server_files/ .
+
+# LA COMMANDE LA PLUS IMPORTANTE : On construit l'application pour la production.
+# Cela va creer un dossier /app/dist contenant le bon index.html et le dossier /assets.
+RUN npm run build
+
+# Stage de production
+FROM node:22-alpine AS production
 
 WORKDIR /app
 
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y npm && rm -rf /var/lib/apt/lists/*
+# Copier les dépendances de production
+COPY ./server_files/package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-COPY ./server_files/ /app/
-RUN npm ci
+# Copier l'application buildée et les assets
+COPY ./server_files/production-server.js ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/public/uploads ./public/uploads
+COPY .env* ./
 
-# Build l'application pour la production
-RUN npm run build
+# On expose les ports
+EXPOSE 80
+EXPOSE 443
 
-# Exposer le port de production
-EXPOSE 5000
+# Variables d'environnement par défaut
+ENV NODE_ENV=production
 
-# Démarrer le serveur de production
-ENTRYPOINT ["npm", "start"]
+# On demarre le serveur de production
+CMD ["node", "production-server.js"]

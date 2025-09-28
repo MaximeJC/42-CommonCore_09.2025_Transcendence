@@ -6,13 +6,20 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { GameInstance } from './GameInstance.js';
+import fs from 'fs';
 
 // import fastifyCors from '@fastify/cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = fastify({ logger: true });
+const app = fastify({
+	logger: true,
+	https: {
+		key: fs.readFileSync('/app/certs/hgp_https.key'),
+		cert: fs.readFileSync('/app/certs/hgp_https.crt'),
+	}
+  });
 
 // app.register(fastifyCors, {
 //   origin: "http://localhost:5173",

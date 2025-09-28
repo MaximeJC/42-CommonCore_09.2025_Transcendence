@@ -1,15 +1,16 @@
 COMPOSE_PROJECT_NAME = transcendence
 COMPOSE_FILE = srcs/docker-compose.yml
 COMPOSE_PROD_FILE = srcs/docker-compose.prod.yml
+CERT_FILE = srcs/certs/hgp_https.crt
 
 #! RULES
 
-.PHONY: all up build start down stop restart clean re logs fclean mkdir dev prod
+.PHONY: all up build start down stop restart clean re logs fclean mkdir dev prod certs
 
 all: up
 
 # Développement - arrete la prod si necessaire et lance la dev
-dev: mkdir
+dev: mkdir certs 
 	@echo "Switching to DEVELOPMENT mode..."
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
@@ -17,14 +18,26 @@ dev: mkdir
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
 # Production - arrete la dev si necessaire et lance la prod
-prod: mkdir
+prod: mkdir certs 
 	@echo "Switching to PRODUCTION mode..."
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services..."
 	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
-up: mkdir
+certs:
+	@if [ ! -f "$(CERT_FILE)" ]; then \
+		echo "Generating self-signed certificates..."; \
+		mkdir -p srcs/certs; \
+		openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+			-keyout srcs/certs/hgp_https.key \
+			-out srcs/certs/hgp_https.crt \
+			-subj "/CN=hgp.local"; \
+	else \
+		echo "Certificates already exist. Skipping generation."; \
+	fi
+
+up: mkdir certs 
 	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
@@ -46,6 +59,8 @@ clean:
 	@echo "Cleaning up all containers and volumes..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
+	@echo "Removing certificates..."
+	@rm -rf srcs/certs
 
 # Full cleanup: containers, volumes, networks, and images
 fclean: clean
@@ -65,3 +80,7 @@ ps:
 mkdir:
 	cd ${HOME} && mkdir -p hgp_data
 	cd ${HOME}/hgp_data && mkdir -p database avatars
+
+# a utilise avec precaution
+space:
+	@docker system prune -a --volumes
