@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "🚀 Démarrage en mode PRODUCTION..."
+echo "Demarrage en mode PRODUCTION..."
 echo "Port: 5000"
-echo "Mode: Production (serveur Express optimisé)"
+echo "Mode: Production (serveur Express optimise)"
 
 cd srcs
 

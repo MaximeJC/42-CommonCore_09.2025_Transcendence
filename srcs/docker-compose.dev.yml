@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: hgp_front_end_img
     volumes:
-      - front_avatars:/app/uploads
+      - front_avatars:/app/s
       - ./requirements/front_end/server_files:/app  # Mount en développement pour hot-reload
     ports:
       - "5173:5173"  # Port de développement

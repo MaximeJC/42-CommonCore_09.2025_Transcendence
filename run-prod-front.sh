@@ -2,7 +2,7 @@
 
 echo "🚀 Lancement du front-end en mode PRODUCTION"
 echo "Port: 5000"
-echo "Serveur: Express optimisé"
+echo "Serveur: Express optimise"
 
 cd "$(dirname "$0")/srcs"
 

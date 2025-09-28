@@ -27,7 +27,7 @@ RUN npm ci --only=production && npm cache clean --force
 # Copier l'application buildée et les assets
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/uploads ./uploads
+COPY --from=builder /app/uploads ./public/uploads
 COPY production-server.js ./
 COPY .env* ./
 

@@ -8,17 +8,17 @@ COMPOSE_PROD_FILE = srcs/docker-compose.prod.yml
 
 all: up
 
-# Développement - arrête la prod si nécessaire et lance la dev
+# Développement - arrete la prod si necessaire et lance la dev
 dev: mkdir
-	@echo "🛠️ Switching to DEVELOPMENT mode..."
+	@echo "Switching to DEVELOPMENT mode..."
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services..."
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
-# Production - arrête la dev si nécessaire et lance la prod
+# Production - arrete la dev si necessaire et lance la prod
 prod: mkdir
-	@echo "🚀 Switching to PRODUCTION mode..."
+	@echo "Switching to PRODUCTION mode..."
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services..."

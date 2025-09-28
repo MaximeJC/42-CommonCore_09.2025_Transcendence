@@ -38,7 +38,6 @@ const handletypeplay = (isActive: boolean, type: string) => {
 		<play
 		:activePlay="activePlay"
 		:set-language="props.setLanguage"
-		@gameisfinish="handletypeplay"
 		></play>
 	</div>
 </template>

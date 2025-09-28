@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Servir les fichiers publics (images, etc.)
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 app.use('/includes', express.static(path.join(__dirname, 'public/includes')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/public/uploads', express.static('/app/public/uploads'));
 
 // Configuration du proxy pour les API
 const API_TARGET = process.env.API_TARGET || 'http://localhost:3000';
@@ -75,7 +75,7 @@ app.use('/game', createProxyMiddleware({
 
 // Fallback pour les routes SPA - renvoie toujours index.html
 app.use((req, res, next) => {
-  // Si c'est une requête pour un fichier existant, passez
+  // Si c'est une requete pour un fichier existant, passez
   if (req.url.includes('.')) {
     return next();
   }
@@ -90,10 +90,10 @@ app.use((err, req, res, next) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Production server running on port ${PORT}`);
-  console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
-  console.log(`🔗 API proxy target: ${API_TARGET}`);
-  console.log(`🤖 AI Server proxy target: ${AI_SERVER_TARGET}`);
-  console.log(`🎮 Game Management proxy target: ${GAME_MANAGEMENT_TARGET}`);
-  console.log(`🔌 WebSocket proxy enabled for /api/ws and /game/ws`);
+  console.log(`Production server running on port ${PORT}`);
+  console.log(`Serving static files from: ${path.join(__dirname, 'dist')}`);
+  console.log(`API proxy target: ${API_TARGET}`);
+  console.log(`AI Server proxy target: ${AI_SERVER_TARGET}`);
+  console.log(`Game Management proxy target: ${GAME_MANAGEMENT_TARGET}`);
+  console.log(`WebSocket proxy enabled for /api/ws and /game/ws`);
 });

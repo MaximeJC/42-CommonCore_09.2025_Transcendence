@@ -2,7 +2,7 @@
 	import { onMounted, ref, nextTick, watch, computed } from "vue"
 	import type { Ref } from "vue"
 	import { user } from '../../user';
-	const emit = defineEmits(['gameisfinish']);
+	// const emit = defineEmits(['gameisfinish']);
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
