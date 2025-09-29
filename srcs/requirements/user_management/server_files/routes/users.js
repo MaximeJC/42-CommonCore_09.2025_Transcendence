@@ -11,7 +11,9 @@ import { updateIsConnected, updateIsNotConnected } from '../services/userConnect
 import { updateUserRanks } from '../services/gameService.js';
 import { notifyAllsocket } from '../websocket/handlers.js';
 
+import 'dotenv/config';
 import axios from 'axios';
+import qs from 'qs'; 
 
 export default async function userRoutes(fastify, options) {
 	const { db, getUserByEmail, getUserByLogin, userSocketMap, DEBUG_MODE } = options.deps;
@@ -64,15 +66,26 @@ export default async function userRoutes(fastify, options) {
 			return reply.redirect('/connexion');
 		}
 
-		try {
 			// echanger le code contre un access_token
-			const tokenResponse = await axios.post('https://api.intra.42.fr/oauth/token', {
-				grant_type: 'authorization_code',
-				client_id: process.env.FORTYTWO_CLIENT_ID,
-				client_secret: process.env.FORTYTWO_CLIENT_SECRET,
-				code: code,
-				redirect_uri: process.env.FORTYTWO_REDIRECT_URI,
-			});
+		const requestData = {
+			grant_type: 'authorization_code',
+			client_id: process.env.FORTYTWO_CLIENT_ID,
+			client_secret: process.env.FORTYTWO_CLIENT_SECRET,
+			code: code,
+			redirect_uri: process.env.FORTYTWO_REDIRECT_URI,
+		};
+
+		try {
+			// Échanger le code contre un access_token
+			const tokenResponse = await axios.post(
+				'https://api.intra.42.fr/oauth/token',
+				qs.stringify(requestData),
+				{
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}
+			);
 
 			const accessToken = tokenResponse.data.access_token;
 

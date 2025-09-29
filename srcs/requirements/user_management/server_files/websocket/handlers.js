@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 export const userSocketMap = new Map();
+import fs from 'fs';
 
 let app;
 
