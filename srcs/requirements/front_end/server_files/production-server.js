@@ -80,6 +80,9 @@ app.use('/api', apiProxy);
 app.use('/game', gameProxy); 
 // Fallback pour les routes SPA - renvoie toujours index.html 
 app.use((req, res, next) => {
+	if (req.url.includes('.')) {
+		return next();
+	}
 	res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
