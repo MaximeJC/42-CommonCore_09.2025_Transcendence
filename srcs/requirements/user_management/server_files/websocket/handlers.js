@@ -46,12 +46,12 @@ if (process.env.NODE_ENV === 'production') {
 		cert: fs.readFileSync('/app/certs/hgp_https.crt')
 	  }
 	});
-  } else {
+} else {
 	console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
 	app = fastify({
 	  logger: true
 	});
-  }
+}
 
 export function initializeWebSocket(fastify, dependencies) {
 	const { db } = dependencies;
