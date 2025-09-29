@@ -15,7 +15,8 @@ dev: mkdir
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+#2>&1 | tee dev.log
 
 # Production - arrete la dev si necessaire et lance la prod
 prod: mkdir
@@ -23,19 +24,8 @@ prod: mkdir
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services..."
-	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
-
-# certs:
-# 	@if [ ! -f "$(CERT_FILE)" ]; then \
-# 		echo "Generating self-signed certificates..."; \
-# 		mkdir -p srcs/certs; \
-# 		openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-# 			-keyout srcs/certs/hgp_https.key \
-# 			-out srcs/certs/hgp_https.crt \
-# 			-subj "/CN=hgp.local"; \
-# 	else \
-# 		echo "Certificates already exist. Skipping generation."; \
-# 	fi
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+#2>&1 | tee prod.log
 
 up: mkdir 
 	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."

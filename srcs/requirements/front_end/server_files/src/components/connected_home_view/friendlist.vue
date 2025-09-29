@@ -46,16 +46,7 @@ const friends = ref<Friend[]>([]);
 
 async function fetchFriends(currentUserLogin: string) {
 	try {
-		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-		// 	method: 'GET',
-		// 	credentials: 'include'
-		// });
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const currentUserLogin = currentUser.user.login;
-
-		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
+		// console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
 		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
