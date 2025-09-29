@@ -84,10 +84,10 @@ db.serialize(()=>{
 });
 
 export async function getUserByEmail(email) {
-	db = await open({
+	const db = await open({
 			filename: dbPath,
 			driver: sqlite3.Database,
-		});
+		});	
 		console.log('Base de donnees ouverte');
 	try {
 		const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
@@ -100,13 +100,13 @@ export async function getUserByEmail(email) {
 }
 
 export async function getUserByLogin(login) {
-	db = await open({
+	const db = await open({
 			filename: dbPath,
 			driver: sqlite3.Database,
 		});
 		console.log('Base de donnees ouverte');
 	try {
-		const user = db.get("SELECT * FROM users WHERE login = ?", [login]);
+		const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
 		console.log('login trouve en base:', user);
 		return (user);
 	} catch (err) {

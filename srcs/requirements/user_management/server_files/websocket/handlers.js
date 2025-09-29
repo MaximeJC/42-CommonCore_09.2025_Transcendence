@@ -1,4 +1,7 @@
+import fastify from 'fastify';
 export const userSocketMap = new Map();
+
+let app;
 
 export function notifyAllsocket(eventSend, messageSend) {
 	const notification = JSON.stringify({
@@ -16,11 +19,11 @@ export function notifyAllsocket(eventSend, messageSend) {
 	}
 }
 
-export function notifyUser(targetUserId, event, payload) {
-	const targetSocket = userSocketMap.get(targetUserId);
+export function notifyUser(targetUserLogin, event, payload) {
+	const targetSocket = userSocketMap.get(targetUserLogin);
 
 	if (targetSocket && targetSocket.readyState === 1) { 
-		console.log(`Utilisateur ${targetUserId} trouvé, envoi de la notification.`);
+		console.log(`Utilisateur ${targetUserLogin} trouvé, envoi de la notification.`);
 		
 		const notification = {
 			event: event,
@@ -30,9 +33,25 @@ export function notifyUser(targetUserId, event, payload) {
 		targetSocket.send(JSON.stringify(notification));
 
 	} else {
-		console.log(`L'utilisateur ${targetUserId} n'est pas connecte via WebSocket ou sa connexion est inactive.`);
+		console.log(`L'utilisateur ${targetUserLogin} n'est pas connecte via WebSocket ou sa connexion est inactive.`);
 	}
 }
+
+if (process.env.NODE_ENV === 'production') {
+	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
+	app = fastify({
+	  logger: true,
+	  https: {
+		key: fs.readFileSync('/app/certs/hgp_https.key'),
+		cert: fs.readFileSync('/app/certs/hgp_https.crt')
+	  }
+	});
+  } else {
+	console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
+	app = fastify({
+	  logger: true
+	});
+  }
 
 export function initializeWebSocket(fastify, dependencies) {
 	const { db } = dependencies;
@@ -40,7 +59,7 @@ export function initializeWebSocket(fastify, dependencies) {
 	fastify.get('/ws', { websocket: true }, (connection, req) => {
 		console.log("--- Handler WebSocket demarre pour une nouvelle connexion. ---");
 		try {
-			let currentUserId = null;
+			let currentUserLogin = null;
 
 			console.log(`Client connecte avec succes ! Attachement des listeners...`);
 
@@ -49,11 +68,11 @@ export function initializeWebSocket(fastify, dependencies) {
 					const data = JSON.parse(message.toString());
 
 					if (data.event === 'register' && data.payload) {
-						currentUserId = data.payload;
+						currentUserLogin = data.payload;
 						try {
 							db.run(
-								`UPDATE users SET connected = ? WHERE id = ?`,
-								[1, currentUserId],
+								`UPDATE users SET connected = ? WHERE login = ?`,
+								[1, currentUserLogin],
 								(err) => {
 									if (err)
 										console.log("Erreur de mise a jour de connexion du joueur:", err);
@@ -64,8 +83,8 @@ export function initializeWebSocket(fastify, dependencies) {
 						} catch (err) {
 							console.log("WebSocket connecte error:", err);
 						}
-						console.log(`WebSocket enregistre pour l'utilisateur ${currentUserId}`);
-						userSocketMap.set(currentUserId, connection);
+						console.log(`WebSocket enregistre pour l'utilisateur ${currentUserLogin}`);
+						userSocketMap.set(currentUserLogin, connection);
 					}
 
 				} catch (error) {
@@ -75,12 +94,12 @@ export function initializeWebSocket(fastify, dependencies) {
 
 			connection.on('close', () => {
 				console.log(`WebSocket deconnecte (evenement 'close' reçu).`);
-				if (currentUserId) {
+				if (currentUserLogin) {
 					db.serialize(() => { 
 						try {
 							db.run(
-								`UPDATE users SET connected = ? WHERE id = ?`,
-								[0, currentUserId],
+								`UPDATE users SET connected = ? WHERE login = ?`,
+								[0, currentUserLogin],
 								(err) => {
 									if (err)
 										console.log("Erreur de mise a jour de connexion du joueur:", err);
@@ -91,8 +110,8 @@ export function initializeWebSocket(fastify, dependencies) {
 							console.log("WebSocket deconnecte error:", err);
 						}
 					});
-					userSocketMap.delete(currentUserId);
-					console.log(`Entree pour ${currentUserId} supprimee.`);
+					userSocketMap.delete(currentUserLogin);
+					console.log(`Entree pour ${currentUserLogin} supprimee.`);
 				}
 			});
 

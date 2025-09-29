@@ -172,7 +172,7 @@ export default async function friendRoutes(fastify, options) {
 			if (DEBUG_MODE)
 				console.log("La relation existe bien.\n");
 
-			notifyUser(user2.id, 'friend_check', {
+			notifyUser(login2, 'friend_check', {
 				message: `Vous etes ami : ${user1.login}`
 			});
 
@@ -244,7 +244,7 @@ export default async function friendRoutes(fastify, options) {
 			if (DEBUG_MODE)
 				console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
 
-			notifyUser(user2.id, 'friend_invite_cancel', {
+			notifyUser(login2, 'friend_invite_cancel', {
 				message: `Vous avez une invite annule : ${login1}`,
 				loginInviteur: `${login1}`
 			});
@@ -271,7 +271,7 @@ export default async function friendRoutes(fastify, options) {
 				console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
 	
 	
-			notifyUser(user2.id, 'friend_invite_decline', {
+			notifyUser(login2, 'friend_invite_decline', {
 				message: `Vous avez une invite refuse : ${login1}`,
 				loginInviteur: `${login1}`
 			});
@@ -298,7 +298,7 @@ export default async function friendRoutes(fastify, options) {
 				console.log("Login2 a bien ete trouve dans la base de donnees: ", {login2});
 	
 
-			notifyUser(user2.id, 'friend_invite_accepted', {
+			notifyUser(login2, 'friend_invite_accepted', {
 				message: `Vous avez une invite accepte : ${login1}`,
 				loginInviteur: `${login1}`
 			});

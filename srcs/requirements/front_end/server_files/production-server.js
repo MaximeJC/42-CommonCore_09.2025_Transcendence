@@ -23,26 +23,23 @@ app.use('/includes', express.static(path.join(__dirname, 'public/includes')));
 app.use('/uploads', express.static('/app/uploads'));
 
 // Configuration du proxy pour les API
-const API_TARGET = process.env.API_TARGET || 'http://localhost:3000'; 
+const API_TARGET = process.env.API_TARGET || 'http://hgp_user_management:3000'; 
 const AI_SERVER_TARGET = process.env.AI_SERVER_TARGET || 'http://hgp_ai_server:3001'; 
 const GAME_MANAGEMENT_TARGET = process.env.GAME_MANAGEMENT_TARGET || 'http://hgp_game_management:3003'; 
 
 // Proxy HTTP pour les API REST 
-app.use('/api', createProxyMiddleware({
+const apiProxy = createProxyMiddleware({
 	target: API_TARGET,
 	changeOrigin: true,
-	pathRewrite: {
-		'^/api': '',
-	}, 
-// Gestion des WebSockets 
-ws: true,
-onError: (err, req, res) => {
-	console.error('API Proxy error:', err);
-	if (res && !res.headersSent) {
-		res.status(500).json({ error: 'API Proxy error' });
-	}
-},
-}));
+	pathRewrite: { '^/api': '' }, 
+	ws: true,
+	onError: (err, req, res) => {
+		console.error('API Proxy error:', err);
+		if (res && !res.headersSent) {
+			res.status(500).json({ error: 'API Proxy error' });
+		}
+	},
+});
 
 // Proxy pour le serveur IA 
 app.use('/ai', createProxyMiddleware({
@@ -78,7 +75,8 @@ const gameProxy = createProxyMiddleware({
 	},
 });
 
-// Appliquer le proxy pour Express 
+// Appliquer le proxy pour Express
+app.use('/api', apiProxy);
 app.use('/game', gameProxy); 
 // Fallback pour les routes SPA - renvoie toujours index.html 
 app.use((req, res, next) => {
@@ -103,6 +101,9 @@ try {
 		// On verifie l'URL et on transmet la requete au bon proxy.
 		if (req.url.startsWith('/game')) {
 			gameProxy.upgrade(req, socket, head);
+		} else if (req.url.startsWith('/api/ws')) {
+        console.log('Redirection de la WebSocket vers le proxy de l\'API...');
+        apiProxy.upgrade(req, socket, head);
 		} else {
 			// Si l'URL ne correspond pas, on ferme la connexion proprement.
 			socket.destroy();

@@ -63,6 +63,7 @@ services:
     volumes:
       - user_management_db:/app/db
       - user_avatars:/app/uploads
+      - ./certs:/app/certs:ro 
     ports:
       - "3000:3000"
     environment:  

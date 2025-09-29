@@ -17,7 +17,7 @@ import userRoutes from './routes/users.js';
 import gameRoutes from './routes/games.js';
 import friendRoutes from './routes/friends.js';
 import leaderboardRoutes from './routes/leaderboard.js';
-import { initializeWebSocket, userSocketMap, notifyAllsocket, notifyUser } from './websocket/handlers.js';
+import { initializeWebSocket, userSocketMap } from './websocket/handlers.js';
 
 const fastify = Fastify({ logger: true });
 

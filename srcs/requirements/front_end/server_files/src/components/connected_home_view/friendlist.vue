@@ -207,19 +207,6 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 
 </script>
 
-// const friends: Friend[] = [
-// 	{ name: "Micka", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Louise", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Maxime", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Axel", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Nico", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Thomas", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Anas", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Arthur", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Dorina", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Wictor", avatar_src: "/images/default_avatar.png", isconnected: true},
-// ]
-
 <template>
 	<div ref="rootElement" title="friend-list-container" class="friend-list-container">
 		<div class="title-leaderbord" data-i18n="friendlist.friendlist"></div>
