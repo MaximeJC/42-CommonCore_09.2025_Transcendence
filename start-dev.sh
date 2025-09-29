@@ -16,4 +16,5 @@ echo "Mode: Development (Vite avec hot-reload)"
 cd srcs
 
 # Demarrer en mode developpement avec hot-reload
-docker-compose -f docker-compose.dev.yml up front_end
+# docker-compose -f docker-compose.dev.yml up front_end
+docker-compose -f docker-compose.yml up front_end

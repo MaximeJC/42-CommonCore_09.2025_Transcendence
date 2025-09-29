@@ -36,7 +36,7 @@ function formatDate(date: string | number): string {
 	return `${day}/${month} - ${hours}:${minutes}`;
 }
 
-async function fetchMyGames() {
+async function fetchMyGames() { //TODO : tester si utilisateur connecte avant !!
 	try {
 		const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
 			method: 'GET',

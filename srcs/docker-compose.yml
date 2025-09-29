@@ -21,6 +21,7 @@ services:
     # env_file: ./.env
     volumes:
       - front_avatars:/app/public/uploads
+      - ./certs:/app/certs:ro 
     ports:
       - "5173:5173"
     environment:
@@ -40,6 +41,8 @@ services:
       context: ./requirements/game_management
       dockerfile: Dockerfile
     image: hgp_game_management_img
+    volumes:
+      - ./certs:/app/certs:ro 
     # env_file: ./.env
     ports:
       - "3003:3003"

@@ -29,7 +29,6 @@ export function setAppInitializer(initializer) {
 	mainAppInitializer = initializer;
 }
 
-
 class NetworkManager {
 	constructor() {
 		this.socket = null;

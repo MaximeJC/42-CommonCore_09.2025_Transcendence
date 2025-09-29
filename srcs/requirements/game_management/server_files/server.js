@@ -13,13 +13,30 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = fastify({
-	logger: true,
-	https: {
+let app;
+// const app = fastify({
+// 	logger: true,
+// 	https: {
+// 		key: fs.readFileSync('/app/certs/hgp_https.key'),
+// 		cert: fs.readFileSync('/app/certs/hgp_https.crt'),
+// 	}
+//   });
+
+if (process.env.NODE_ENV === 'production') {
+	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
+	app = fastify({
+	  logger: true,
+	  https: {
 		key: fs.readFileSync('/app/certs/hgp_https.key'),
-		cert: fs.readFileSync('/app/certs/hgp_https.crt'),
-	}
-  });
+		cert: fs.readFileSync('/app/certs/hgp_https.crt')
+	  }
+	});
+  } else {
+	console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
+	app = fastify({
+	  logger: true
+	});
+  }
 
 // app.register(fastifyCors, {
 //   origin: "http://localhost:5173",
