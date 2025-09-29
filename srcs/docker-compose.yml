@@ -20,7 +20,7 @@ services:
     image: hgp_front_end_img
     # env_file: ./.env
     volumes:
-      - front_avatars:/app/public/uploads
+      - user_avatars:/app/uploads
       - ./certs:/app/certs:ro 
     ports:
       - "5173:5173"
@@ -62,7 +62,7 @@ services:
     volumes:
       - ./certs:/app/certs:ro 
       - user_management_db:/app/db
-      - user_avatars:/app/server_files/public/uploads
+      - user_avatars:/app/uploads
     ports:
       - "3000:3000"
     networks:
@@ -74,11 +74,6 @@ volumes:
     driver_opts:
       type: none
       device: ${HOME}/hgp_data/database
-      o: bind
-  front_avatars:
-    driver_opts:
-      type: none
-      device: ${HOME}/hgp_data/avatars
       o: bind
   user_avatars:
     driver_opts:

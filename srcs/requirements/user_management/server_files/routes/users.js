@@ -271,9 +271,23 @@ export default async function userRoutes(fastify, options) {
 			return reply.status(401).send({ success: false, message: "Non connecte" });
 		}
 		
-		const { password } = request.body;
-		if (!password) {
-			return reply.status(400).send({ success: false, message: "Mot de passe manquant" });
+		const { old_password, password } = request.body;
+		console.log("*****************");
+		console.log("old_password: ", old_password);
+		console.log("user.password: ", user.password);
+		console.log("password: ", password);
+		console.log("*****************");
+		
+		if (!old_password || !password) {
+			return reply.send({ success: false, message: "Mot de passe manquant" });
+		}
+
+		console.log("*****************");
+		console.log("bcrypt: ", await bcrypt.compare(old_password, user.password));
+		console.log("*****************");
+
+		if (await bcrypt.compare(old_password, user.password) === false) {
+			return reply.send({ success: false, message: "Erreur de mot de passe" });
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
