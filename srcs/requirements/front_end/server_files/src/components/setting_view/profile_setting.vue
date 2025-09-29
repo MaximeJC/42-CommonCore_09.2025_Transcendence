@@ -4,7 +4,7 @@
 	import axios from 'axios';
 	import { user } from '../../user';
 	
-	const { currentUser } = user();
+	const { currentUser, updateUser } = user();
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
@@ -25,6 +25,8 @@
 
 	const avatarFile = ref<File | null>(null);
 	const uploadedAvatar = ref("");
+	const uploadedPseudo = ref("");
+	const uploadedEmail = ref("");
 
 	const handleAvatarChange = (event: Event) => {
 		const input = event.target as HTMLInputElement;
@@ -67,7 +69,7 @@
 			const response = await axios.post(`${USER_MANAGEMENT_URL}/upload-avatar`, formData, {
 				withCredentials: true,
 				headers: {
-                'Content-Type': undefined
+				'Content-Type': undefined
 				},
 			});
 
@@ -75,6 +77,7 @@
 			console.log('Upload réussi:', result);
 
 			if (result.avatar_url) {
+				updateUser({ avatar_url: result.avatar_url });
 				uploadedAvatar.value = `${result.avatar_url}?t=${new Date().getTime()}`;
 			} else {
 				console.error("Erreur lors de l'upload");
@@ -141,6 +144,8 @@
 			
 			if (data.success) {
 				message.value = "Email successfully changed";
+				uploadedEmail.value = new_email.value;
+				updateUser({ email: uploadedEmail.value });
 				new_email.value = "";
 				console.log(message.value);
 			} else {
@@ -200,6 +205,9 @@
 			
 			if (data.success) {
 				message.value = "Login successfully changed";
+				uploadedPseudo.value = new_login.value;
+				updateUser({ login: uploadedPseudo.value });
+
 				new_login.value = "";
 				console.log(message.value);
 			} else {
@@ -258,10 +266,12 @@
 			<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
 			<div tittle="avatar container" class="info_container">
 			<img v-if="uploadedAvatar" :key="uploadedAvatar" :src="uploadedAvatar" alt="Nouvel avatar" class="set_avatar"/>
-            <img v-else :key="currentUser?.avatar_url" :src="currentUser?.avatar_url" alt="Avatar actuel" class="set_avatar" />
+			<img v-else :key="currentUser?.avatar_url" :src="currentUser?.avatar_url" alt="Avatar actuel" class="set_avatar" />
 				<div>
-					<div title="act-mail" class="info_title">{{ currentUser?.email }}</div>
-					<div title="act-login" class="info_title">{{ currentUser?.login }}</div>
+					<div v-if="uploadedEmail" title="act-mail" class="info_title">{{ currentUser?.email }}</div>
+					<div v-else title="act-mail" class="info_title">{{ currentUser?.email }}</div>
+					<div v-if="uploadedPseudo" title="act-login" class="info_title">{{ currentUser?.login }}</div>
+					<div v-else title="act-login" class="info_title">{{ currentUser?.login }}</div>
 				</div>
 			</div>	
 			<div title="avatar_container" class="set_container" > 
