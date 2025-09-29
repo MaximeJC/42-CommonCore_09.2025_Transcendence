@@ -21,7 +21,7 @@ FORTYTWO_REDIRECT_URI="https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/cal
 
 Bien evidement remplacer par les bonnes Info !!!!
 
-dans srcs/front_end/server_files creer un .env qui ne dois pas exister car comme on est des bon dev, on l'a ajoute dans aussi le gitignore bien evidement.
+dans srcs/front_end/server_files creer un .env qui ne dois pas exister car comme on est des bon dev, on l'a ajoute aussi dans le gitignore bien evidement.
 
 dans le .env :
 
