@@ -12,8 +12,18 @@
 	const new_avatar_src = ref("");
 	const new_login = ref("");
 	const new_email = ref("");
+	const old_password = ref("");
 	const new_password = ref("");
 	const conf_new_password = ref("");
+
+	const message = ref("");
+	const error_file = ref(false);
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_login_used = ref(false);
+	const error_email_used = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
 
 	interface player{
 		avatar: string
@@ -56,6 +66,12 @@
 			console.warn("AUcun fichier selectionne");
 			return ;
 		}
+		const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+		if (!validTypes.includes(avatarFile.value.type)) {
+			console.error("Fichier non valide");
+			error_file.value = true;
+			return ;
+		}
 		console.log("Fichier à uploader:", avatarFile.value);
 		const formData = new FormData();
 		formData.append("file", avatarFile.value);
@@ -83,18 +99,6 @@
 			console.error("Erreur lors de la requete:", error);
 		}
 	}
-
-	// const login = ref("");
-	// const email = ref("");
-	// const password = ref("");
-	// const conf_password = ref("");
-	const message = ref("");
-	const error_login = ref(false);
-	const error_email = ref(false);
-	const error_login_used = ref(false);
-	const error_email_used = ref(false);
-	const error_password = ref(false);
-	const error_conf_password = ref(false);
 
 	async function handleEmail() {
 		error_email.value = false;
@@ -232,18 +236,24 @@
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					id: currentUser?.value?.id ?? "",
+					old_password: old_password.value,
 					password: new_password.value,
 				}),
 			});
 			
 			const data = await result.json();
+
+			console.log("data: ", data);
 			
 			if (data.success) { // afficher un message et reinitialiser les variables
 				message.value = "Password successfully changed";
+				console.log("Password successfully changed");
+				old_password.value = "";
 				new_password.value = "";
 				conf_new_password.value = "";
 			} else {
 				message.value = data.message || "Password error";
+				error_password.value = true;
 			}
 		} catch (err) {
 			message.value = "Cannot change password";
@@ -268,11 +278,12 @@
 				<form title="form_avatar" class="set_form" @submit.prevent="uploadAvatar">
 					<label title="avatar_label" class="set_subtitle" data-i18n="setting.avatar" ></label>
 					<div class="set_sub_inp">
-						<input title="avatar_input" class="set_input" type="file" id="avatar_src" required @change="handleAvatarChange"></input>
+						<input title="avatar_input" class="set_input" type="file" id="avatar_src" required accept=".png, .jpg, .jpeg" @change="handleAvatarChange"></input>
 						<button type="submit" title="avatar_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">source invalide</div>
-
+					<div title="pasword-error" class="set_error"  >
+						<div v-show="error_file" data-i18n="setting.file_error"></div>
+					</div>
 				</form>
 			</div>
 			<div title="mail_container" class="set_container" >
@@ -282,7 +293,10 @@
 						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
 						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">email invalide</div>
+					<div title="email-error" class="set_error"  >
+						<div v-show="error_email" data-i18n="setting.mail_error"></div>
+						<div v-show="error_email_used" data-i18n="setting.mail_used_error"></div>
+					</div>
 				</form>
 			</div>
 			<div class="set_container" title="login_container">
@@ -292,25 +306,38 @@
 						<input title="login_input" class="set_input" type="login" id="login" v-model="new_login"></input>
 						<button @click="handleLogin" type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">login invalide</div>
-
+					<div title="login-error" class="set_error"  >
+						<div v-show="error_login" data-i18n="setting.login_error"></div>
+						<div v-show="error_login_used" data-i18n="setting.login_used_error"></div>
+					</div>
 				</form>
 			</div>
 			<div class="set_container" title="password_container">
-				<form class="set_form" title="form_password">
-					<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
-					<div class="set_sub_password">
-						<div>
-							<input title="password_input" class="set_input" type="password" v-model="new_password" />
-							<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
-							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
+				<div class="set_sub_password">
+					<div class="password_inputs">
+							<form class="set_form" title="form_password">
+								<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
+								<input title="old_password_input" class="set_input" type="password" v-model="old_password" />
+								<div title="password-error" class="set_error"  >
+									<div v-show="error_password" data-i18n="setting.password_invalid"></div>
+								</div>
+							</form>
+							<form class="set_form" title="form_password">
+								<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
+								<input title="password_input" class="set_input" type="password" v-model="new_password" />
+							</form>
+							<form class="set_form" title="form_password">
+								<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
+								<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
+							</form>
 						</div>
 						<div class="pos_pass_button">
 							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
 					</div>
-					<div class="set_error">password invalide</div>
-				</form>
+					<div title="password-error" class="set_error"  >
+						<div v-show="error_conf_password" data-i18n="setting.conf_password_error"></div>
+					</div>
 			</div>
 		</div>
 </template>
@@ -409,7 +436,6 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 0.8fr 1fr;
-	margin-top: 1rem;
 }
 
 
@@ -436,7 +462,7 @@
 
 .set_sub_password {
 	display: grid;
-	margin-top: -0.8rem;
+	margin-top: 1rem;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr;
 }
@@ -453,6 +479,11 @@
 	margin-left: 0.8rem;
 	border: none;
 	
+}
+
+.password_inputs {
+	display: grid;
+	row-gap: 1rem;
 }
 
 .set_button{
@@ -505,5 +536,6 @@
 	0 0 20px #fd2d49;
 	font-size: 1rem;
 	margin-left: 1rem;
+	margin-top: 0.5rem;
 }
 </style>
