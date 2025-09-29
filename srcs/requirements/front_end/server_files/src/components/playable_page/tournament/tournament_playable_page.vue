@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
-import { setLanguage, updateText } from '../../service/translators';
-import { user } from '../../user';
-import { startMatchmaking } from "../../../public/includes/js/app.js";
+import { setLanguage, updateText } from '../../../service/translators';
+import { user } from '../../../user';
+import { startMatchmaking } from "../../../../public/includes/js/app.js";
 
 const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
 const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
-	activePlay: string;
-	opponentLogin?: string | null;
+	act_match: Array<string>
 }>();
 
 onMounted(async () => {
@@ -19,8 +18,6 @@ onMounted(async () => {
 	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
 })
 
-
-const { currentUser } = user();
 
 const showResultScreen = ref(false);
 const gameResult = ref({
@@ -44,40 +41,6 @@ interface GameConfig {
 	language: string; //en, fr, es
 };
 
-async function addGameToDataBase(newGame: any) {
-	if (!newGame.winner || !newGame.loser) {
-		console.error("Donnees de partie incompletes", newGame);
-		return;
-	}
-	
-	// Ne sauvegarder que les parties 1V1 en ligne (entre vrais joueurs)
-	if (newGame.gameMode !== "1V1_ONLINE") {
-		console.log(`Partie en mode ${newGame.gameMode} - pas de sauvegarde dans la BDD`);
-		return;
-	}
-	
-	try {
-		const response = await fetch(`${USER_MANAGEMENT_URL}/games`, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				login_winner: newGame.winner,
-				login_loser: newGame.loser,
-				score_winner: newGame.score_left > newGame.score_right? newGame.score_left : newGame.score_right,
-				score_loser: newGame.score_left <= newGame.score_right? newGame.score_left : newGame.score_right,
-				game_id: newGame.gameId
-			})
-		}
-		);
-		if (!response.ok)
-			throw new Error(`Erreur http: ${response.status}`);
-		console.log("Partie enregistree dans la base de donnees avec succes.");
-	} catch (err) {
-		console.error("Erreur d'ajout de partie a la base de donnees:", err);
-	}
-}
-
 // GESTION DE L'EVENEMENT DE FIN DE PARTIE
 async function handleGameResult(event: CustomEvent) {
 	console.log("Evenement 'gameresult' capture par Vue!", event.detail);
@@ -85,38 +48,53 @@ async function handleGameResult(event: CustomEvent) {
 	showResultScreen.value = true;
 	await nextTick();  
 	updateText()
-	addGameToDataBase(gameResult.value);
 }
 
-const handleReturnToLobby = () => {
-	console.log("retour au lobby recu!");
-	showResultScreen.value = false;
-	const target = 'profil';
-	window.location.hash = target.startsWith('/') ? target : '/' + target;
+const emit = defineEmits(['match_rslt']);
+
+const showSetting = (winner: string, loser: string) => {
+		emit('match_rslt', winner, loser);
+};
+
+const handleReturnTournament = () => {
+	console.log("retour au tournoi recu!");
+	showSetting(gameResult.value.winner, gameResult.value.loser)
 }
 
 function handleStartGame() {
 	showResultScreen.value = false;
 	const gameConfig: GameConfig = {
-		pseudo: currentUser.value?.login ?? "",
-		opponentPseudo: props.opponentLogin || "", // Laisser vide pour un match public
-		avatarUrl: currentUser.value?.avatar_url ?? "",
-		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
+		pseudo: props.act_match[0],
+		opponentPseudo: props.act_match[1], // Laisser vide pour un match public
+		avatarUrl: "",
+		gameMode: "2P_LOCAL", //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: "fr" //en, fr, es
 	};
 
-	if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {
-		gameConfig.opponentPseudo = props.opponentLogin;
-	}
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 	(window as any).networkConfig = {
 		pongServerBaseUrl: pongServerPath,
 		aiServerBaseUrl: aiServerPath
 	};
-	startMatchmaking(gameConfig);
+	
+	try {
+		startMatchmaking(gameConfig);
+	} catch (error) {
+		console.error("Erreur lors du lancement du jeu:", error);
+		// Réessayer après un délai si ça échoue
+		setTimeout(() => {
+			try {
+				startMatchmaking(gameConfig);
+			} catch (secondError) {
+				console.error("Échec du second essai:", secondError);
+			}
+		}, 1000);
+	}
 }
 
 onMounted(() => {
+	console.log("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
 	const babylonScript = document.createElement("script")
 	babylonScript.src = "/includes/js/BabylonJS/babylon.js"
 	document.body.appendChild(babylonScript)
@@ -125,38 +103,46 @@ onMounted(() => {
 		const guiScript = document.createElement("script")
 		guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
 		document.body.appendChild(guiScript)
+		
+		guiScript.onload = () => {
+			// Attendre que Babylon.js soit complètement initialisé
+			setTimeout(() => {
+				console.log("Babylon.js chargé, lancement du jeu...");
+				window.addEventListener('babylon-returned-to-lobby', handleReturnTournament);
+				window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+				nextTick().then(() => {
+					handleStartGame();
+				});
+			}, 500); // Délai de 500ms pour s'assurer que tout est prêt
+		}
 	}
-
-	window.addEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 })
 
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
-	window.removeEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+	window.removeEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 });
 
-watch(() => props.activePlay, (newVal) => {
-	 if (newVal === "1P_VS_AI" || newVal === "2P_LOCAL" || newVal === "1V1_ONLINE" || newVal === "4P_ONLINE" ){
-		nextTick().then(() => {
-			handleStartGame();
-		});
-	 }
-}, { immediate: true });
+//watch(() => props.act_match[1], (newVal) => {
+//	 if (newVal){
+//		nextTick().then(() => {
+//			handleStartGame();
+//		});
+//	 }
+//}, { immediate: true });
 
 </script>
 
 <template>
-	<div v-show="props.activePlay != 'tournament' && !showResultScreen" class="home_disconnect">		
+	<div v-show="!showResultScreen" class="tournament-home_disconnect">		
 		<div id="lobby"></div>
 		<canvas id="renderCanvas"></canvas>
 	</div>
 	
-	<div ref="rootElement" title="result frame" class="result-container" v-if="showResultScreen">
-		<label class="h2" data-i18n="victory.text"></label>
-		<div class="winner">{{ gameResult.winner }}</div>
-		<button @click="handleReturnToLobby" tittle="return-button" class="return-button">
+	<div ref="rootElement" title="result frame" class="tournament-result-container" v-if="showResultScreen">
+		<label class="tournament-h2" data-i18n="victory.text"></label>
+		<div class="tournament-winner">{{ gameResult.winner }}</div>
+		<button @click="handleReturnTournament" tittle="return-button" class="tournament-return-button">
 				<div data-i18n="home_player_button.return"></div>
 		</button>
 	</div>
@@ -164,7 +150,7 @@ watch(() => props.activePlay, (newVal) => {
 
 <style scoped>
 
-.result-container{
+.tournament-result-container{
 		display: grid;
 		grid-template-rows: 0.5fr 0.5fr 0.5fr;
 		grid-template-columns: 1fr;
@@ -183,7 +169,7 @@ watch(() => props.activePlay, (newVal) => {
 	}
 
 
-.h2{
+.tournament-h2{
 		text-align: center;
 		font-family: netron;
 		font-weight: bold;
@@ -199,7 +185,7 @@ watch(() => props.activePlay, (newVal) => {
 		margin-bottom: 0.5rem;
 	}
 
-.winner{
+.tournament-winner{
 		grid-column: 1 / -1;
 		text-align: center;
 		font-family: netron;
@@ -213,7 +199,7 @@ watch(() => props.activePlay, (newVal) => {
 		margin-bottom: 0.5rem;
 	}
 
-.grid-row{
+.tournament-grid-row{
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		align-items: center;
@@ -233,7 +219,7 @@ watch(() => props.activePlay, (newVal) => {
 		/*justify-content: ;*/
 	}
 
-.grid-header{
+.tournament-grid-header{
 		display: grid;
 		padding: 3px;
 		border-bottom: 1px solid #ddd;
@@ -242,7 +228,7 @@ watch(() => props.activePlay, (newVal) => {
 		align-items: center;
 	}
 
-.grid-header > div{
+.tournament-grid-header > div{
 		color: white;
 		font-size: 1rem;
 		text-shadow:
@@ -251,27 +237,27 @@ watch(() => props.activePlay, (newVal) => {
 		0 0 40px #18c3cf;
 	}
 
-	.sub1{
+	.tournament-sub1{
 		text-align: start;
 		margin-right: 2rem;
 	}
-	.sub2{
+	.tournament-sub2{
 		text-align: end;
 
 	}
-	.stat1{
+	.tournament-stat1{
 		text-align: center;
 		font-size: 1.5rem;
 
 	}
 
-	.stat2{
+	.tournament-stat2{
 		text-align: end;
 		font-size: 1.5rem;
 		margin-right: 1rem;
 	}
 
-.home_disconnect {
+.tournament-home_disconnect {
 	width: 100vw;
 	height: 100vh;
 	display: flex;
@@ -280,8 +266,8 @@ watch(() => props.activePlay, (newVal) => {
 	margin: 0;
 	padding: 0;
 	position: fixed;
-	top: 50%;
-	left: 50%;
+	top: 0;
+	left: 0;
 }
 
 #renderCanvas {
@@ -303,7 +289,7 @@ watch(() => props.activePlay, (newVal) => {
 }
 
 
-.return-button{
+.tournament-return-button{
 		width: fit-content;
 		height: auto;
 		justify-self: center;
@@ -327,7 +313,7 @@ watch(() => props.activePlay, (newVal) => {
 		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
 	}
 
-	.return-button:hover{
+	.tournament-return-button:hover{
 		background-color: rgba(251, 255, 34, 0.5);
 		border: 2px solid #fbff22;
 		box-shadow:

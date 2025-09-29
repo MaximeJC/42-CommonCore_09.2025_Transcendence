@@ -79,5 +79,16 @@
 
 	"victory":{
  	   "text": "Victoria de"
+	},
+
+	"tournament":{
+    "player 1": "Player 1",
+    "player 2": "Player 2",
+    "player 3": "Player 3",
+    "player 4": "Player 4",
+    "player 5": "Player 5",
+    "player 6": "Player 6",
+    "player 7": "Player 7",
+    "player 8": "Player 8"
 	}
 }

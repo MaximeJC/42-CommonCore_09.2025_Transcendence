@@ -81,5 +81,22 @@
 
 	"victory":{
 		"text": "Victoire de" 
+	},
+
+	"tournament":{
+		"player 1": "Joueur 1",
+		"player 2": "Joueur 2",
+		"player 3": "Joueur 3",
+		"player 4": "Joueur 4",
+		"player 5": "Joueur 5",
+		"player 6": "Joueur 6",
+		"player 7": "Joueur 7",
+		"player 8": "Joueur 8",
+		"quart final": "Quart de Finale",
+		"semi final": "Demi Finale",
+		"final": "Finale",
+		"start": "Commencer",
+		"first_match": "Match 1",
+		"seconde_match": "Match 2"
 	}
 }

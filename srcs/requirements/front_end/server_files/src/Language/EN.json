@@ -79,5 +79,16 @@
 
 	"victory":{
    		"text": "Victory of"
+	},
+
+	"tournament":{
+    "player 1": "Jugador 1",
+    "player 2": "Jugador 2",
+    "player 3": "Jugador 3",
+    "player 4": "Jugador 4",
+    "player 5": "Jugador 5",
+    "player 6": "Jugador 6",
+    "player 7": "Jugador 7",
+    "player 8": "Jugador 8"
 	}
 }

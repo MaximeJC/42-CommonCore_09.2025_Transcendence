@@ -22,6 +22,8 @@ services:
     volumes:
       - front_avatars:/app/public/uploads
       - ./certs:/app/certs:ro 
+      - ./requirements/front_end/server_files/src:/app/src
+      - ./requirements/front_end/server_files/public:/app/public 
     ports:
       - "5173:5173"
     environment:

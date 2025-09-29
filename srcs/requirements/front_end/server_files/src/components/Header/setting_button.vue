@@ -7,7 +7,6 @@
 	const emit = defineEmits(['show_setting']);
 
 	const showSetting = (pageName: string) => {
-		//console.log(pageName);
 		emit('show_setting', pageName);
 	};
 </script>

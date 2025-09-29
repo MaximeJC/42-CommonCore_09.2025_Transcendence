@@ -1,93 +1,75 @@
 <script setup lang="ts">
-	import { onMounted, ref, nextTick, watch, computed } from "vue"
-	import type { Ref } from "vue"
-	import { user } from '../../user';
-	// const emit = defineEmits(['gameisfinish']);
+import { onMounted, ref, nextTick, watch, computed } from "vue"
+import type { Ref } from "vue"
+import { setLanguage, updateText } from '../../../service/translators';
 
-	const props = defineProps<{
+import demi_final from "./4P_demi_final.vue"
+
+onMounted(async () => {
+	await nextTick()
+	updateText()
+})
+
+const props = defineProps<{
 		setLanguage: (lang: string) => void;
 	}>();
 
-	const { currentUser } = user();
-	const nbr_players = ref(0);
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
-	const chooseNbrPlayers = (n: number) => {
-		nbr_players.value = n;
-	}
+const list_of_players = ref(["","","",""])
+const order_for_matches = ref(["","","",""])
+function handleSubmit(e: Event) {
+	e.preventDefault();
+	// Récupère les pseudos des inputs
+	const inputs = document.querySelectorAll<HTMLInputElement>('.add_players_login input');
+	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
+	order_for_matches.value = shuffleArray(list_of_players.value);
+	showDemiFinal.value = true;
+}
 
-	interface Players {
-		player1: string;
-		player2: Ref<string>;
-		player3: Ref<string>;
-		player4: Ref<string>;
-		player5: Ref<string>;
-		player6: Ref<string>;
-		player7: Ref<string>;
-		player8: Ref<string>;
-	}
+const showDemiFinal = ref(false);
 
-	const list_of_players: Players = {
-		player1: "",
-		player2: ref(""),
-		player3: ref(""),
-		player4: ref(""),
-		player5: ref(""),
-		player6: ref(""),
-		player7: ref(""),
-		player8: ref("")
-	};
 
-	// Replace $SELECTION_PLACEHOLDER$ with this code:
-
-	watch(nbr_players, (val) => {
-		if (val === 4 || val === 8) {
-			list_of_players.player1 = currentUser.value?.login ?? "";
-		}
-	});
-
-	
 
 </script>
 
 <template>
-		<div v-show="nbr_players === 0" class="select_offline_online_page">
-			<button @click="chooseNbrPlayers(4)" class="select_button">
-				<div class="play_title" data-i18n="play.4_players"></div>
-			</button>
-			<button @click="chooseNbrPlayers(8)" class="select_button">
-				<div class="play_title" data-i18n="play.8_players"></div>
-			</button>
-		</div>
-		<form v-show="nbr_players == 4" class="four_player_frame">
-			<div class="title">Choissisez vos pseudo</div>
-			<div title="add_players_login" class="add_players_login">
-				
-				<div title="player1" class="player_title">
-					<div>player 1</div>
-					<div class="player1">{{ list_of_players.player1 }}</div>
-				</div>
-				<div title="player2" class="player_title">
-					<div>player 2</div>
-					<input title="player2"></input>
-				</div>
-				<div title="player3" class="player_title">
-					<div>player 3</div>
-					<input title="player3"></input>
-				</div>
-				<div title="player4" class="player_title">
-					<div>player 4</div>
-					<input title="player4"></input>
-				</div>
+	<form v-if="!showDemiFinal" class="four_player_frame">
+		<div class="title">Choissisez vos pseudo</div>
+		<div title="add_players_login" class="add_players_login">
+			
+			<div title="player1" class="player_title">
+				<div data-i18n="tournament.player 1"></div>
+				<input title="player1"></input>
 			</div>
-			<button title="Submit-button" class=" t_Submit-button">
-				<div data-i18n="Signup.submit"></div>
-			</button>
-		</form>
-		
+			<div title="player2" class="player_title">
+				<div data-i18n="tournament.player 2"></div>
+				<input title="player2"></input>
+			</div>
+			<div title="player3" class="player_title">
+				<div data-i18n="tournament.player 3"></div>
+				<input title="player3"></input>
+			</div>
+			<div title="player4" class="player_title">
+				<div data-i18n="tournament.player 4"></div>
+				<input title="player4"></input>
+			</div>
+		</div>
+		<button @click="handleSubmit" type="button" title="Submit-button" class=" t_Submit-button">
+			<div data-i18n="Signup.submit"></div>
+		</button>
+	</form>
+	<demi_final v-if="showDemiFinal" :order_for_matches="order_for_matches" :setLanguage="props.setLanguage"></demi_final>
 </template>
 
-<style scoped>
-
+<style>
 .four_player_frame{
 	display: grid;
 	grid-template-rows: max-content;
@@ -117,7 +99,7 @@
 	0 0 40px #dd0aba,
 	0 0 80px #ff69b4,
 	0 0 120px #dd0aba;
-	font-size: 2em;
+	font-size: 2rem;
 }
 
 
@@ -211,5 +193,4 @@
 	0 0 40px #dd0aba,
 	0 0 80px #dd0aba;
 }
-
 </style>

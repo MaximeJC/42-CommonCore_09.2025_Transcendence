@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import selec_play from './selection-type-play.vue'
 import play from './playable_page.vue'
+import tournament from './tournament/tournament_page.vue'
 import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps<{
@@ -43,12 +44,15 @@ watch(() => props.activePlay, (newVal) => {
 			:set-language="props.setLanguage"
 		></selec_play>
 	</div>
-	<div v-show="isPlayActive">
+	<div v-if="isPlayActive && activePlay !== 'tournament'">
 		<play
 		:activePlay="activePlay"
 		:opponentLogin="props.opponentLogin"
 		:set-language="props.setLanguage"
 		></play>
+	</div>
+	<div v-if="isPlayActive && activePlay === 'tournament'">
+		<tournament :setLanguage="props.setLanguage"></tournament>
 	</div>
 </template>
 

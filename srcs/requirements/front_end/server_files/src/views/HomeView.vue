@@ -177,6 +177,7 @@ const toggleissettnig = () => {
 
 const toggleshow_play = () => {
 	show_play.value = !show_play.value;
+	console.log(show_play);
 	if (show_play.value) issetting.value = false;
 	syncFlagsToHash();
 };
