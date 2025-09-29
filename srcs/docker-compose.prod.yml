@@ -21,8 +21,8 @@ services:
       - prod_front_avatars:/app/public/uploads
       - ./certs:/app/certs:ro 
     ports:
-      - "8080:80"
-      - "5000:443"
+      - "8080:8080"
+      - "5000:5000"
     environment:
       - NODE_ENV=production 
       - API_TARGET=http://hgp_user_management:3000
