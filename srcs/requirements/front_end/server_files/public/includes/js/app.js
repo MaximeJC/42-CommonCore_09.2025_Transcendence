@@ -62,8 +62,9 @@ function returnToLobby(endgame) {
 		lobby.style.display = 'block';
 	if (canvas)
 		canvas.style.display = 'none';
-	if (endgame === false)
+	if (endgame !== true) {
 		window.dispatchEvent(new CustomEvent('babylon-returned-to-lobby'));
+	}
 }
 
 /**
