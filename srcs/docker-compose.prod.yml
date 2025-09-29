@@ -60,6 +60,8 @@ services:
       context: ./requirements/user_management
       dockerfile: Dockerfile
     image: hgp_user_management_img
+    env_file: 
+      - ./prod.env
     volumes:
       - user_management_db:/app/db
       - user_avatars:/app/uploads

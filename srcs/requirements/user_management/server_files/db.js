@@ -30,6 +30,7 @@ db.serialize(()=>{
 				rank INTEGER DEFAULT 0 NOT NULL,
 
 				avatar_url TEXT,
+				login_42 TEXT UNIQUE,
 				level INTEGER DEFAULT 0 NOT NULL,
 				CHECK (level IN (0, 1))
 			)`);

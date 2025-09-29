@@ -58,7 +58,8 @@ services:
       context: ./requirements/user_management
       dockerfile: Dockerfile
     image: hgp_user_management_img
-    # env_file: ./.env
+    env_file: 
+      - ./dev.env
     volumes:
       - ./certs:/app/certs:ro 
       - user_management_db:/app/db

@@ -5,6 +5,13 @@ import { ref, reactive, onMounted } from 'vue'; // fonction ref = cree une refer
 
 import { user } from '../../user';
 import type { User } from '../../user';
+
+const VITE_42_CLIENT_ID = import.meta.env.VITE_42_CLIENT_ID;
+const VITE_42_REDIRECT_URI = import.meta.env.VITE_42_REDIRECT_URI;
+
+// Construire l'URL d'autorisation
+const authUrl42 = `https://api.intra.42.fr/oauth/authorize?client_id=${VITE_42_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_42_REDIRECT_URI)}&response_type=code&scope=public`;
+
 const { setUser } = user();
 // axios.defaults.withCredentials = true;
 
@@ -103,10 +110,10 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			<div  title="pasword-error" class="c-error"  >
 				<div v-show=" error_password" data-i18n="Signup.password_invalid"></div>
 			</div>
-			<div title="c-line_button" class="c-line-button">
-				<div class="c-icon-button">
-					<button title="c-ft-signup" class="c-ft-button"></button>
-				</div>
+			<div title="c-line_button" class="c-line-button"> 
+				<a :href="authUrl42" class="c-icon-button">
+					<button type="button" title="c-ft-signup" class="c-ft-button"></button>
+				</a>
 				<button  type="submit" title="Submit-button" class="c-Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>

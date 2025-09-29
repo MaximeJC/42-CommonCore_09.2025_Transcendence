@@ -1,3 +1,5 @@
+//user_management/server_files/routes/users.js
+
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import { pipeline } from 'stream/promises';
@@ -9,10 +11,118 @@ import { updateIsConnected, updateIsNotConnected } from '../services/userConnect
 import { updateUserRanks } from '../services/gameService.js';
 import { notifyAllsocket } from '../websocket/handlers.js';
 
+import axios from 'axios';
+
 export default async function userRoutes(fastify, options) {
 	const { db, getUserByEmail, getUserByLogin, userSocketMap, DEBUG_MODE } = options.deps;
 	const __filename = fileURLToPath(import.meta.url);
 	const __dirname = dirname(__filename);
+
+// --- Pour l'auth 42 ---
+
+	// Fonction pour trouver un utilisateur par son login 42
+	async function getUserBy42Login(login42) {
+		return new Promise((resolve, reject) => {
+			db.get(`SELECT * FROM users WHERE login_42 = ?`, [login42], (err, row) => {
+				if (err) reject(err);
+				else resolve(row);
+			});
+		});
+	}
+
+	// Fonction pour creer un utilisateur a partir des donnees de l'API 42
+	async function createUserFrom42(userData) {
+		const { login, email, avatar_url } = userData;
+		
+		// Un mot de passe aleatoire est genere car l'utilisateur ne se connectera pas avec.
+		const randomPassword = Math.random().toString(36).slice(-8);
+		const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+		return new Promise((resolve, reject) => {
+			db.run(
+				`INSERT INTO users (login, email, password, avatar_url, login_42) VALUES (?, ?, ?, ?, ?)`,
+				[login, email, hashedPassword, avatar_url, login],
+				function (err) {
+					if (err) reject(err);
+					else {
+						// On retourne le nouvel utilisateur cree
+						db.get(`SELECT * FROM users WHERE id = ?`, [this.lastID], (err, row) => {
+							if (err) reject(err);
+							else resolve(row);
+						});
+					}
+				}
+			);
+		});
+	}
+
+	// DEBUT ROUTE D'AUTH 42---
+	fastify.get('/auth/42/callback', async (request, reply) => {
+		const { code } = request.query;
+
+		if (!code) {
+			return reply.redirect('/connexion');
+		}
+
+		try {
+			// echanger le code contre un access_token
+			const tokenResponse = await axios.post('https://api.intra.42.fr/oauth/token', {
+				grant_type: 'authorization_code',
+				client_id: process.env.FORTYTWO_CLIENT_ID,
+				client_secret: process.env.FORTYTWO_CLIENT_SECRET,
+				code: code,
+				redirect_uri: process.env.FORTYTWO_REDIRECT_URI,
+			});
+
+			const accessToken = tokenResponse.data.access_token;
+
+			// Utiliser l'access_token pour recuperer les infos de l'utilisateur
+			const userResponse = await axios.get('https://api.intra.42.fr/v2/me', {
+				headers: { Authorization: `Bearer ${accessToken}` },
+			});
+
+			const userData42 = userResponse.data;
+			const { login: login42, email, image } = userData42;
+			const avatarUrl = image.link;
+
+			// Verifier si un utilisateur avec ce login 42 existe deja
+			let user = await getUserBy42Login(login42);
+
+			if (!user) {
+				// Si non, on verifie si un compte avec le meme login "normal" existe
+				const existingLogin = await getUserByLogin(login42);
+				const existingEmail = await getUserByEmail(email);
+				if(existingLogin && existingEmail) {
+					await new Promise((resolve, reject) => {
+						db.run(`UPDATE users SET login42 = ? WHERE login = ?`, [login42, login42], (err) => {
+							if (err) reject(err);
+							else resolve();
+						});
+					});
+				}
+				
+				// Creer l'utilisateur s'il n'existe pas
+				user = await createUserFrom42({
+					login: login42,
+					email: email,
+					avatar_url: avatarUrl,
+				});
+				await updateUserRanks(db);
+				notifyAllsocket('leaderboard_update', `Nouveau joueur ${login42}`);
+			}
+
+			// On cree la session
+			request.session.set('user', user);
+			updateIsConnected(db, user.id);
+
+			return reply.redirect('/profile');
+
+		} catch (error) {
+			console.error("Erreur lors de l'auth 42:", error.response ? error.response.data : error.message);
+			return reply.redirect('/?error=auth_failed');
+		}
+	});
+	// FIN AUTHE 42
 
 	// Ajouter un nouvel utilisateur
 	fastify.post('/users', async (request, reply) => {
