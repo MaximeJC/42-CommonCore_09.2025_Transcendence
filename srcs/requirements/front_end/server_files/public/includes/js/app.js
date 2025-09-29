@@ -429,13 +429,13 @@ async function startMatchmaking(config) {
 		});
 	}
 
-		// On affiche un simple ecran d'attente.
-	showWaitingScreen();
-
+	
 	// On contacte le serveur.
 	try {
 		await networkManager.connect(JwtToken); // JwtToken a ajouter dans config si besoin aussi
-
+		// On affiche un simple ecran d'attente.
+		showWaitingScreen();
+		
 		if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
 			// Si un adversaire est specifie, on cree une partie privee
 			console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
