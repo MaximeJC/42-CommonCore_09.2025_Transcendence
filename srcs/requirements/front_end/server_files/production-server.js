@@ -11,8 +11,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT_HTTP = 80;
-const PORT_HTTPS = 443;
+const PORT_HTTP = 8080;
+const PORT_HTTPS = 5000;
 
 // Servir les fichiers statiques depuis le dossier dist
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -29,103 +29,106 @@ const GAME_MANAGEMENT_TARGET = process.env.GAME_MANAGEMENT_TARGET || 'http://hgp
 
 // Proxy HTTP pour les API REST 
 app.use('/api', createProxyMiddleware({
-  target: API_TARGET,
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': '',
-  }, 
+	target: API_TARGET,
+	changeOrigin: true,
+	pathRewrite: {
+		'^/api': '',
+	}, 
 // Gestion des WebSockets 
 ws: true,
 onError: (err, req, res) => {
-  console.error('API Proxy error:', err);
-  if (res && !res.headersSent) {
-    res.status(500).json({ error: 'API Proxy error' });
-  }
+	console.error('API Proxy error:', err);
+	if (res && !res.headersSent) {
+		res.status(500).json({ error: 'API Proxy error' });
+	}
 },
 }));
 
 // Proxy pour le serveur IA 
 app.use('/ai', createProxyMiddleware({
-  target: AI_SERVER_TARGET,
-  changeOrigin: true,
-  pathRewrite: {
-    '^/ai': '',
-  },
-  onError: (err, req, res) => {
-    console.error('AI Server Proxy error:', err);
-    if (res && !res.headersSent) {
-      res.status(500).json({ error: 'AI Server Proxy error' });
-    }
-  },
+	target: AI_SERVER_TARGET,
+	changeOrigin: true,
+	pathRewrite: {
+		'^/ai': '',
+	},
+	onError: (err, req, res) => {
+		console.error('AI Server Proxy error:', err);
+		if (res && !res.headersSent) {
+			res.status(500).json({ error: 'AI Server Proxy error' });
+		}
+	},
 }));
 
 // Proxy pour le game management avec WebSocket 
 const agent = new https.Agent({
-  ca: fs.readFileSync('/app/certs/hgp_https.crt'),
+	ca: fs.readFileSync('/app/certs/hgp_https.crt'),
 });
 
 const gameProxy = createProxyMiddleware({
-  target: GAME_MANAGEMENT_TARGET,
-  changeOrigin: true,
-  pathRewrite: { '^/game': '' },
-  ws: true,
-  agent: agent,
-  onError: (err, req, res) => {
-    console.error('Game Management Proxy error:', err);
-    if (res && !res.headersSent) {
-      res.status(500).json({ error: 'Game Management Proxy error' });
-    }
-  },
+	target: GAME_MANAGEMENT_TARGET,
+	changeOrigin: true,
+	pathRewrite: { '^/game': '' },
+	ws: true,
+	agent: agent,
+	onError: (err, req, res) => {
+		console.error('Game Management Proxy error:', err);
+		if (res && !res.headersSent) {
+			res.status(500).json({ error: 'Game Management Proxy error' });
+		}
+	},
 });
 
 // Appliquer le proxy pour Express 
 app.use('/game', gameProxy); 
 // Fallback pour les routes SPA - renvoie toujours index.html 
 app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
+	res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+	console.error('Server error:', err);
+	res.status(500).json({ error: 'Internal server error' });
 });
 
 try {
-  const sslOptions = {
-    key: fs.readFileSync('/app/certs/hgp_https.key'),
-    cert: fs.readFileSync('/app/certs/hgp_https.crt'),
-  };
+	const sslOptions = {
+		key: fs.readFileSync('/app/certs/hgp_https.key'),
+		cert: fs.readFileSync('/app/certs/hgp_https.crt'),
+	};
 
-  // Serveur HTTPS principal
-  const httpsServer = https.createServer(sslOptions, app);
-  httpsServer.on('upgrade', (req, socket, head) => {
-    // On verifie l'URL et on transmet la requete au bon proxy.
-    if (req.url.startsWith('/game')) {
-      gameProxy.upgrade(req, socket, head);
-    } else {
-      // Si l'URL ne correspond pas, on ferme la connexion proprement.
-      socket.destroy();
-    }
-  });
-  httpsServer.listen(PORT_HTTPS, '0.0.0.0', () => {
-    console.log(`HTTPS production server running on port ${PORT_HTTPS}`);
-    console.log(`Serving static files from: ${path.join(__dirname, 'dist')}`);
-    console.log(`API proxy target: ${API_TARGET}`);
-    console.log(`AI Server proxy target: ${AI_SERVER_TARGET}`);
-    console.log(`Game Management proxy target: ${GAME_MANAGEMENT_TARGET}`);
-    console.log(`WebSocket proxy enabled for /api/ws and /game/ws`);
+	// Serveur HTTPS principal
+	const httpsServer = https.createServer(sslOptions, app);
+	httpsServer.on('upgrade', (req, socket, head) => {
+		// On verifie l'URL et on transmet la requete au bon proxy.
+		if (req.url.startsWith('/game')) {
+			gameProxy.upgrade(req, socket, head);
+		} else {
+			// Si l'URL ne correspond pas, on ferme la connexion proprement.
+			socket.destroy();
+		}
+	});
+		httpsServer.listen(PORT_HTTPS, '0.0.0.0', () => {
+		console.log(`HTTPS server listening on internal port ${PORT_HTTPS}`);
+		console.log(`Serving static files from: ${path.join(__dirname, 'dist')}`);
+		console.log(`API proxy target: ${API_TARGET}`);
+		console.log(`AI Server proxy target: ${AI_SERVER_TARGET}`);
+		console.log(`Game Management proxy target: ${GAME_MANAGEMENT_TARGET}`);
+		console.log(`WebSocket proxy enabled for /api/ws and /game/ws`);
 });
 
-  const httpServer = http.createServer((req, res) => {
-    res.writeHead(301, { "Location": `https://${req.headers.host}${req.url}` });
-    res.end();
-  });
+	const httpServer = http.createServer((req, res) => {
+		const hostname = req.headers.host.split(':')[0];
+		const redirectUrl = `https://${hostname}:${PORT_HTTPS}${req.url}`;
+		res.writeHead(301, { "Location": redirectUrl });
+		res.end();
+		res.end();
+	});
 
-  httpServer.listen(PORT_HTTP, '0.0.0.0', () => {
-    console.log(`HTTP server running on port ${PORT_HTTP} and redirecting to HTTPS.`);
-  });
+	httpServer.listen(PORT_HTTP, '0.0.0.0', () => {
+		console.log(`HTTP server running on port ${PORT_HTTP} and redirecting to HTTPS.`);
+	});
 
 } catch (error) {
-  console.error('Failed to start server.', error);
+	console.error('Failed to start server.', error);
 }

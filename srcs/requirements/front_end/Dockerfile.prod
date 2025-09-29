@@ -32,8 +32,8 @@ COPY --from=builder /app/public/uploads ./public/uploads
 COPY .env* ./
 
 # On expose les ports
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 5000
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
