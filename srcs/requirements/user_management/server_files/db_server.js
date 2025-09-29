@@ -149,7 +149,7 @@ fastify.post('/upload-avatar', async (request, reply) => {
 				origin.startsWith('http://172.') ||  origin.startsWith('https://172.') ||
 				origin.startsWith('https://10.') || origin.startsWith('https://192.') ||
 				origin.startsWith('http://127.') || origin.startsWith('http://localhost') ||
-				origin.startsWith('https://127.') || origin.startsWith('https://localhost.'))
+				origin.startsWith('https://127.') || origin.startsWith('https://localhost'))
 			{
 				return cb(null, true);
 			}
