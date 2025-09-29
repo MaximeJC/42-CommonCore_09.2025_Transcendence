@@ -300,7 +300,7 @@
 				<form title="form_mail" class="set_form">
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
-						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
+						<input title="mail_input" class="set_input" type="email" id="new_email" v-model="new_email"></input>
 						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div title="email-error" class="set_error"  >
@@ -313,7 +313,7 @@
 				<form class="set_form" title="form_login">
 					<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
 					<div class="set_sub_inp">
-						<input title="login_input" class="set_input" type="login" id="login" v-model="new_login"></input>
+						<input title="login_input" class="set_input" type="login" id="new_login" v-model="new_login"></input>
 						<button @click="handleLogin" type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div title="login-error" class="set_error"  >
@@ -323,31 +323,29 @@
 				</form>
 			</div>
 			<div class="set_container" title="password_container">
-				<div class="set_sub_password">
-					<div class="password_inputs">
-							<form class="set_form" title="form_password">
-								<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
-								<input title="old_password_input" class="set_input" type="password" v-model="old_password" />
-								<div title="password-error" class="set_error"  >
-									<div v-show="error_password" data-i18n="setting.password_invalid"></div>
-								</div>
-							</form>
-							<form class="set_form" title="form_password">
-								<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
-								<input title="password_input" class="set_input" type="password" v-model="new_password" />
-							</form>
-							<form class="set_form" title="form_password">
-								<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
-								<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
-							</form>
+				<div class="password_inputs">
+					<form class="set_form" title="form_password">
+						<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
+						<div class="set_sub_inp">
+							<input title="old_password_input" class="set_input" type="password" v-model="old_password" />
 						</div>
-						<div class="pos_pass_button">
+						<div title="password-error" class="set_error"  >
+							<div v-show="error_password" data-i18n="setting.password_invalid"></div>
+						</div>
+						<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
+						<div class="set_sub_inp">
+							<input title="password_input" class="set_input" type="password" v-model="new_password" />
+						</div>
+						<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
+						<div class="set_sub_inp">
+							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
 							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
-					</div>
-					<div title="password-error" class="set_error"  >
-						<div v-show="error_conf_password" data-i18n="setting.conf_password_error"></div>
-					</div>
+							<div title="password-error" class="set_error"  >
+								<div v-show="error_conf_password" data-i18n="setting.conf_password_error"></div>
+							</div>
+					</form>
+				</div>
 			</div>
 		</div>
 </template>
@@ -406,7 +404,8 @@
 
 	grid-template-rows: min-content;
 	grid-template-columns: 1fr;
-	width: 32rem;
+	/* width: 32rem;*/
+	width: 100%;
 	background-color: rgba(156, 50, 133, 0.5);
 	border: 2px solid #e251ca;
 	box-shadow: 
@@ -440,15 +439,11 @@
 	grid-template-columns: 1fr;
 }
 
-
-
 .set_form{
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 0.8fr 1fr;
 }
-
-
 
 .set_subtitle{
 	font-family: netron;
@@ -482,7 +477,7 @@
 }
 	
 .set_input{
-	width: 22rem;
+	width: 25rem;
 	font-size: 1.2rem;
 	margin-right: 1rem;
 	border-radius: 20px;
