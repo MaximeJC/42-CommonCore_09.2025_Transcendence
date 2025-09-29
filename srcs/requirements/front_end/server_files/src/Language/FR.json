@@ -97,6 +97,8 @@
 		"final": "Finale",
 		"start": "Commencer",
 		"first_match": "Match 1",
-		"seconde_match": "Match 2"
+		"seconde_match": "Match 2",
+		"third_match": "Match 3",
+		"fourth_match": "Match 4"
 	}
 }

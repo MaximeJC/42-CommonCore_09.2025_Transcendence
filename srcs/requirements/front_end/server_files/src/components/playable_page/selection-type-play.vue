@@ -37,17 +37,14 @@
 
 		if ((target as Element).closest && (target as Element).closest('[data-ignore-outside]')) return
 
-		// Fermer offline seulement si ouvert et clic en dehors
 		if (offline_play.value && offlineBox.value && !offlineBox.value.contains(target)) {
 			offline_play.value = false;
 		}
 
-		// Fermer online seulement si ouvert et clic en dehors
 		if (online_play.value && onlineBox.value && !onlineBox.value.contains(target)) {
 			online_play.value = false;
 		}
 
-		// Gérer l'affichage du "play" uniquement quand rien d'autre n'est ouvert
 		if (!offline_play.value && !online_play.value && playBox.value && !playBox.value.contains(target)) {
 			if(props.show_play === true)
 				emit('show_play');
@@ -130,7 +127,7 @@
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 200%;
+	top: 230%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -141,7 +138,7 @@
 	grid-template-columns: 1fr 1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 200%;
+	top: 230%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }
@@ -152,7 +149,7 @@
 	grid-template-columns:1fr 1fr; 
 	grid-template-rows: 1fr;
 	gap:3rem;
-	top: 200%;
+	top: 230%;
 	left: 50%;
 	transform: translate(-50%, -40%);
 }

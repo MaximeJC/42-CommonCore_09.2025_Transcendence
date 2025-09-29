@@ -1,37 +1,45 @@
 <script setup lang="ts">
-import { onMounted, ref, nextTick, watch, computed } from "vue"
+import { onMounted, onUnmounted, ref, nextTick, watch, computed } from "vue"
 import type { Ref } from "vue"
+import quart_final from "./8P_quart_final.vue"
+import { setLanguage, updateText } from '../../../service/translators';
 
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 	}>();
 
-interface Players {
-		player1: Ref<string>;
-		player2: Ref<string>;
-		player3: Ref<string>;
-		player4: Ref<string>;
-		player5: Ref<string>;
-		player6: Ref<string>;
-		player7: Ref<string>;
-		player8: Ref<string>;
+onMounted(async () => {
+	await nextTick()
+	updateText()
+})
 
-	}
+const showQuartFinal = ref(false);
 
-	const list_of_players: Players = {
-		player1: ref(""),
-		player2: ref(""),
-		player3: ref(""),
-		player4: ref(""),
-		player5: ref(""),
-		player6: ref(""),
-		player7: ref(""),
-		player8: ref(""),
-	};
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+const list_of_players = ref(["","","","","","","",""])
+const order_for_matches = ref(["","","","","","","",""])
+function handleSubmit(e: Event) {
+	e.preventDefault();
+	const inputs = document.querySelectorAll<HTMLInputElement>('.e_add_players_login input');
+	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
+	order_for_matches.value = shuffleArray(list_of_players.value);
+	showQuartFinal.value = true;
+}
+
+const playBox = ref<HTMLElement | null>(null);
+
 </script>
 
 <template>
-	<form  class="eight_player_frame">
+	<form v-show="!showQuartFinal" class="eight_player_frame">
 			<div class="title">Choissisez vos pseudo</div>
 			<div title="add_players_login" class="e_add_players_login">
 				
@@ -68,10 +76,11 @@ interface Players {
 					<input title="player8"></input>
 				</div>
 			</div>
-			<button title="Submit-button" class=" t_Submit-button">
+			<button @click="handleSubmit" type="button" title="Submit-button" class=" t_Submit-button">
 				<div data-i18n="Signup.submit"></div>
 			</button>
 		</form>
+		<quart_final v-if="showQuartFinal" :order_for_matches="order_for_matches" :setLanguage="props.setLanguage"> </quart_final>
 </template>
 
 <style>

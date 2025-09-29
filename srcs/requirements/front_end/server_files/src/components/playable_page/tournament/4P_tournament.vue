@@ -27,7 +27,6 @@ const list_of_players = ref(["","","",""])
 const order_for_matches = ref(["","","",""])
 function handleSubmit(e: Event) {
 	e.preventDefault();
-	// Récupère les pseudos des inputs
 	const inputs = document.querySelectorAll<HTMLInputElement>('.add_players_login input');
 	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
 	order_for_matches.value = shuffleArray(list_of_players.value);

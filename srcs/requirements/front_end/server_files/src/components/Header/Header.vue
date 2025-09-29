@@ -38,11 +38,18 @@
 		console.log(pageName)
 		emit('show_setting', pageName);
 	}
+
+	const handleReturnToLobby = () => {
+		const target = 'profil';
+		window.location.hash = target.startsWith('/') ? target : '/' + target;
+	}
+
+
 </script>
 
 <template>
 	<header class="header">
-		<h1 class="logo">FT_TRANSCENDENCE</h1>
+		<button @click="handleReturnToLobby()" class="logo">FT_TRANSCENDENCE</button>
 		<div class="end-button" data-ignore-outside>
 			<button @click=handleButtonClick  class="my-button" title="sign_up" >
 				<div v-show="!isConnect" data-i18n="header.signUp"></div>
@@ -67,7 +74,9 @@
 	.header{
 		display: flex;
 		justify-content: space-between;
-		align-items:flex-start
+		align-items:flex-start;
+		width: 100vw;
+		height: 20vh;
 	}
 
 	.end-button{
@@ -125,27 +134,33 @@
 	}
 
 	.logo{
-		background-color: rgba(156, 50, 133, 0);
+		background: none;
+		border: none;
+		outline: none;
 		font-family: neon;
-		color: #ffbcf4;
+		color: #ffffff;
 		margin-left: 1.5rem;
 		font-size: 5rem;
-		margin-top: 1.4rem;
+		font-weight: bold;
 		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 80px #ff69b4,
+			0 0 120px #dd0aba;
 		position: relative;
+		cursor: pointer;
+		padding: 0;
+		box-shadow: none;
+		user-select: none;
 	}
 	.logo::after {
 		content: '';
 		position: absolute;
 		width: 40rem;
 		height: 0.4rem;
-		background-color: #fafc95; /* Couleur de la ligne de soulignement */
+		background-color: #fafc95;
 		box-shadow:
 			0 0 10px #fbff22,
 			0 0 10px #fbff22,
@@ -155,6 +170,28 @@
 			0 0 120px #fbff22;
 		bottom: 0;
 		left: 0;
+	}
+
+	.logo:hover{
+		text-shadow: 
+			0 0 10px #fbff22,
+			0 0 10px #fbff22,
+			0 0 20px #fbff22,
+			0 0 40px #fbff22,
+			0 0 80px #fbff22,
+			0 0 120px #fbff22;
+	}
+
+	.logo:hover::after{
+		background-color: #fc95f3;
+
+		box-shadow:
+			0 0 10px #dd0aba,
+			0 0 10px #dd0aba,
+			0 0 20px #dd0aba,
+			0 0 40px #dd0aba,
+			0 0 80px #dd0aba,
+			0 0 120px #dd0aba;
 	}
 
 	@media (max-width: 1600px) {
