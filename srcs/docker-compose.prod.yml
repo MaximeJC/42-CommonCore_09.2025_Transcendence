@@ -19,7 +19,7 @@ services:
     image: hgp_front_end_prod_img
     volumes:
       - user_avatars:/app/uploads
-      - ./certs:/app/certs:ro 
+      - certs_https:/app/certs:ro 
     ports:
       - "8080:8080"
       - "5000:5000"
@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile
     image: hgp_game_management_img
     volumes:
-      - ./certs:/app/certs:ro 
+      - certs_https:/app/certs:ro 
     ports:
       - "3003:3003"
     environment:
@@ -63,7 +63,7 @@ services:
     volumes:
       - user_management_db:/app/db
       - user_avatars:/app/uploads
-      - ./certs:/app/certs:ro 
+      - certs_https:/app/certs:ro 
     ports:
       - "3000:3000"
     environment:  
@@ -87,6 +87,11 @@ volumes:
     driver_opts:
       type: none
       device: ${HOME}/hgp_data/avatars
+      o: bind
+  certs_https:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/certs
       o: bind
 
 networks:
