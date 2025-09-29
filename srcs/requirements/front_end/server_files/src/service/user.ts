@@ -20,7 +20,7 @@ export  class User{
 		this._nb_Win = 0;
 		this._nb_Lose = 0;
 		this._win_ratio = 0;
-		this._url_avatar = "/public/images/default_avatar.png"
+		this._url_avatar = "/images/default_avatar.png"
 		this._user_rank = -1;
 
 		this._userID = -1;

@@ -74,7 +74,7 @@ async function configure() {
 	// Gestion des fichiers (pour les avatars)
 	await fastify.register(fastifyMultipart);
 	await fastify.register(fastifyStatic, {
-		root: path.join(__dirname, 'uploads'),
+		root: path.join(__dirname, 'avatars'),
 		prefix: '/uploads/',
 	});
 

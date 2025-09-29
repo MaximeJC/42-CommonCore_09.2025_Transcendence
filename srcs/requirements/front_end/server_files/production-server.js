@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Servir les fichiers publics (images, etc.)
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 app.use('/includes', express.static(path.join(__dirname, 'public/includes')));
-app.use('/public/uploads', express.static('/app/public/uploads'));
+app.use('/uploads', express.static('/app/uploads'));
 
 // Configuration du proxy pour les API
 const API_TARGET = process.env.API_TARGET || 'http://localhost:3000'; 

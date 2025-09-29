@@ -31,7 +31,7 @@ export default async function userRoutes(fastify, options) {
 			const result = await new Promise((resolve, reject) => {
 				db.run(
 					`INSERT INTO users (login, email, password, avatar_url) VALUES (?, ?, ?, ?)`,
-					[cleanLogin, cleanEmail, hashedPassword, '/public/images/default_avatar.png'],
+					[cleanLogin, cleanEmail, hashedPassword, '/images/default_avatar.png'],
 					function (err) {
 						if (err) reject(err);
 						else resolve(this);
@@ -137,7 +137,7 @@ export default async function userRoutes(fastify, options) {
 		}
 
 		const filename = `${user.id}-${data.filename}`;
-		const saveTo = path.join(__dirname, '..', 'uploads', filename);
+		const saveTo = '/app/uploads/' + filename;
 
 		try {
 			// Supprimer l'ancien avatar
