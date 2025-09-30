@@ -189,18 +189,21 @@ watch(socket, (newSocket, oldSocket) => {
 		0 0 120px #dd0aba;
 		border-bottom: 1px solid #ddd;
 		/*justify-content: ;*/
-	}	
+	}
+	
 
 	.grid-header{
 		display: grid;
 		grid-template-columns: 0.1fr 1fr 0.2fr 0.3fr;
 		padding: 3px;
+		gap: 2rem;
 		border-bottom: 1px solid #ddd;
 		/*justify-content: ;*/
 	}	
 	.grid-header > div{
 		color: white;
 		font-size: 1rem;
+		text-align: start;
 		text-shadow: 
 		0 0 10px #18c3cf,
 		0 0 20px #18c3cf,
@@ -227,6 +230,12 @@ watch(socket, (newSocket, oldSocket) => {
 		0 0 40px #dd0aba,
 		0 0 80px #dd0aba;
 		background: transparent;
+
+		display: inline-block;   /* nécessaire pour gérer la largeur */
+		width: 10ch;              /* largeur équivalente à ~6 caractères */
+		overflow: hidden;        /* coupe ce qui dépasse */
+		white-space: nowrap;     /* empêche le retour à la ligne */
+		text-overflow: ellipsis; /* ajoute "…" à la fin si coupé */
 		cursor: pointer;
 		margin-left: 2.5rem;
 		transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3 ease-in-out;

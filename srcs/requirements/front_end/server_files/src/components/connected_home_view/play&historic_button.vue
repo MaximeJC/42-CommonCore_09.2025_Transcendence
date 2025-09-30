@@ -27,7 +27,7 @@ const props = defineProps<{
 
 		width: auto;
 		height: auto;
-		margin-left: 2rem;
+		margin-left: 3rem;
 		gap: 1rem;
 	}
 
