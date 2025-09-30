@@ -6,7 +6,7 @@
 	  "icon_lang": "/images/flag/Espana.png"
 	},
 	"home": {
-	  "connection": "conexión"
+	  "connection": "Conexión"
 	},
 	"Signup":{
 		"login": "Usuario",
@@ -24,7 +24,7 @@
 	"player_stat": {
  	   "nbr_games": "Partidas",
  	   "nbr_victory": "Victorias",
- 	   "rank": "rango"
+ 	   "rank": "Rango"
 	},
 	"home_player_button": {
 		"play": "JUGAR",
@@ -44,51 +44,67 @@
 	    "victory": "Victoria",
 	    "login": "Usuario",
 	    "my_score": "Mi puntuación",
-	    "time": "Data",
-	    "o_score": "Puntuación adv. ",
+	    "time": "Fecha",
+	    "o_score": "Puntuación adv.",
 	    "o_login": "Adversario"
 	},
-
 	"setting":{
+		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
+		"mail_error": "Correo electrónico no válido.",
+		"login_used_error": "El nombre de usuario ya está en uso.",
+		"mail_used_error": "El correo electrónico ya está en uso.",
+		"password_error": "Condiciones de la contraseña.",
+		"password_invalid": "Contraseña incorrecta.",
+		"conf_password_error": "Las dos contraseñas no son idénticas.",
+		"file_error": "Fuente no válida",
 		"profile": "Perfil",
 		"setting": "Ajustes",
 		"avatar": "Cambiar mi Avatar",
 		"login": "Cambiar mi Nombre de usuario",
 		"mail": "Cambiar mi Correo electrónico",
+		"old_password": "Contraseña actual",
 		"password": "Cambiar mi Contraseña",
 		"about": "Acerca de",
-		"contact": "Contacto"
+		"contact": "Contacto",
+		"teams": "Nuestro Equipo"
 	},
-
 	"play":{
-    "local_play": "Juego local",
-    "online_play": "Juego en línea",
-    "VS_ia": "Jugador vs IA",
-    "VS_player": "Jugador vs Jugador",
-    "2_VS_2": "Dos contra Dos",
-    "tournament": "Torneo",
-	"4_players": "4 Juga-\ndores",
-	"8_players": "8 Juga-\ndores"
+    	"local_play": "Juego local",
+    	"online_play": "Juego en línea",
+    	"VS_ia": "Jugador vs IA",
+    	"VS_player": "Jugador vs Jugador",
+    	"2_VS_2": "Dos contra Dos",
+    	"tournament": "Torneo",
+		"4_players": "4 Juga-\ndores",
+		"8_players": "8 Juga-\ndores"
 	},
-
 	"invit":{
     	"accept": "Aceptar",
     	"refuse": "Rechazar",
 		"cancel": "Cancelar"
 	},
-
 	"victory":{
  	   "text": "Victoria de"
 	},
-
 	"tournament":{
-    "player 1": "Player 1",
-    "player 2": "Player 2",
-    "player 3": "Player 3",
-    "player 4": "Player 4",
-    "player 5": "Player 5",
-    "player 6": "Player 6",
-    "player 7": "Player 7",
-    "player 8": "Player 8"
+	    "player 1": "Jugador 1",
+	    "player 2": "Jugador 2",
+	    "player 3": "Jugador 3",
+	    "player 4": "Jugador 4",
+	    "player 5": "Jugador 5",
+	    "player 6": "Jugador 6",
+	    "player 7": "Jugador 7",
+	    "player 8": "Jugador 8",
+	    "quart final": "Cuartos de Final",
+	    "semi final": "Semifinal",
+	    "final": "Final",
+	    "start": "Comenzar",
+	    "first_match": "Partido 1",
+	    "seconde_match": "Partido 2",
+	    "third_match": "Partido 3",
+	    "fourth_match": "Partido 4"
+	},
+	"contact":{
+		"text": "No sabía qué poner aquí, así que puse un conejo."
 	}
 }

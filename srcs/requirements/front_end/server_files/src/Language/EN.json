@@ -48,47 +48,63 @@
  	   "o_score": "Opponent score",
  	   "o_login": "Opponent"
 	},
-
 	"setting":{
+		"login_error": "The username must be between 3 and 13 characters long.",
+		"mail_error": "Invalid email.",
+		"login_used_error": "The Username is already in use.",
+		"mail_used_error": "The email is already in use.",
+		"password_error": "Password conditions.",
+		"password_invalid": "Incorrect password.",
+		"conf_password_error": "The two passwords are not identical.",
+		"file_error": "Invalid source",
 		"profile": "Profile",
 		"setting": "Settings",
 		"avatar": "Change my Avatar",
 		"login": "Change my Username",
 		"mail": "Change my Email",
+		"old_password": "Current Password",
 		"password": "Change my Password",
 		"about": "About",
-		"contact": "Contact"
+		"contact": "Contact",
+		"teams": "Our Team"
 	},
-
 	"play":{
-    "local_play": "Local play",
-    "online_play": "Online play",
-    "VS_ia": "Player vs IA",
-    "VS_player": "Player vs Player",
-    "2_VS_2": "Two vs Two",
-    "tournament": "Tourney",
-	"4_players": "4 Players",
-	"8_players": "8 Players"
+    	"local_play": "Local play",
+    	"online_play": "Online play",
+    	"VS_ia": "Player vs IA",
+    	"VS_player": "Player vs Player",
+    	"2_VS_2": "Two vs Two",
+    	"tournament": "Tourney",
+		"4_players": "4 Players",
+		"8_players": "8 Players"
 	},
-
 	"invit":{
 		"accept": "Accept",
 		"refuse": "Decline",
 		"cancel": "Cancel"
 	},
-
 	"victory":{
    		"text": "Victory of"
 	},
-
 	"tournament":{
-    "player 1": "Jugador 1",
-    "player 2": "Jugador 2",
-    "player 3": "Jugador 3",
-    "player 4": "Jugador 4",
-    "player 5": "Jugador 5",
-    "player 6": "Jugador 6",
-    "player 7": "Jugador 7",
-    "player 8": "Jugador 8"
+	    "player 1": "Player 1",
+	    "player 2": "Player 2",
+	    "player 3": "Player 3",
+	    "player 4": "Player 4",
+	    "player 5": "Player 5",
+	    "player 6": "Player 6",
+	    "player 7": "Player 7",
+	    "player 8": "Player 8",
+	    "quart final": "Quarter Final",
+	    "semi final": "Semi Final",
+	    "final": "Final",
+	    "start": "Start",
+	    "first_match": "Match 1",
+	    "seconde_match": "Match 2",
+	    "third_match": "Match 3",
+	    "fourth_match": "Match 4"
+	},
+	"contact":{
+		"text": "I didn’t know what to put here, so I put a rabbit."
 	}
 }
