@@ -14,13 +14,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let app;
-// const app = fastify({
-// 	logger: true,
-// 	https: {
-// 		key: fs.readFileSync('/app/certs/hgp_https.key'),
-// 		cert: fs.readFileSync('/app/certs/hgp_https.crt'),
-// 	}
-//   });
 
 if (process.env.NODE_ENV === 'production') {
 	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");

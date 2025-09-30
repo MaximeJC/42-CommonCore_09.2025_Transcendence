@@ -4,7 +4,7 @@
 	import axios from 'axios';
 	import { user } from '../../user';
 	
-	const { currentUser } = user();
+	const { currentUser, updateUser } = user();
 
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
@@ -12,8 +12,18 @@
 	const new_avatar_src = ref("");
 	const new_login = ref("");
 	const new_email = ref("");
+	const old_password = ref("");
 	const new_password = ref("");
 	const conf_new_password = ref("");
+
+	const message = ref("");
+	const error_file = ref(false);
+	const error_login = ref(false);
+	const error_email = ref(false);
+	const error_login_used = ref(false);
+	const error_email_used = ref(false);
+	const error_password = ref(false);
+	const error_conf_password = ref(false);
 
 	interface player{
 		avatar: string
@@ -25,6 +35,8 @@
 
 	const avatarFile = ref<File | null>(null);
 	const uploadedAvatar = ref("");
+	const uploadedPseudo = ref("");
+	const uploadedEmail = ref("");
 
 	const handleAvatarChange = (event: Event) => {
 		const input = event.target as HTMLInputElement;
@@ -56,6 +68,12 @@
 			console.warn("AUcun fichier selectionne");
 			return ;
 		}
+		const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+		if (!validTypes.includes(avatarFile.value.type)) {
+			console.error("Fichier non valide");
+			error_file.value = true;
+			return ;
+		}
 		console.log("Fichier à uploader:", avatarFile.value);
 		const formData = new FormData();
 		formData.append("file", avatarFile.value);
@@ -67,7 +85,7 @@
 			const response = await axios.post(`${USER_MANAGEMENT_URL}/upload-avatar`, formData, {
 				withCredentials: true,
 				headers: {
-                'Content-Type': undefined
+				'Content-Type': undefined
 				},
 			});
 
@@ -75,6 +93,7 @@
 			console.log('Upload réussi:', result);
 
 			if (result.avatar_url) {
+				updateUser({ avatar_url: result.avatar_url });
 				uploadedAvatar.value = `${result.avatar_url}?t=${new Date().getTime()}`;
 			} else {
 				console.error("Erreur lors de l'upload");
@@ -83,18 +102,6 @@
 			console.error("Erreur lors de la requete:", error);
 		}
 	}
-
-	// const login = ref("");
-	// const email = ref("");
-	// const password = ref("");
-	// const conf_password = ref("");
-	const message = ref("");
-	const error_login = ref(false);
-	const error_email = ref(false);
-	const error_login_used = ref(false);
-	const error_email_used = ref(false);
-	const error_password = ref(false);
-	const error_conf_password = ref(false);
 
 	async function handleEmail() {
 		error_email.value = false;
@@ -141,6 +148,8 @@
 			
 			if (data.success) {
 				message.value = "Email successfully changed";
+				uploadedEmail.value = new_email.value;
+				updateUser({ email: uploadedEmail.value });
 				new_email.value = "";
 				console.log(message.value);
 			} else {
@@ -200,6 +209,9 @@
 			
 			if (data.success) {
 				message.value = "Login successfully changed";
+				uploadedPseudo.value = new_login.value;
+				updateUser({ login: uploadedPseudo.value });
+
 				new_login.value = "";
 				console.log(message.value);
 			} else {
@@ -232,18 +244,24 @@
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					id: currentUser?.value?.id ?? "",
+					old_password: old_password.value,
 					password: new_password.value,
 				}),
 			});
 			
 			const data = await result.json();
+
+			console.log("data: ", data);
 			
 			if (data.success) { // afficher un message et reinitialiser les variables
 				message.value = "Password successfully changed";
+				console.log("Password successfully changed");
+				old_password.value = "";
 				new_password.value = "";
 				conf_new_password.value = "";
 			} else {
 				message.value = data.message || "Password error";
+				error_password.value = true;
 			}
 		} catch (err) {
 			message.value = "Cannot change password";
@@ -258,59 +276,76 @@
 			<div title="profile_title" class="profile_title" data-i18n="setting.profile"></div>
 			<div tittle="avatar container" class="info_container">
 			<img v-if="uploadedAvatar" :key="uploadedAvatar" :src="uploadedAvatar" alt="Nouvel avatar" class="set_avatar"/>
-            <img v-else :key="currentUser?.avatar_url" :src="currentUser?.avatar_url" alt="Avatar actuel" class="set_avatar" />
+			<img v-else :key="currentUser?.avatar_url" :src="currentUser?.avatar_url" alt="Avatar actuel" class="set_avatar" />
 				<div>
-					<div title="act-mail" class="info_title">{{ currentUser?.email }}</div>
-					<div title="act-login" class="info_title">{{ currentUser?.login }}</div>
+					<div v-if="uploadedEmail" title="act-mail" class="info_title">{{ currentUser?.email }}</div>
+					<div v-else title="act-mail" class="info_title">{{ currentUser?.email }}</div>
+					<div v-if="uploadedPseudo" title="act-login" class="info_title">{{ currentUser?.login }}</div>
+					<div v-else title="act-login" class="info_title">{{ currentUser?.login }}</div>
 				</div>
 			</div>	
 			<div title="avatar_container" class="set_container" > 
 				<form title="form_avatar" class="set_form" @submit.prevent="uploadAvatar">
 					<label title="avatar_label" class="set_subtitle" data-i18n="setting.avatar" ></label>
 					<div class="set_sub_inp">
-						<input title="avatar_input" class="set_input" type="file" id="avatar_src" required @change="handleAvatarChange"></input>
+						<input title="avatar_input" class="set_input" type="file" id="avatar_src" required accept=".png, .jpg, .jpeg" @change="handleAvatarChange"></input>
 						<button type="submit" title="avatar_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">source invalide</div>
-
+					<div title="pasword-error" class="set_error"  >
+						<div v-show="error_file" data-i18n="setting.file_error"></div>
+					</div>
 				</form>
 			</div>
 			<div title="mail_container" class="set_container" >
 				<form title="form_mail" class="set_form">
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
-						<input title="mail_input" class="set_input" type="email" id="email" v-model="new_email"></input>
+						<input title="mail_input" class="set_input" type="email" id="new_email" autocomplete="off" v-model="new_email"></input>
 						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">email invalide</div>
+					<div title="email-error" class="set_error"  >
+						<div v-show="error_email" data-i18n="setting.mail_error"></div>
+						<div v-show="error_email_used" data-i18n="setting.mail_used_error"></div>
+					</div>
 				</form>
 			</div>
 			<div class="set_container" title="login_container">
 				<form class="set_form" title="form_login">
 					<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
 					<div class="set_sub_inp">
-						<input title="login_input" class="set_input" type="login" id="login" v-model="new_login"></input>
+						<input title="login_input" class="set_input" type="login" id="new_login" v-model="new_login"></input>
 						<button @click="handleLogin" type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
-					<div class="set_error">login invalide</div>
-
+					<div title="login-error" class="set_error"  >
+						<div v-show="error_login" data-i18n="setting.login_error"></div>
+						<div v-show="error_login_used" data-i18n="setting.login_used_error"></div>
+					</div>
 				</form>
 			</div>
 			<div class="set_container" title="password_container">
-				<form class="set_form" title="form_password">
-					<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
-					<div class="set_sub_password">
-						<div>
-							<input title="password_input" class="set_input" type="password" v-model="new_password" />
-							<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
-							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
+				<div class="password_inputs">
+					<form class="set_form" title="form_password">
+						<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
+						<div class="set_sub_inp">
+							<input title="old_password_input" class="set_input" type="password" id="old_password" autocomplete="off" v-model="old_password" />
 						</div>
-						<div class="pos_pass_button">
+						<div title="password-error" class="set_error"  >
+							<div v-show="error_password" data-i18n="setting.password_invalid"></div>
+						</div>
+						<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
+						<div class="set_sub_inp">
+							<input title="password_input" class="set_input" type="password" id="new_password" autocomplete="off" v-model="new_password" />
+						</div>
+						<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
+						<div class="set_sub_inp">
+							<input title="conf_password_input" class="set_input" type="password" id="repeat_new_password" autocomplete="off" v-model="conf_new_password" />
 							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
-					</div>
-					<div class="set_error">password invalide</div>
-				</form>
+							<div title="password-error" class="set_error"  >
+								<div v-show="error_conf_password" data-i18n="setting.conf_password_error"></div>
+							</div>
+					</form>
+				</div>
 			</div>
 		</div>
 </template>
@@ -369,7 +404,8 @@
 
 	grid-template-rows: min-content;
 	grid-template-columns: 1fr;
-	width: 32rem;
+	/* width: 32rem;*/
+	width: 100%;
 	background-color: rgba(156, 50, 133, 0.5);
 	border: 2px solid #e251ca;
 	box-shadow: 
@@ -403,16 +439,11 @@
 	grid-template-columns: 1fr;
 }
 
-
-
 .set_form{
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 0.8fr 1fr;
-	margin-top: 1rem;
 }
-
-
 
 .set_subtitle{
 	font-family: netron;
@@ -436,7 +467,7 @@
 
 .set_sub_password {
 	display: grid;
-	margin-top: -0.8rem;
+	margin-top: 1rem;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr;
 }
@@ -446,13 +477,18 @@
 }
 	
 .set_input{
-	width: 22rem;
+	width: 25rem;
 	font-size: 1.2rem;
 	margin-right: 1rem;
 	border-radius: 20px;
 	margin-left: 0.8rem;
 	border: none;
 	
+}
+
+.password_inputs {
+	display: grid;
+	row-gap: 1rem;
 }
 
 .set_button{
@@ -505,5 +541,6 @@
 	0 0 20px #fd2d49;
 	font-size: 1rem;
 	margin-left: 1rem;
+	margin-top: 0.5rem;
 }
 </style>

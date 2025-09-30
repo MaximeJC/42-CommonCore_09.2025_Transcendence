@@ -16,7 +16,7 @@ const host = window.location.host;
 const hostname = window.location.hostname;
 const WS_URL = `${protocol}//${hostname}:3003`;
 
-console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
+// console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
 // On cree une variable "boite" pour stocker la fonction initializeApp.
 let mainAppInitializer = null;

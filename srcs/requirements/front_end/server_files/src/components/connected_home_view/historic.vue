@@ -3,6 +3,9 @@
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, nextTick } from 'vue';
 import { setLanguage, updateText } from '../../service/translators';
+import { user } from '../../user';
+	
+const { currentUser } = user();
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
@@ -10,7 +13,7 @@ const props = defineProps<{
 
 onMounted(async () => {
 	await nextTick()
-	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+	updateText()
 })
 
 interface Match{
@@ -36,33 +39,30 @@ function formatDate(date: string | number): string {
 	return `${day}/${month} - ${hours}:${minutes}`;
 }
 
-async function fetchMyGames() { //TODO : tester si utilisateur connecte avant !!
+async function fetchMyGames() {
 	try {
-		const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-			method: 'GET',
-			credentials: 'include'
-		});
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const login = currentUser.user.login;
+		if (currentUser.value) {
+			const login = currentUser.value.login;
+			
+			const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(login)}`);
+			if (!result.ok) {
+				throw new Error(`Erreur: ${result.status}`);
+			}
+			const games = await result.json();
 
-		console.log("Fonction fetchMyGames pour affichage de l'historique de l'utilisateur connecte", login);
-		
-		const result = await fetch(`${USER_MANAGEMENT_URL}/games/me?login_current=${encodeURIComponent(login)}`);
-		if (!result.ok)
-			throw new Error(`Erreur http: ${result.status}`);
-		const games = await result.json();
+			matches.value = games.map((game: any) => ({
+				win: game.login_winner === login,
+				date: game.created_at,
+				c_login: login,
+				score_c: game.login_winner === login ? game.score_winner : game.score_loser,
+				score_o: game.login_winner === login ? game.score_loser : game.score_winner,
+				o_login: game.login_winner === login ? game.login_loser : game.login_winner,
+			}));
+			// console.log("Parties recuperees (historic.vue).");
 
-		matches.value = games.map((game: any)=>({
-			win: game.login_winner === login,
-			date: game.created_at,
-			c_login: login,
-			score_c: game.login_winner === login? game.score_winner : game.score_loser,
-			score_o: game.login_winner === login? game.score_loser : game.score_winner,
-			o_login:  game.login_winner === login? game.login_loser : game.login_winner,
-		}));
-		console.log("Parties recuperees (historic.vue).");
+		} else {
+			matches.value = [];
+		}
 	} catch (err) {
 		console.error("Erreur de recuperation des parties:", err);
 	}

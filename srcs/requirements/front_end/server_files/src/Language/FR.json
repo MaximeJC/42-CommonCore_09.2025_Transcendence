@@ -52,11 +52,20 @@
 	},
 
 	"setting":{
+		"login_error": "le Pseudo doit faire entre 3 et 13 caractères.",
+		"mail_error": "Email invalide.",
+		"login_used_error": "Le nom d'utilisateur est déjà utilisé",
+		"mail_used_error": "Email est déjà utilisé",
+		"password_error": "Condition du mot de passe.",
+		"password_invalid": "Mot de passe incorrect.",
+		"conf_password_error": "les deux mots de passe ne sont pas indentique.",
+		"file_error": "Source invalide",
 		"profile": "profil",
 		"setting": "Réglages",
 		"avatar": "Changer mon Avatar",
 		"login": "Changer mon Pseudo",
 		"mail": "Changer mon Email",
+		"old_password": "Mot de passe Actuel",
 		"password": "Changer mon Mot de passe",
 		"about": "À propos",
 		"contact": "contact"
