@@ -1,12 +1,27 @@
 services:
+  caddy:
+    container_name: hgp_caddy_prod
+    build:
+      context: ./requirements/caddy
+      dockerfile: Dockerfile
+    image: hgp_caddy_img
+    ports:
+      - "5000:5000"
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - front_end_prod
+      - user_management
+      - game_management
+      - ai_server
+
   ai_server:
     container_name: hgp_ai_server
     build:
       context: ./requirements/ai_server
       dockerfile: Dockerfile
     image: hgp_ai_server_img
-    ports:
-      - "3001:3001"
     networks:
       - hgp_network
     restart: unless-stopped
@@ -20,9 +35,6 @@ services:
     volumes:
       - user_avatars:/app/uploads
       - certs_https:/app/certs:ro 
-    ports:
-      - "8080:8080"
-      - "5000:5000"
     environment:
       - NODE_ENV=production 
       - API_TARGET=http://hgp_user_management:3000
@@ -42,12 +54,11 @@ services:
     image: hgp_game_management_img
     volumes:
       - certs_https:/app/certs:ro 
-    ports:
-      - "3003:3003"
     environment:
       - NODE_ENV=production
       - AI_SERVER_URL=http://hgp_ai_server:3001
       - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - CADDY_PROXY=true
     depends_on:
       - ai_server
     networks:
@@ -66,8 +77,6 @@ services:
       - user_management_db:/app/db
       - user_avatars:/app/uploads
       - certs_https:/app/certs:ro 
-    ports:
-      - "3000:3000"
     environment:  
       - POSTGRES_HOST=localhost
       - POSTGRES_PORT=5432
@@ -75,6 +84,7 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=transcendence
       - DATABASE_URL=postgresql://postgres:root@localhost:5432/transcendence
+      - CADDY_PROXY=true
     networks:
       - hgp_network
     restart: unless-stopped

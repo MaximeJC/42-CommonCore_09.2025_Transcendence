@@ -40,9 +40,8 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 	-out certs/hgp_https.crt \
 	-subj "/CN=hgp.local"
 
-# On expose les ports
+# On expose seulement le port 8080 (Caddy gère le 5000)
 EXPOSE 8080
-EXPOSE 5000
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production

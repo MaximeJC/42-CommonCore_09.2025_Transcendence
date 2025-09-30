@@ -38,7 +38,7 @@ export function notifyUser(targetUserLogin, event, payload) {
 	}
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && !process.env.CADDY_PROXY) {
 	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
 	app = fastify({
 	  logger: true,
@@ -48,7 +48,11 @@ if (process.env.NODE_ENV === 'production') {
 	  }
 	});
 } else {
-	console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
+	if (process.env.CADDY_PROXY) {
+		console.log("Demarrage en mode PRODUCTION avec Caddy Proxy (HTTP/WS)");
+	} else {
+		console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
+	}
 	app = fastify({
 	  logger: true
 	});

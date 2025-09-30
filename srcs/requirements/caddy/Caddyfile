@@ -1,0 +1,55 @@
+localhost:5000 {
+    # Certificat auto-signé pour localhost
+    tls internal
+    
+    # Headers de sécurité et CORS
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+    }
+    
+    # Gestion des requêtes OPTIONS pour CORS
+    @options {
+        method OPTIONS
+    }
+    respond @options 200
+    
+    # Proxy pour l'API user_management (REST + WebSocket)
+    handle_path /api/* {
+        reverse_proxy hgp_user_management:3000
+    }
+    
+    # Proxy pour game_management (WebSocket du jeu) - WebSocket spécial
+    @websocket_game {
+        header Connection *Upgrade*
+        header Upgrade websocket
+        path /game*
+    }
+    handle @websocket_game {
+        rewrite * /
+        reverse_proxy hgp_game_management:3003
+    }
+    
+    # Routes HTTP normales pour game_management
+    handle_path /game/* {
+        reverse_proxy hgp_game_management:3003
+    }
+    
+    # Proxy pour AI server
+    handle_path /ai/* {
+        reverse_proxy hgp_ai_server:3001
+    }
+    
+    # Servir les fichiers statiques depuis le front-end production (ordre important: en dernier)
+    reverse_proxy /* hgp_front_end_prod:8080
+    
+    # Logging pour le debug
+    log {
+        output stdout
+        level INFO
+    }
+}

@@ -5,7 +5,7 @@ CERT_FILE = srcs/certs/hgp_https.crt
 
 #! RULES
 
-.PHONY: all up build start down stop restart clean re logs fclean mkdir dev prod certs
+.PHONY: all up build start down stop restart clean re logs fclean mkdir dev prod caddy-dev caddy-prod certs
 
 all: up
 
@@ -26,6 +26,24 @@ prod: mkdir
 	@echo "Starting production services..."
 	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
 #2>&1 | tee prod.log
+
+# Développement avec Caddy - nouvelle architecture avec reverse proxy
+caddy-dev: mkdir 
+	@echo "Switching to DEVELOPMENT mode with Caddy reverse proxy..."
+	@echo "Stopping production containers..."
+	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	@echo "Starting development services with Caddy..."
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+	@echo "🚀 Access your application at: https://localhost:5000"
+
+# Production avec Caddy - nouvelle architecture avec reverse proxy
+caddy-prod: mkdir
+	@echo "Switching to PRODUCTION mode with Caddy reverse proxy..."
+	@echo "Stopping development containers..."
+	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	@echo "Starting production services with Caddy..."
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+	@echo "🚀 Access your application at: https://localhost:5000"
 
 up: mkdir 
 	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."

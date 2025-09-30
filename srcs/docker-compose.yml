@@ -1,4 +1,21 @@
 services:
+  caddy:
+    container_name: hgp_caddy
+    build:
+      context: ./requirements/caddy
+      dockerfile: Dockerfile
+    image: hgp_caddy_img
+    ports:
+      - "5000:5000"
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - front_end
+      - user_management
+      - game_management
+      - ai_server
+
   ai_server:
     container_name: hgp_ai_server
     build:
@@ -6,8 +23,6 @@ services:
       dockerfile: Dockerfile
     image: hgp_ai_server_img
     # env_file: ./.env
-    ports:
-      - "3001:3001"
     networks:
       - hgp_network
     restart: unless-stopped
@@ -24,12 +39,10 @@ services:
       - ./certs:/app/certs:ro 
       - ./requirements/front_end/server_files/src:/app/src
       - ./requirements/front_end/server_files/public:/app/public 
-    ports:
-      - "5173:5173"
     environment:
       - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
-      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
+      - VITE_PONG_SERVER_BASE_URL=/game
+      - VITE_AI_SERVER_BASE_URL=/ai
     networks:
       - hgp_network
     restart: unless-stopped
@@ -46,8 +59,6 @@ services:
     volumes:
       - ./certs:/app/certs:ro 
     # env_file: ./.env
-    ports:
-      - "3003:3003"
     environment:
       - AI_SERVER_URL=http://hgp_ai_server:3001
     networks:
@@ -66,8 +77,6 @@ services:
       - ./certs:/app/certs:ro 
       - user_management_db:/app/db
       - user_avatars:/app/uploads
-    ports:
-      - "3000:3000"
     networks:
       - hgp_network
     restart: unless-stopped
