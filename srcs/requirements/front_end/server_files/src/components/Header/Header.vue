@@ -85,7 +85,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items:flex-start;
-		width: 100vw;
+		width: 99vw;
 		height: 20vh;
 	}
 
@@ -149,7 +149,7 @@
 		outline: none;
 		font-family: neon;
 		color: #ffffff;
-		margin-left: 1.5rem;
+		margin-left: 2.5rem;
 		font-size: 5rem;
 		font-weight: bold;
 		text-shadow: 
