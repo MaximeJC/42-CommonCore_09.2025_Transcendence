@@ -7,6 +7,9 @@ services:
     image: hgp_caddy_img
     ports:
       - "5000:5000"
+    volumes:
+      - ./requirements/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - certs_https:/app/certs:ro
     networks:
       - hgp_network
     restart: unless-stopped

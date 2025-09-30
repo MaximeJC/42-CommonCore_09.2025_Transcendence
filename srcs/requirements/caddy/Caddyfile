@@ -1,6 +1,7 @@
-localhost:5000 {
-    # Certificat auto-signé pour localhost
-    tls internal
+# Configuration pour toutes les interfaces avec vos certificats personnalisés
+:5000 {
+    # Utiliser vos certificats existants au lieu de ceux de Caddy
+    tls /app/certs/hgp_https.crt /app/certs/hgp_https.key
     
     # Headers de sécurité et CORS
     header {

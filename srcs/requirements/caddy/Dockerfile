@@ -1,7 +1,6 @@
 FROM caddy:2.7-alpine
 
-# Copier la configuration Caddy
-COPY Caddyfile /etc/caddy/Caddyfile
+# Le Caddyfile sera monté via volume - pas de COPY
 
 # Exposer le port 5000
 EXPOSE 5000
