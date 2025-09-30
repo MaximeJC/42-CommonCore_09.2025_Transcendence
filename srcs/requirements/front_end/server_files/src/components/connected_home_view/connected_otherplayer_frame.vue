@@ -119,7 +119,9 @@ watch(socket, (newSocket, oldSocket) => {
 		<div class="avatar+login">
 			<img v-if=playerData.avatar_url :src="playerData.avatar_url" alt="Avatar" class="avatar">
 			<img v-else  src="/images/default_avatar.png" alt="avatar" class="avatar">
-			<div title="login" class="login">{{ playerData.login }}</div>
+			<div title="login" class="login">
+				<div>{{ playerData.login }}</div>
+			</div>
 		</div>
 		<div class="stat-container">
 			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
