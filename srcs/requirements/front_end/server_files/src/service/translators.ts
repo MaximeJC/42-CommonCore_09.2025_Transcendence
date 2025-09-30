@@ -8,7 +8,9 @@ en,
 es
 }; 
 
-let currentLang: keyof typeof translations =
+//export let act_lang: string;
+
+export let currentLang: keyof typeof translations =
   (localStorage.getItem('lang') as keyof typeof translations) || 'fr'
 
 export const updateText = (): void => {

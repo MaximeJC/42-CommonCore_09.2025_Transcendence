@@ -92,7 +92,13 @@ function showWaitingScreen() {
 
 	// ------------------------------------
 
-	const cancelButton = BABYLON.GUI.Button.CreateSimpleButton("cancelButton", "ANNULER");
+	const cancelButton = BABYLON.GUI.Button.CreateSimpleButton("cancelButton");
+	if (gameState.language == 'fr')
+		cancelButton.textBlock.text = "Annuler";
+	else if (gameState.language == 'es')
+		cancelButton.textBlock.text = "Cancelar";
+	else
+		cancelButton.textBlock.text = "Cancel";
 	cancelButton.width = "200px";
 	cancelButton.height = "50px";
 	cancelButton.color = "#dd0aba";

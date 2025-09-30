@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
-import { setLanguage, updateText } from '../../service/translators';
+import { setLanguage, updateText, currentLang } from '../../service/translators';
 import { user } from '../../user';
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
@@ -102,7 +102,7 @@ function handleStartGame() {
 		opponentPseudo: props.opponentLogin || "", // Laisser vide pour un match public
 		avatarUrl: currentUser.value?.avatar_url ?? "",
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
-		language: "fr" //en, fr, es
+		language: currentLang //en, fr, es
 	};
 
 	if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {

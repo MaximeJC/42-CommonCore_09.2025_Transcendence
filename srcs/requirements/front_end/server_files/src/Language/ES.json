@@ -32,7 +32,7 @@
 	},
 	"home_player_button": {
 		"play": "JUGAR",
-		"leaderboard": "Clasificacion",
+		"Leaderboard": "Clasificacion",
 		"historic": "Historial",
 		"social": "Social",
 		"return": "Volver",

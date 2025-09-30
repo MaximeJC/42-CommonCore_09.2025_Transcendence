@@ -95,7 +95,7 @@ watch(socket, (newSocket, oldSocket) => {
 
 <template>
 	<div ref="rootElement" title="leaderbord frame" class="leaderboard-container">
-		<div class="title-leaderbord" data-i18n="home_player_button.Leaderbord"></div>
+		<div class="title-leaderbord" data-i18n="home_player_button.Leaderboard"></div>
 		<div title="leaderbord-header" class="grid-header">
 			<div class="sub1" data-i18n="player_stat.rank"></div>
 			<div class="sub1">Login</div>

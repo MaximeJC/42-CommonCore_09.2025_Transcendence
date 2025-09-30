@@ -32,7 +32,7 @@
 	},
 	"home_player_button": {
 		"play": "PLAY",
-		"leaderboard": "Leaderboard",
+		"Leaderboard": "Leaderboard",
 		"historic": "History",
 		"social": "Social",
 		"return": "Return",
