@@ -1,4 +1,5 @@
 // js/playerManager.js
+import * as BABYLON from '@babylonjs/core';
 
 import { createPlayer } from './gameObjects.js';
 import { limitUp2v2, limitDown2v2, limitUp4v4, limitDown4v4 } from './config.js';

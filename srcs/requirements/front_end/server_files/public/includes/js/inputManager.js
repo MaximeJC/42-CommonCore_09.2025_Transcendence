@@ -1,4 +1,5 @@
 // js/inputManager.js
+import * as BABYLON from '@babylonjs/core';
 
 export const inputMap = {};
 

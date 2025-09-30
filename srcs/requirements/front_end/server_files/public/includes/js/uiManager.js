@@ -2,15 +2,14 @@
 
 import { create3DButton, createTextBox } from './gameObjects.js';
 import { returnToLobby } from './app.js';
+import * as BABYLON from '@babylonjs/core';
+import * as GUI from '@babylonjs/gui';
 
-/* Cree la modale "VS" mais la laisse cachee.
- * @param {BABYLON.GUI.AdvancedDynamicTexture} guiTexture - La texture sur laquelle dessiner.
- * @param {object} gameState - L'etat du jeu.
- */
+
 function createVSModal(guiTexture, gameState) {
 
 	// Conteneur principal (le fond)
-	const vsContainer = new BABYLON.GUI.Rectangle("vsContainer");
+	const vsContainer = new GUI.Rectangle("vsContainer");
 	vsContainer.width = "55%";
 	vsContainer.adaptHeightToChildren = true;
 	vsContainer.cornerRadius = 20;
@@ -26,20 +25,20 @@ function createVSModal(guiTexture, gameState) {
 
 	// FONCTION D'AIDE POUR CREER UN PANNEAU JOUEUR (AVATAR + PSEUDO) 
 	const createPlayerPanel = (name) => {
-		const panel = new BABYLON.GUI.StackPanel(name + "_panel");
+		const panel = new GUI.StackPanel(name + "_panel");
 		panel.isVertical = true;
 
-		const avatarContainer = new BABYLON.GUI.Ellipse(name + "_avatar_container");
+		const avatarContainer = new GUI.Ellipse(name + "_avatar_container");
 		avatarContainer.width = "120px";
 		avatarContainer.height = "120px";
 		avatarContainer.thickness = 0;
 		avatarContainer.color = "white";
 		panel.addControl(avatarContainer);
 
-		const avatarImage = new BABYLON.GUI.Image(name + "_avatar_img", "includes/img/default_avatar.png");
+		const avatarImage = new GUI.Image(name + "_avatar_img", "includes/img/default_avatar.png");
 		avatarContainer.addControl(avatarImage);
 
-		const pseudoText = new BABYLON.GUI.TextBlock(name + "_pseudo", "");
+		const pseudoText = new GUI.TextBlock(name + "_pseudo", "");
 		pseudoText.color = "white";
 		pseudoText.fontSize = 40;
 		pseudoText.fontWeight = "bold";
@@ -53,7 +52,7 @@ function createVSModal(guiTexture, gameState) {
 	// ==========================================================
 	//  MISE EN PAGE 1 : GRILLE POUR LE 1v1
 	// ==========================================================
-	const grid1v1 = new BABYLON.GUI.Grid("vsGrid1v1");
+	const grid1v1 = new GUI.Grid("vsGrid1v1");
 	grid1v1.addRowDefinition(1.0); // Une seule ligne pour un centrage vertical parfait
 	grid1v1.addColumnDefinition(0.45);
 	grid1v1.addColumnDefinition(0.20);
@@ -63,7 +62,7 @@ function createVSModal(guiTexture, gameState) {
 
 	const p1 = createPlayerPanel("vsP_1v1_L");
 	const p2 = createPlayerPanel("vsP_1v1_R");
-	const vsText1v1 = new BABYLON.GUI.TextBlock("vsText1v1", "VS");
+	const vsText1v1 = new GUI.TextBlock("vsText1v1", "VS");
 	vsText1v1.color = "#e251ca";
 	vsText1v1.fontSize = 40;
 	vsText1v1.fontWeight = "bold";
@@ -75,7 +74,7 @@ function createVSModal(guiTexture, gameState) {
 	// ==========================================================
 	//  MISE EN PAGE 2 : GRILLE POUR LE 2v2 (HAUT/BAS)
 	// ==========================================================
-	const grid2v2 = new BABYLON.GUI.Grid("vsGrid2v2");
+	const grid2v2 = new GUI.Grid("vsGrid2v2");
 	// On revient a une grille a 3 lignes pour un placement simple et fiable
 	grid2v2.addRowDefinition(0.45); // Ligne du haut
 	grid2v2.addRowDefinition(0.10); // Ligne du milieu pour le VS
@@ -90,7 +89,7 @@ function createVSModal(guiTexture, gameState) {
 	const p_lb = createPlayerPanel("vsP_2v2_LB");
 	const p_rt = createPlayerPanel("vsP_2v2_RT");
 	const p_rb = createPlayerPanel("vsP_2v2_RB");
-	const vsText2v2 = new BABYLON.GUI.TextBlock("vsText2v2", "VS");
+	const vsText2v2 = new GUI.TextBlock("vsText2v2", "VS");
 	vsText2v2.color = "#e251ca";
 	vsText2v2.fontSize = 40;
 	vsText2v2.fontWeight = "bold";
@@ -134,7 +133,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	//#region----------------------------------------GUI-jeu-----------------------------------------
 
 	//Creation de l'interface GUI
-	const guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+	const guiTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 	gameState.ui.guiTexture = guiTexture;
 
 	// --- ELEMENTS DU GUI POSITIONNES AVEC ANCRAGE ET POURCENTAGES ---
@@ -278,7 +277,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	returnButton.mesh.isVisible = false; // Important: il est cache au debut
 	gameState.ui.returnButton = returnButton;
 
-	const exitButton = BABYLON.GUI.Button.CreateSimpleButton("exitBtn", "X");
+	const exitButton = GUI.Button.CreateSimpleButton("exitBtn", "X");
 	exitButton.width = "40px";
 	exitButton.height = "40px";
 	exitButton.color = "white";
@@ -289,8 +288,8 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	// exitButton.fontFamily = "Courier New, monospace";
 	
 	// Positionnement en haut a droite de l'ecran
-	exitButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-	exitButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+	exitButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+	exitButton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 	exitButton.left = "-20px"; // Marge par rapport a la droite
 	exitButton.top = "20px";   // Marge par rapport au haut
 	

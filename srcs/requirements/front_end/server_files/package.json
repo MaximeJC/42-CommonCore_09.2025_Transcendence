@@ -17,6 +17,10 @@
     "prod": "npm run build && npm start"
   },
   "dependencies": {
+    "@babylonjs/core": "^8.29.0",
+    "@babylonjs/gui": "^8.29.0",
+    "@babylonjs/loaders": "^8.29.0",
+    "@babylonjs/materials": "^8.29.0",
     "@fastify/websocket": "^11.2.0",
     "axios": "^1.12.2",
     "dotenv": "^17.2.2",
