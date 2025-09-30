@@ -1,34 +1,38 @@
 {
+	"lang":{
+		"act": "es"
+	},
+
 	"header": {
 	  "signUp": "Registro",
-	  "signOut": "CERRAR SESIÓN",
+	  "signOut": "CERRAR SESION",
 	  "language": "ES",
 	  "icon_lang": "/images/flag/Espana.png"
 	},
 	"home": {
-	  "connection": "Conexión"
+	  "connection": "Conexion"
 	},
 	"Signup":{
 		"login": "Usuario",
-		"password": "Contraseña",
-		"conf_password": "Confirmación de la contraseña",
+		"password": "Contrasena",
+		"conf_password": "Confirmacion de la contrasena",
 		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
-		"mail_error": "Correo electrónico no válido.",
-		"login_used_error": "El nombre de usuario ya está en uso",
-		"mail_used_error": "El correo electrónico ya está en uso.",
-		"password_error": "Condiciones de la contraseña.",
-		"password_invalid": "Contraseña incorrecta.",
-		"conf_password_error": "Las dos contraseñas no son idénticas.",
+		"mail_error": "Correo electronico no valido.",
+		"login_used_error": "El nombre de usuario ya esta en uso",
+		"mail_used_error": "El correo electronico ya esta en uso.",
+		"password_error": "Condiciones de la contrasena.",
+		"password_invalid": "Contrasena incorrecta.",
+		"conf_password_error": "Las dos contrasenas no son identicas.",
 		"submit": "ENVIAR"
 	},
 	"player_stat": {
- 	   "nbr_games": "Partidas",
- 	   "nbr_victory": "Victorias",
- 	   "rank": "Rango"
+	   "nbr_games": "Partidas",
+	   "nbr_victory": "Victorias",
+	   "rank": "Rango"
 	},
 	"home_player_button": {
 		"play": "JUGAR",
-		"leaderboard": "Clasificación",
+		"leaderboard": "Clasificacion",
 		"historic": "Historial",
 		"social": "Social",
 		"return": "Volver",
@@ -37,74 +41,74 @@
 	},
 	"friendlist":{
 		"friendlist": "Lista de amigos",
-		"addfriends": "Añadir amigos"
+		"addfriends": "Anadir amigos"
 	},
 	"historic":{
-	    "historic": "Historial",
-	    "victory": "Victoria",
-	    "login": "Usuario",
-	    "my_score": "Mi puntuación",
-	    "time": "Fecha",
-	    "o_score": "Puntuación adv.",
-	    "o_login": "Adversario"
+		"historic": "Historial",
+		"victory": "Victoria",
+		"login": "Usuario",
+		"my_score": "Mi puntuacion",
+		"time": "Fecha",
+		"o_score": "Puntuacion adv.",
+		"o_login": "Adversario"
 	},
 	"setting":{
 		"login_error": "El nombre de usuario debe tener entre 3 y 13 caracteres.",
-		"mail_error": "Correo electrónico no válido.",
-		"login_used_error": "El nombre de usuario ya está en uso.",
-		"mail_used_error": "El correo electrónico ya está en uso.",
-		"password_error": "Condiciones de la contraseña.",
-		"password_invalid": "Contraseña incorrecta.",
-		"conf_password_error": "Las dos contraseñas no son idénticas.",
-		"file_error": "Fuente no válida",
+		"mail_error": "Correo electronico no valido.",
+		"login_used_error": "El nombre de usuario ya esta en uso.",
+		"mail_used_error": "El correo electronico ya esta en uso.",
+		"password_error": "Condiciones de la contrasena.",
+		"password_invalid": "Contrasena incorrecta.",
+		"conf_password_error": "Las dos contrasenas no son identicas.",
+		"file_error": "Fuente no valida",
 		"profile": "Perfil",
 		"setting": "Ajustes",
 		"avatar": "Cambiar mi Avatar",
 		"login": "Cambiar mi Nombre de usuario",
-		"mail": "Cambiar mi Correo electrónico",
-		"old_password": "Contraseña actual",
-		"password": "Cambiar mi Contraseña",
+		"mail": "Cambiar mi Correo electronico",
+		"old_password": "Contrasena actual",
+		"password": "Cambiar mi Contrasena",
 		"about": "Acerca de",
 		"contact": "Contacto",
 		"teams": "Nuestro Equipo"
 	},
 	"play":{
-    	"local_play": "Juego local",
-    	"online_play": "Juego en línea",
-    	"VS_ia": "Jugador vs IA",
-    	"VS_player": "Jugador vs Jugador",
-    	"2_VS_2": "Dos contra Dos",
-    	"tournament": "Torneo",
+		"local_play": "Juego local",
+		"online_play": "Juego en linea",
+		"VS_ia": "Jugador vs IA",
+		"VS_player": "Jugador vs Jugador",
+		"2_VS_2": "Dos contra Dos",
+		"tournament": "Torneo",
 		"4_players": "4 Juga-\ndores",
 		"8_players": "8 Juga-\ndores"
 	},
 	"invit":{
-    	"accept": "Aceptar",
-    	"refuse": "Rechazar",
+		"accept": "Aceptar",
+		"refuse": "Rechazar",
 		"cancel": "Cancelar"
 	},
 	"victory":{
- 	   "text": "Victoria de"
+	   "text": "Victoria de"
 	},
 	"tournament":{
-	    "player 1": "Jugador 1",
-	    "player 2": "Jugador 2",
-	    "player 3": "Jugador 3",
-	    "player 4": "Jugador 4",
-	    "player 5": "Jugador 5",
-	    "player 6": "Jugador 6",
-	    "player 7": "Jugador 7",
-	    "player 8": "Jugador 8",
-	    "quart final": "Cuartos de Final",
-	    "semi final": "Semifinal",
-	    "final": "Final",
-	    "start": "Comenzar",
-	    "first_match": "Partido 1",
-	    "seconde_match": "Partido 2",
-	    "third_match": "Partido 3",
-	    "fourth_match": "Partido 4"
+		"player 1": "Jugador 1",
+		"player 2": "Jugador 2",
+		"player 3": "Jugador 3",
+		"player 4": "Jugador 4",
+		"player 5": "Jugador 5",
+		"player 6": "Jugador 6",
+		"player 7": "Jugador 7",
+		"player 8": "Jugador 8",
+		"quart final": "Cuartos de Final",
+		"semi final": "Semifinal",
+		"final": "Final",
+		"start": "Comenzar",
+		"first_match": "Partido 1",
+		"seconde_match": "Partido 2",
+		"third_match": "Partido 3",
+		"fourth_match": "Partido 4"
 	},
 	"contact":{
-		"text": "No sabía qué poner aquí, así que puse un conejo."
+		"text": "No sabia que poner aqui, asi que puse un conejo."
 	}
 }

@@ -1,4 +1,8 @@
 {
+	"lang":{
+		"act": "fr"
+	},
+
 	"header": {
 	  "signUp": "INSCRIPTION",
 	  "signOut": "DÉCONNEXION",
