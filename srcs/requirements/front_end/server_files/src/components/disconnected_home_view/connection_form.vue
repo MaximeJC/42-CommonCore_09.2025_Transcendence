@@ -5,6 +5,13 @@ import { ref, reactive, onMounted } from 'vue'; // fonction ref = cree une refer
 
 import { user } from '../../user';
 import type { User } from '../../user';
+
+const VITE_42_CLIENT_ID = import.meta.env.VITE_42_CLIENT_ID;
+const VITE_42_REDIRECT_URI = import.meta.env.VITE_42_REDIRECT_URI;
+
+// Construire l'URL d'autorisation
+const authUrl42 = `https://api.intra.42.fr/oauth/authorize?client_id=${VITE_42_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_42_REDIRECT_URI)}&response_type=code&scope=public`;
+
 const { setUser } = user();
 // axios.defaults.withCredentials = true;
 
@@ -46,19 +53,13 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			}
 			const data: ServerResponse = await result.json(); // conversion de resultat en objet javascript data de type ServerResponse
 			
-			console.log("*****************************************");
-			console.log("Test data:");
-			console.log(data.success, data);
-			console.log("*****************************************");
 			if (result.ok) { 
-			message.value = `Welcome ${data.user?.login}!`
-			console.log(message.value, "*******************");
+				message.value = `Welcome ${data.user?.login}!`
 			if (data.user)
 				setUser(data.user);
 			emit('isconnected'); // emission de l'evenement de connexion reussie
 		} else {
 			message.value = data.message || "Connexion error";
-			console.log(message.value, "2*******************");
 			if (data.field === 'email') { 
 				error_email.value = true;
 			} else if (data.field === 'password') {
@@ -92,21 +93,21 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		<div class="connectionTitle" title="connection_title" data-i18n="home.connection"></div>
 		<form @submit.prevent="handleConnection">
 			<label class="c-subTitle">Email</label>
-			<input class="c-input" type="email" id="email" v-model="email" required>
+			<input class="c-input" type="email" id="email" autocomplete="email" v-model="email" required>
 			<div class="c-error"  title="mail-error">
 				<div v-show="error_email"  data-i18n="Signup.mail_error"></div>
 			</div>
 			<label class="c-subTitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
-			<input class="c-input" type="password" id="password" v-model="password" required>
+			<input class="c-input" type="password" id="password" autocomplete="current-password" v-model="password" required>
 			<div  title="pasword-error" class="c-error"  >
 				<div v-show=" error_password" data-i18n="Signup.password_invalid"></div>
 			</div>
-			<div title="c-line_button" class="c-line-button">
-				<div class="c-icon-button">
-					<button title="c-ft-signup" class="c-ft-button"></button>
-				</div>
+			<div title="c-line_button" class="c-line-button"> 
+				<a :href="authUrl42" class="c-icon-button">
+					<button type="button" title="c-ft-signup" class="c-ft-button"></button>
+				</a>
 				<button  type="submit" title="Submit-button" class="c-Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>

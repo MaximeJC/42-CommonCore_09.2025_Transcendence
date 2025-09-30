@@ -30,6 +30,7 @@ db.serialize(()=>{
 				rank INTEGER DEFAULT 0 NOT NULL,
 
 				avatar_url TEXT,
+				login_42 TEXT UNIQUE,
 				level INTEGER DEFAULT 0 NOT NULL,
 				CHECK (level IN (0, 1))
 			)`);
@@ -37,21 +38,21 @@ db.serialize(()=>{
 	db.run(`CREATE TABLE IF NOT EXISTS games (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				game_id TEXT UNIQUE NOT NULL,
-				login_winner TEXT NOT NULL,
-				login_loser TEXT NOT NULL,
+				id_winner INTEGER NOT NULL,
+				id_loser INTEGER NOT NULL,
 				score_winner INTEGER NOT NULL,
 				score_loser INTEGER NOT NULL,
 				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-				FOREIGN KEY (login_winner) REFERENCES users(login) ON DELETE CASCADE,
-				FOREIGN KEY (login_loser) REFERENCES users(login) ON DELETE CASCADE
+				FOREIGN KEY (id_winner) REFERENCES users(id) ON DELETE CASCADE,
+				FOREIGN KEY (id_loser) REFERENCES users(id) ON DELETE CASCADE
 			)`);
 
 	db.run(`CREATE TABLE IF NOT EXISTS friends (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				login1 TEXT NOT NULL,
-				login2 TEXT NOT NULL,
-				FOREIGN KEY (login1) REFERENCES users(login) ON DELETE CASCADE,
-				FOREIGN KEY (login2) REFERENCES users(login) ON DELETE CASCADE
+				id_1 INTEGER NOT NULL,
+				id_2 INTEGER NOT NULL,
+				FOREIGN KEY (id_1) REFERENCES users(id) ON DELETE CASCADE,
+				FOREIGN KEY (id_2) REFERENCES users(id) ON DELETE CASCADE
 			)`);
 });
 
@@ -66,7 +67,7 @@ db.serialize(()=>{
 						nb_games = nb_games + 1,
 						nb_won_games = nb_won_games + 1,
 						winning_ratio = (nb_won_games + 1.0) / (nb_games + 1.0)
-					WHERE login = NEW.login_winner;
+					WHERE id = NEW.id_winner;
 				END;
 			`);
 	db.run(` CREATE TRIGGER IF NOT EXISTS update_loser_stat
@@ -78,20 +79,20 @@ db.serialize(()=>{
 						nb_games = nb_games + 1,
 						nb_lost_games = nb_lost_games + 1,
 						winning_ratio = (nb_won_games * 1.0) / (nb_games + 1.0)
-					WHERE login = NEW.login_loser;
+					WHERE id = NEW.id_loser;
 				END;
 			`);
 });
 
 export async function getUserByEmail(email) {
-	db = await open({
+	const db = await open({
 			filename: dbPath,
 			driver: sqlite3.Database,
-		});
-		console.log('Base de données ouverte');
+		});	
+		console.log('Base de donnees ouverte');
 	try {
 		const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
-		console.log('UserMail trouvé en base:', user);
+		console.log('UserMail trouve en base:', user);
 		return (user);
 	} catch (err) {
 		console.error('Erreur dans getUserByEmail:', err);
@@ -100,14 +101,14 @@ export async function getUserByEmail(email) {
 }
 
 export async function getUserByLogin(login) {
-	db = await open({
+	const db = await open({
 			filename: dbPath,
 			driver: sqlite3.Database,
 		});
-		console.log('Base de données ouverte');
+		console.log('Base de donnees ouverte');
 	try {
-		const user = db.get("SELECT * FROM users WHERE login = ?", [login]);
-		console.log('login trouvé en base:', user);
+		const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
+		console.log('login trouve en base:', user);
 		return (user);
 	} catch (err) {
 		console.error('Erreur dans getUserByLogin:', err);

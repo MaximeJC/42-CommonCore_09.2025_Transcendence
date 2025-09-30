@@ -118,7 +118,7 @@ watch(socket, (newSocket, oldSocket) => {
 	<div  tittle="connected_player_frame" class="connected_player_frame">
 		<div class="avatar+login">
 			<img v-if=playerData.avatar_url :src="playerData.avatar_url" alt="Avatar" class="avatar">
-			<img v-else  src="/public/images/default_avatar.png" alt="avatar" class="avatar">
+			<img v-else  src="/images/default_avatar.png" alt="avatar" class="avatar">
 			<div title="login" class="login">{{ playerData.login }}</div>
 		</div>
 		<div class="stat-container">

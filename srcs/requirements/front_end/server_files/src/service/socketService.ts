@@ -14,7 +14,7 @@ function connectSocket(userLogin: string) {
 	const newSocket = new WebSocket(SOCKET_URL);
 
 	newSocket.addEventListener('open', () => {
-		console.log('Connecte au serveur WebSocket !');
+		// console.log('Connecte au serveur WebSocket !');
 		socket.value = newSocket;
 
 		const registerMessage = {
@@ -25,7 +25,7 @@ function connectSocket(userLogin: string) {
 	});
 
 	newSocket.addEventListener('close', () => {
-		console.log('Deconnecte du serveur WebSocket.');
+		// console.log('Deconnecte du serveur WebSocket.');
 		socket.value = null;
 	});
 

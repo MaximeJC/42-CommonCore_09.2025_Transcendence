@@ -10,34 +10,24 @@ CERT_FILE = srcs/certs/hgp_https.crt
 all: up
 
 # Développement - arrete la prod si necessaire et lance la dev
-dev: mkdir certs 
+dev: mkdir 
 	@echo "Switching to DEVELOPMENT mode..."
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+#2>&1 | tee dev.log
 
 # Production - arrete la dev si necessaire et lance la prod
-prod: mkdir certs 
+prod: mkdir
 	@echo "Switching to PRODUCTION mode..."
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services..."
-	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
+#2>&1 | tee prod.log
 
-certs:
-	@if [ ! -f "$(CERT_FILE)" ]; then \
-		echo "Generating self-signed certificates..."; \
-		mkdir -p srcs/certs; \
-		openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-			-keyout srcs/certs/hgp_https.key \
-			-out srcs/certs/hgp_https.crt \
-			-subj "/CN=hgp.local"; \
-	else \
-		echo "Certificates already exist. Skipping generation."; \
-	fi
-
-up: mkdir certs 
+up: mkdir 
 	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
@@ -60,7 +50,7 @@ clean:
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
 	@echo "Removing certificates..."
-	@rm -rf srcs/certs
+# 	@rm -rf srcs/certs
 
 # Full cleanup: containers, volumes, networks, and images
 fclean: clean
@@ -79,7 +69,7 @@ ps:
 
 mkdir:
 	cd ${HOME} && mkdir -p hgp_data
-	cd ${HOME}/hgp_data && mkdir -p database avatars
+	cd ${HOME}/hgp_data && mkdir -p database avatars certs
 
 # a utilise avec precaution
 space:

@@ -46,16 +46,7 @@ const friends = ref<Friend[]>([]);
 
 async function fetchFriends(currentUserLogin: string) {
 	try {
-		// const current = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-		// 	method: 'GET',
-		// 	credentials: 'include'
-		// });
-		// if (!current.ok)
-		// 	throw new Error(`Erreur http: ${current.status}`);
-		// const currentUser = await current.json();
-		// const currentUserLogin = currentUser.user.login;
-
-		console.log("fetchFriends: currentUserLogin =", currentUserLogin);
+		// console.log("fetchFriends: currentUserLogin =", currentUserLogin);
 
 		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/me?login_current=${encodeURIComponent(currentUserLogin)}`, {
 			method: 'GET',
@@ -207,19 +198,6 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 
 </script>
 
-// const friends: Friend[] = [
-// 	{ name: "Micka", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Louise", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Maxime", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Axel", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Nico", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Thomas", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Anas", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Arthur", avatar_src: "/images/default_avatar.png", isconnected: true},
-// 	{ name: "Dorina", avatar_src: "/images/default_avatar.png", isconnected: false},
-// 	{ name: "Wictor", avatar_src: "/images/default_avatar.png", isconnected: true},
-// ]
-
 <template>
 	<div ref="rootElement" title="friend-list-container" class="friend-list-container">
 		<div class="title-leaderbord" data-i18n="friendlist.friendlist"></div>
@@ -233,7 +211,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 				<li class="friend">
 					<button @click="showOtherPlayer(friend.name)" class="avatar_button">
 						<img v-if=friend.avatar_src class="friend-avatar" :src="friend.avatar_src" alt="avatar">
-						<img v-else class="friend-avatar" src="/public/images/default_avatar.png" alt="avatar">
+						<img v-else class="friend-avatar" src="/images/default_avatar.png" alt="avatar">
 					</button>
 					<button @click="showOtherPlayer(friend.name)" title="friend-button" class="friend-button">{{ friend.name }}</button>
 					<button @click="inviteFriend(friend.name, friend.isconnected)" title="inv-play-button" class="inv-play-button" :class="{'can-hover' : friend.isconnected}">

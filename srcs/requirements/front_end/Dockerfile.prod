@@ -1,5 +1,5 @@
 # Dockerfile de production
-FROM node:22-alpine AS builder
+FROM node:22.19.0-trixie-slim AS builder
 
 # On definit le repertoire de travail
 WORKDIR /app
@@ -16,9 +16,12 @@ COPY ./server_files/ .
 RUN npm run build
 
 # Stage de production
-FROM node:22-alpine AS production
+FROM node:22.19.0-trixie-slim AS production
 
 WORKDIR /app
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y npm openssl && rm -rf /var/lib/apt/lists/*
 
 # Copier les dépendances de production
 COPY ./server_files/package*.json ./
@@ -31,9 +34,15 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/public/uploads ./public/uploads
 COPY .env* ./
 
+RUN mkdir -p certs
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+	-keyout certs/hgp_https.key \
+	-out certs/hgp_https.crt \
+	-subj "/CN=hgp.local"
+
 # On expose les ports
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 5000
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production

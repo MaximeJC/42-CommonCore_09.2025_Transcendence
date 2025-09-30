@@ -22,65 +22,6 @@ const playerData = ref({
 	nb_won_games: 0,
 	rank: 0,
 });
-
-/* async function fetchPlayerData() {
-	try {
-		// const currentUserLogin = "Louise";
-		const current = await fetch(`${USER_MANAGEMENT_URL}/me`);
-		if (!current.ok)
-			throw new Error(`Erreur http: ${current.status}`);
-		const currentUser = await current.json();
-		const currentUserLogin = currentUser.user.login;
-
-		const response = await fetch(`http://${USER_MANAGEMENT_URL}/users/specificlogin?login=${currentUserLogin}`);
-		if (!response.ok)
-			throw new Error('Player data fetch error');
-
-		const data = await response.json();
-		playerData.value = {
-			login: data.login,
-			nb_games: data.nb_games,
-			nb_won_games: data.nb_won_games,
-			rank: data.rank,
-		};
-	} catch (error) {
-		console.log("Error:", error);
-	}
-}
-onMounted(()=>{ fetchPlayerData(); });
-
-async function fetchPlayerData(retries = 5, delay = 1000) {
-	try {
-		for (let i = 0; i < retries; i++) {
-			const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-				method: 'GET',
-				credentials: 'include'
-			});
-			if (response.ok) {
-				const data = await response.json();
-				// Si user est présent, on peut sortir
-				if (data.user && data.user.login) {
-					playerData.value = {
-						login: data.user.login,
-						nb_games: data.user.nb_games,
-						nb_won_games: data.user.nb_won_games,
-						rank: data.user.rank
-					};
-					return;
-				}
-			}
-			// Attendre avant de réessayer
-			await new Promise(res => setTimeout(res, delay));
-		}
-		// console.warn("User non trouvé après plusieurs tentatives.");
-		// playerData.value = null;
-	} catch (error) {
-		console.error("Erreur dans fetchPlayerData:", error);
-		// playerData.value = null;
-	}
-}
-onMounted(async()=>{ await fetchPlayerData(); }); */
-
 </script>
 
 <template>
