@@ -3,6 +3,11 @@
 	import { ref } from 'vue';
 	import LangMenu from './LanguageMenu.vue';
 	import setting from './setting_button.vue'
+	import { user } from '../../user';
+
+	const { currentUser } = user();
+
+
 	let UserCookie = ''; 
 
 	const props = defineProps<{
@@ -40,7 +45,12 @@
 	}
 
 	const handleReturnToLobby = () => {
-		const target = 'profil';
+		let target;
+		if (!currentUser.value?.login)
+			target = 'connexion';
+		else
+			target = 'profil';
+
 		window.location.hash = target.startsWith('/') ? target : '/' + target;
 	}
 

@@ -2,6 +2,8 @@
 	import { ref, onMounted, nextTick, watch } from 'vue';
 
 	import profile from '../components/setting_view/profile_setting.vue'
+	import about from '../components/setting_view/about_setting.vue'
+	import contact from '../components/setting_view/contact_setting.vue'
 	const props = defineProps<{
 			setLanguage: (lang: string) => void;
 			setting_activePage: string;
@@ -13,6 +15,8 @@
 <template>
 	<div class="s_page">
 		<profile v-show="setting_activePage == 'profil'" :setLanguage="props.setLanguage"></profile>
+		<about v-show="setting_activePage == 'about'" :setLanguage="props.setLanguage"></about>
+		<contact v-show="setting_activePage == 'contact'" :setLanguage="props.setLanguage"></contact>
 	</div>	
 </template>
 

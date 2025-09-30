@@ -94,7 +94,8 @@ function applyHashToFlags() {
 		isConnect.value = true;
 		issetting.value = true;
 		show_play.value = false;
-	handleShowPage("profil")
+		if(setting_activePage.value === "")
+			handleShowPage("profil")
 	} else if (view === 'play'|| view === 'playinvite') {
 		isConnect.value = true;
 		issetting.value = false;
@@ -158,6 +159,7 @@ const isSignup = () => {
 const handleShowPage = (pageName: string) => {
 	// garde ton fonctionnement actuel
 	setting_activePage.value = pageName;
+	//console.log(setting_activePage.value);
 	issetting.value = !!setting_activePage.value;
 	// synchro URL
 	syncFlagsToHash();

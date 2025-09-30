@@ -68,7 +68,8 @@
 		"old_password": "Mot de passe Actuel",
 		"password": "Changer mon Mot de passe",
 		"about": "À propos",
-		"contact": "contact"
+		"contact": "contact",
+		"teams": "Notre équipe"
 	},
 
 	"play":{
@@ -109,5 +110,9 @@
 		"seconde_match": "Match 2",
 		"third_match": "Match 3",
 		"fourth_match": "Match 4"
+	},
+
+	"contact":{
+		"text": "Je ne savais pas quoi mettre ici, alors j'ai mis un lapin."
 	}
 }

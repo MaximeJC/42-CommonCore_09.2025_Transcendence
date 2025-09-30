@@ -189,6 +189,7 @@ const chooseMatches = () =>{
 	font-family: netron;
 	font-weight: bold;
 	color: white;
+	text-align: center;
 	text-shadow: 
 	0 0 10px #dd0aba,
 	0 0 10px #dd0aba,
@@ -209,7 +210,8 @@ const chooseMatches = () =>{
 	grid-template-rows: 1fr 1fr 1fr 1fr;
 	grid-template-columns: 1fr;
 	gap: 1rem;
-	
+	margin-left: 1rem;
+	margin-right: 1rem;
 }
 
 .label_match{

@@ -7,6 +7,7 @@
 	const emit = defineEmits(['show_setting']);
 
 	const showSetting = (pageName: string) => {
+		console.log(pageName);
 		emit('show_setting', pageName);
 	};
 </script>
@@ -109,7 +110,6 @@
 		align-self: center;
 		background-color: rgba(251, 255, 34, 0);
 		border: none;
-		/*text-align: center;*/
 		font-size: 1.5rem;
 		color: white;
 		text-shadow: 
