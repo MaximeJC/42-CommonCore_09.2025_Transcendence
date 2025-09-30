@@ -1,4 +1,5 @@
-// js/app.js
+import * as GUI from '@babylonjs/gui';
+import * as BABYLON from '@babylonjs/core';
 
 // --- IMPORTATIONS DES MODULES ---
 import { debugVisuals, debug, JwtToken } from './config.js';
@@ -77,8 +78,8 @@ function showWaitingScreen() {
 	const camera = new BABYLON.FreeCamera("waitingCam", new BABYLON.Vector3(0, 0, -10), waitingScene);
 	waitingScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
-	const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, waitingScene);
-	const text = new BABYLON.GUI.TextBlock();
+	const ui = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, waitingScene);
+	const text = new GUI.TextBlock();
 	if (gameState.language == 'fr')
 		text.text = "Recherche d'une partie...";
 	else if (gameState.language == 'es')
@@ -92,7 +93,7 @@ function showWaitingScreen() {
 
 	// ------------------------------------
 
-	const cancelButton = BABYLON.GUI.Button.CreateSimpleButton("cancelButton", "ANNULER");
+	const cancelButton = GUI.Button.CreateSimpleButton("cancelButton", "ANNULER");
 	cancelButton.width = "200px";
 	cancelButton.height = "50px";
 	cancelButton.color = "#dd0aba";
@@ -106,8 +107,8 @@ function showWaitingScreen() {
 		cancelButton.textBlock.color = "white";
 	}
 
-	cancelButton.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-	cancelButton.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+	cancelButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+	cancelButton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 	cancelButton.top = "-50px";
 	const hoverBackgroundColor = "rgba(251, 255, 34, 0.5)";
 	const hoverBorderColor = "#fbff22";

@@ -292,7 +292,7 @@ watch(() => props.selectedPlayerLogin ?? "", (newLoginFriend) => {
 
 	.delete-friends{
 		display: block;
-		background-image:  url("../../images/trash_can.png");
+		background-image:  url("/images/trash_can.png");
 		background-size: 1.5rem;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -311,7 +311,7 @@ watch(() => props.selectedPlayerLogin ?? "", (newLoginFriend) => {
 	}
 	
 	.i-add-friends:hover{
-		background-image:  url("..//images/add_button_alt.png");
+		background-image:  url("/images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
 		box-shadow: 
@@ -323,7 +323,7 @@ watch(() => props.selectedPlayerLogin ?? "", (newLoginFriend) => {
 	}
 
 	.delete-friends:hover{
-		background-image:  url("../../../images/trash_can_yellow.png");
+		background-image:  url("/images/trash_can_yellow.png");
   		background-color: transparent;
 		border: 1px solid #dd0aba;
 		box-shadow: 

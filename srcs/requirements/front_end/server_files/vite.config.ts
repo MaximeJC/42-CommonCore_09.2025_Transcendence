@@ -19,6 +19,12 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ''),
         ws: true,
       },
+      '/game': {
+        target: 'http://hgp_game_management:3003',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/game/, ''),
+        ws: true,
+      }
     },
     host: '0.0.0.0', 
     port: 5173,

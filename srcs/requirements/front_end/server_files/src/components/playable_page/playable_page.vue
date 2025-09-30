@@ -6,9 +6,6 @@ import { user } from '../../user';
 import tournament from "./tournament_page.vue";
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
-const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
-const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
-
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
@@ -114,23 +111,11 @@ function handleStartGame() {
 	}
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 
-	(window as any).networkConfig = {
-		pongServerBaseUrl: pongServerPath,
-		aiServerBaseUrl: aiServerPath
-	};
 	startMatchmaking(gameConfig);
 }
 
 onMounted(() => {
-	const babylonScript = document.createElement("script")
-	babylonScript.src = "/includes/js/BabylonJS/babylon.js"
-	document.body.appendChild(babylonScript)
 
-	babylonScript.onload = () => {
-		const guiScript = document.createElement("script")
-		guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
-		document.body.appendChild(guiScript)
-	}
 
 	window.addEventListener('babylon-returned-to-lobby', handleReturnToLobby);
 	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));

@@ -7,26 +7,18 @@
     <title>Hell's Gate Pong</title>
 	<style>
 		body {
-		  background: url('./images/fond.png');
+		  background: url('/images/fond.png');
 		  background-size: cover;
 		  background-position: center;
 		  background-repeat: no-repeat;
 		  background-attachment: fixed;
 		}
 	  </style>
-	  <!-- officiel : https://cdn.babylonjs.com/  enregistre dans includes/js/BabylonJS/-->
-			<script src="includes/js/BabylonJS/babylon.js"></script> <!-- Importe la bibliothèque Babylon.js 
-		directement depuis un CDN. -->
-			<script src="includes/js/BabylonJS/loaders/babylonjs.loaders.min.js"></script> <!-- Ceci est une extension 
-			de Babylon.js qui permet de charger différents formats de modèles 3D comme GLB ou OBJ.-->
-		<script src="includes/js/BabylonJS/materialsLibrary/babylon.gridMaterial.min.js"></script>
-			<!-- Le script pour l'interface graphique (GUI) -->
-		<script src="includes/js/BabylonJS/gui/babylon.gui.min.js"></script>
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="./src/main.ts"></script>
 	 <div id="jeu"></div>
- 	 <script type="module" src="/includes/js/app.js"></script>
+ 	 <script type="module" src="./public/includes/js/app.js"></script>
   </body>
 </html>
