@@ -2,6 +2,13 @@
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet a Vue de suivre les changements de valeur et de maj le DOM automatiquement
 
+const VITE_42_CLIENT_ID = import.meta.env.VITE_42_CLIENT_ID;
+const VITE_42_REDIRECT_URI = import.meta.env.VITE_42_REDIRECT_URI;
+
+// Construire l'URL d'autorisation
+const authUrl42 = `https://api.intra.42.fr/oauth/authorize?client_id=${VITE_42_CLIENT_ID}&redirect_uri=${encodeURIComponent(VITE_42_REDIRECT_URI)}&response_type=code&scope=public`;
+
+
 	const props = defineProps<{ // fonction Vue pour declarer proprietes que le composant peut recevoir de son parent
 			setLanguage: (lang: string) => void; // fonction qui prend une chaine de caracteres lang en parametre et ne retourne rien
 		}>();
@@ -78,11 +85,11 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 				message.value = data.message || "An error occurred.";
 				if (data.field === 'login') {
 					error_login_used.value = true;
-					console.error("login deja utilise!");			
+					console.error("login deja utilise!");	
 
 				} else if (data.field === 'email') {
 					error_email_used.value = true;
-					console.error("email deja utilise!");			
+					console.error("email deja utilise!");
 				}
 				console.error("message.value = " + message.value);
 				return;
@@ -116,14 +123,14 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			<label class="subtitle">
 					<div data-i18n="Signup.login"></div>
 			</label>
-			<input class="input" type="login" id="login" v-model="login" required>
+			<input class="input" type="login" id="login_signup" autocomplete="off" v-model="login" required>
 			<div  title="login-error" class="error"  >
 					<div v-show="error_login" data-i18n="Signup.login_error"></div>
 					<div v-show="error_login_used" data-i18n="Signup.login_used_error"></div>
 			</div>
 
 			<label class="subtitle">Email</label>
-			<input class="input" type="email" id="email" v-model="email" required>
+			<input class="input" type="email" id="email_signup" autocomplete="off" v-model="email" required>
 			<div  title="mail-error" class="error" >
 				<div v-show="error_email" data-i18n="Signup.mail_error"></div>
 				<div v-show="error_email_used" data-i18n="Signup.mail_used_error"></div>
@@ -132,7 +139,7 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			<label class="subtitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
-			<input class="input" type="password" id="password" v-model="password" required>
+			<input class="input" type="password" id="password_signup" autocomplete="off" v-model="password" required>
 			<div title="pasword-error" class="error"  >
 				<div v-show="error_password" data-i18n="Signup.password_error"></div>
 
@@ -140,15 +147,15 @@ import { ref } from 'vue'; // fonction ref = cree une reference reactive: permet
 			<label class="subtitle">
 					<div data-i18n="Signup.conf_password"></div>
 			</label>
-			<input class="input" type="password" id="conf_password" v-model="conf_password" required>
+			<input class="input" type="password" id="conf_password" autocomplete="off" v-model="conf_password" required>
 			<div  title="conf_password-error" class="error" >
 				<div v-show="error_conf_password" data-i18n="Signup.conf_password_error"></div>
 
 			</div>
 			<div title="line_button" class="line-button">
-				<div class="icon-button">
-					<button title="ft-signup" class="ft-button"></button>
-				</div>
+				<a :href="authUrl42" class="c-icon-button">
+					<button type="button" title="ft-signup" class="ft-button"></button>
+				</a>
 				<button title="Submit-button" class="Submit-button">
 					<div data-i18n="Signup.submit"></div>
 				</button>

@@ -300,7 +300,7 @@
 				<form title="form_mail" class="set_form">
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
-						<input title="mail_input" class="set_input" type="email" id="new_email" v-model="new_email"></input>
+						<input title="mail_input" class="set_input" type="email" id="new_email" autocomplete="off" v-model="new_email"></input>
 						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div title="email-error" class="set_error"  >
@@ -327,18 +327,18 @@
 					<form class="set_form" title="form_password">
 						<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
 						<div class="set_sub_inp">
-							<input title="old_password_input" class="set_input" type="password" v-model="old_password" />
+							<input title="old_password_input" class="set_input" type="password" id="old_password" autocomplete="off" v-model="old_password" />
 						</div>
 						<div title="password-error" class="set_error"  >
 							<div v-show="error_password" data-i18n="setting.password_invalid"></div>
 						</div>
 						<label title="password_label" class="set_subtitle" data-i18n="setting.password" ></label>
 						<div class="set_sub_inp">
-							<input title="password_input" class="set_input" type="password" v-model="new_password" />
+							<input title="password_input" class="set_input" type="password" id="new_password" autocomplete="off" v-model="new_password" />
 						</div>
 						<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
 						<div class="set_sub_inp">
-							<input title="conf_password_input" class="set_input" type="password" v-model="conf_new_password" />
+							<input title="conf_password_input" class="set_input" type="password" id="repeat_new_password" autocomplete="off" v-model="conf_new_password" />
 							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
 							<div title="password-error" class="set_error"  >

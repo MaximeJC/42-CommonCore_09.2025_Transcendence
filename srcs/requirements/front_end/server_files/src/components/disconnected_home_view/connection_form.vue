@@ -93,14 +93,14 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 		<div class="connectionTitle" title="connection_title" data-i18n="home.connection"></div>
 		<form @submit.prevent="handleConnection">
 			<label class="c-subTitle">Email</label>
-			<input class="c-input" type="email" id="emailConnect" v-model="email" required>
+			<input class="c-input" type="email" id="email" autocomplete="email" v-model="email" required>
 			<div class="c-error"  title="mail-error">
 				<div v-show="error_email"  data-i18n="Signup.mail_error"></div>
 			</div>
 			<label class="c-subTitle">
 					<div data-i18n="Signup.password"></div>
 			</label>
-			<input class="c-input" type="password" id="passwordConnect" v-model="password" required>
+			<input class="c-input" type="password" id="password" autocomplete="current-password" v-model="password" required>
 			<div  title="pasword-error" class="c-error"  >
 				<div v-show=" error_password" data-i18n="Signup.password_invalid"></div>
 			</div>
