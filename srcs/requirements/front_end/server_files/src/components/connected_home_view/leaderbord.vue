@@ -12,7 +12,7 @@ const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
 
-const emit = defineEmits(['showOtherPlayer']);
+const emit = defineEmits(['showOtherPlayer', 'players', 'currentPlayerStats']);
 
 const showOtherPlayer = (loginToShow: string)=>{
 	console.log("Other player login:", loginToShow);
@@ -46,6 +46,20 @@ async function getPlayers() {
 				games: player.games,
 				victory: player.victory,
 			}));
+			
+			// Trouver les statistiques du joueur actuel
+			if (currentUser.value?.login) {
+				const currentPlayerData = players.value.find(p => p.name === currentUser.value?.login);
+				if (currentPlayerData) {
+					const currentStats: [number, string, number, number] = [
+						currentPlayerData.rank,
+						currentPlayerData.name,
+						currentPlayerData.games,
+						currentPlayerData.victory
+					];
+					emit('currentPlayerStats', currentStats);
+				}
+			}
 	} catch (error) {
 		console.log("Erreur de recuperation du classement des joueurs");
 		// const players: Player[] = [
@@ -71,6 +85,7 @@ function handleServerMessage(event: MessageEvent) {
 			console.log("Maj leaderboard_update recue via WebSocket !", data.payload);
 			if (currentUser.value?.login) {
 				getPlayers();
+				emit('players');
 			}
 		}
 	} catch (error) {
@@ -192,19 +207,7 @@ watch(socket, (newSocket, oldSocket) => {
 		0 0 40px #18c3cf;
 	}
 
-	.sub1{
-		text-align: start;
-		margin-right: 2rem;
-	}
-	.sub2{
-		text-align: end;
 
-	}
-	.stat1{
-		text-align: center;
-		font-size: 1.5rem;
-
-	}
 
 	.stat2{
 		text-align: end;

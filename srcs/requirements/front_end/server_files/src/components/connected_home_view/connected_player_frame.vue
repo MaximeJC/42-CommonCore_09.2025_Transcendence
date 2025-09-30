@@ -14,6 +14,7 @@ const { currentUser } = user();
 const props = defineProps<{
 		setLanguage: (lang: string) => void;
 		historic: boolean;
+		players: [number, string, number, number];
 }>();
 
 const playerData = ref({
@@ -34,15 +35,15 @@ const playerData = ref({
 		</div>
 		<div class="stat-container">
 			<div title="nbr-game" class="label_stat" data-i18n="player_stat.nbr_games"></div>
-			<div title="nbr_game_stat" class="stat"v-if="currentUser">{{ currentUser.nb_games }}</div>
+			<div title="nbr_game_stat" class="stat"v-if="currentUser">{{ props.players[2] }}</div>
 		</div>
 		<div class="stat-container">
 			<div title="nbr-victory" class="label_stat" data-i18n="player_stat.nbr_victory"></div>
-			<div title="nbr-victory_stat" class="stat"v-if="currentUser">{{ currentUser.nb_won_games }}</div>
+			<div title="nbr-victory_stat" class="stat"v-if="currentUser">{{ props.players[3]}}</div>
 		</div>
 		<div class="stat-container">
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
-			<div title="rank_stat" class="stat" v-if="currentUser">{{ currentUser.rank }}</div>
+			<div title="rank_stat" class="stat" v-if="currentUser">{{ props.players[0] }}</div>
 		</div>
 		<play_historic @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="!historic"></play_historic>
 		<play_return @show-historic="emit('show-historic')" @show_play="emit('show_play')" :setLanguage="props.setLanguage" v-show="historic"></play_return>

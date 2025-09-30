@@ -31,26 +31,7 @@ const props = defineProps<{
 		gap: 1rem;
 	}
 
-	.play-button{
-		width: auto;
-		height: auto;
-		font-family: netron;
-		background-color: rgba(251, 255, 34, 0.5);
-		font-size: 2rem;
-		color: white;
-		border: 2px solid #fbff22;
-		text-shadow: 
-		0 0 10px #fbff22,
-		0 0 30px #fbff22;
-		box-shadow: 
-		0 0 5px #fbff22,
-		0 0 10px #fbff22,
-		0 0 20px #fbff22;
-		padding: 0.5rem 2rem;
-		border-radius: 20px;
-		cursor: pointer;
-		transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-	}
+
 
 	.historic-button{
 		width: fit-content;

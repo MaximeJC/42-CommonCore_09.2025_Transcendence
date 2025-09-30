@@ -15,6 +15,24 @@ onMounted(async () => {
 	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
 })
 
+interface Player {
+	rank: number;
+	name: string;
+	games: number;
+	victory: number;
+}
+
+const players = ref<Player[]>([]);
+const currentPlayerStats = ref<[number, string, number, number]>([0, '', 0, 0]);
+
+const handlePlayer = (player: Player) => {
+	players.value.push(player);
+}
+
+const handleCurrentPlayerStats = (stats: [number, string, number, number]) => {
+	currentPlayerStats.value = stats;
+}
+
 const historic = ref(false);
 const other_player = ref(false);
 const selectedPlayerLogin = ref<string | null>(null);
@@ -40,6 +58,7 @@ const toggleother_player = (login: string) => {
 	<div class="page">
 		<player_frame
 		v-show="!other_player"
+			:players="currentPlayerStats"
 		    :setLanguage="props.setLanguage"
 		    :other_player="other_player"
 		    :historic="historic"
@@ -55,7 +74,13 @@ const toggleother_player = (login: string) => {
 			@showOtherPlayer="toggleother_player"
 		></otherplayer_frame>
 		<div v-if="!historic && !other_player" title="leader+friend" class="subpages">
-			<leaderbord @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></leaderbord>
+			<leaderbord 
+				@showOtherPlayer="toggleother_player" 
+				:setLanguage="props.setLanguage" 
+				@players="handlePlayer" 
+				@currentPlayerStats="handleCurrentPlayerStats"
+				:other_player="other_player">
+			</leaderbord>
 			<friendlist @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
 		</div>
 		<div v-show="historic || other_player" title="historic" class="histo-container">

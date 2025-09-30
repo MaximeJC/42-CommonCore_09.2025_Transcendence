@@ -129,25 +129,7 @@ const handleReturnToLobby = () => {
 </template>
 
 <style>
-.demi_final_container{
-	display: grid;
-	grid-template-rows: max-content;
-	grid-template-columns: 1fr;
-	justify-content: center;
-	width: max-content;
-	height: max-content;
-	gap: 1rem;
-	background-color: rgba(156, 50, 133, 0.5);
-	border: 2px solid #e251ca;
-	box-shadow: 
-	0 0 5px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba;
-	margin-top: 5rem;
-	border-radius: 20px;
-	padding: 3rem 3rem;
-}
+
 .d_f_title{
 	font-family: netron;
 	font-weight: bold;
@@ -175,83 +157,7 @@ const handleReturnToLobby = () => {
 	
 }
 
-.label_match{
-font-family: netron;
-	font-weight: bold;
-	color: white;
-	text-align: center;
-	text-shadow: 
-	0 0 10px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba ;
 
-	font-size: 1.5rem;
-}
-.player{
-	font-family: netron;
-	font-weight: bold;
-	color: white;
-	text-align: center;
-	text-shadow: 
-	0 0 10px #e4d725,
-	0 0 10px #e4d725,
-	0 0 20px #e4d725,
-	0 0 40px #e4d725;
-	font-size: 2rem;
-}
-
-.l_player{
-	font-family: netron;
-	font-weight: bold;
-	color: rgb(170, 152, 152);
-	text-align: center;
-	text-shadow: 
-	0 0 10px #41403bf6,
-	0 0 10px #41403bf6,
-	0 0 20px #41403bf6,
-	0 0 40px #41403bf6;
-	font-size: 2rem;
-}
-
-.versus{
-	font-family: netron;
-	font-weight: bold;
-	color: white;
-	text-align: center;
-
-	text-shadow: 
-	0 0 10px #0acfdd,
-	0 0 10px #0acfdd,
-	0 0 20px #0acfdd,
-	0 0 40px #0acfdd,
-	0 0 80px #0acfdd,
-	0 0 120px #0acfdd;
-	font-size: 1.5rem;
-}
-
-.match_button{
-	font-family: netron;
-	background-color: rgba(251, 255, 34, 0.502);
-	font-size: 2rem;
-	text-align: center;
-	justify-self: center;
-	width: 15rem;
-	color: white;
-	border: 2px solid #caece8;
-	text-shadow: 
-	0 0 10px #fbff22,
-	0 0 20px #fbff22;
-	box-shadow: 
-	0 0 5px #fbff22,
-	0 0 10px #fbff22,
-	0 0 20px #fbff22;
-	padding: 1rem 1.3rem;
-	border-radius: 20px;
-	margin-top: 1rem;
-	cursor: pointer;
-	justify-content: center;
-	transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-}
 
 .match_button > div{
 	font-weight:bold;
@@ -274,23 +180,5 @@ font-family: netron;
 	0 0 40px #dd0aba;
 }
 
-.victory_container{
-	display: grid;
-	grid-template-rows: max-content;
-	grid-template-columns: 1fr;
-	justify-content: center;
-	width: max-content;
-	height: max-content;
-	gap: 1rem;
-	background-color: rgba(156, 50, 133, 0.5);
-	border: 2px solid #e251ca;
-	box-shadow: 
-	0 0 5px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba;
-	margin-top: 5rem;
-	border-radius: 20px;
-	padding: 3rem 3rem;
-}
+
 </style>

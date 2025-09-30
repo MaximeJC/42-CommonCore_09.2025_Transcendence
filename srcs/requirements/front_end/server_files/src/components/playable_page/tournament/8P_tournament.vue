@@ -127,33 +127,6 @@ const playBox = ref<HTMLElement | null>(null);
 	margin-top: 1rem
 }
 
-.player_title {
-    display: grid;
-    gap: 0.5rem;
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr;
-	margin-left: 1rem;
-    font-family: netron;
-    font-weight: bold;
-    color: white;
-    text-shadow: 
-    0 0 10px #dd0aba,
-    0 0 10px #dd0aba,
-    0 0 20px #dd0aba;
-    font-size: 1.5rem;
-    margin-top: 1rem;
-    
-    justify-items: center; 
-
-    align-items: center; 
-}
-.player_title > input{
-	width: 10rem;
-	font-size: 1.8rem;
-	border-radius: 20px;
-	border: none;
-}
-
 .player1{
 	font-size: 1.8rem;
 	 color: 18c3cf;
@@ -161,50 +134,5 @@ const playBox = ref<HTMLElement | null>(null);
     0 0 10px #18c3cf,
     0 0 10px #18c3cf,
     0 0 20px #18c3cf;
-}
-
-.t_Submit-button{
-	font-family: netron;
-	background-color: rgba(251, 255, 34, 0.502);
-	font-size: 2rem;
-	text-align: center;
-	justify-self: center;
-	width: 15rem;
-	color: white;
-	border: 2px solid #caece8;
-	text-shadow: 
-	0 0 10px #fbff22,
-	0 0 20px #fbff22;
-	box-shadow: 
-	0 0 5px #fbff22,
-	0 0 10px #fbff22,
-	0 0 20px #fbff22;
-	padding: 0.2rem 1.3rem;
-	border-radius: 20px;
-	cursor: pointer;
-	transition:  background-color 0.3s ease, box-shadow 0.3s ease-in-out, text-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
-}
-
-.t_Submit-button > div{
-	margin-top:  1rem;
-	margin-bottom:  0.5rem;
-}
-
-.T_Submit-button:hover{
-	background-color: #dd0abacc ;
-
-	border: 2px solid #dd0aba;
-	box-shadow: 
-	0 0 5px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba,
-	0 0 80px #dd0aba;
-	text-shadow: 
-	0 0 5px #dd0aba,
-	0 0 10px #dd0aba,
-	0 0 20px #dd0aba,
-	0 0 40px #dd0aba,
-	0 0 80px #dd0aba;
 }
 </style>

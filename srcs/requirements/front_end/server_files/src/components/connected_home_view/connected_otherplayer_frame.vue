@@ -145,21 +145,7 @@ watch(socket, (newSocket, oldSocket) => {
 	src: url("/fonts/netron.regular.woff2") format("woff2");
 	}
 
-	.connected_player_frame{
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 51rem;
-		background-color: rgba(156, 50, 133, 0.5);
-		border: 2px solid #e251ca;
-		box-shadow: 
-		0 0 5px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba;
-		padding: 1rem 2rem;
-		border-radius: 20px;
-	}
+
 
 	.avatar\+login{
 		display: flex;
@@ -167,73 +153,7 @@ watch(socket, (newSocket, oldSocket) => {
 		margin-right: 1rem;
 	}
 	
-	.avatar{
-		width: 6.5rem;
-		height: 6.5rem;
-		border-radius: 50%;
-		border:3px solid #ffffff;
-		box-shadow: 
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba;
-	}
 
-	.login{
-		display: flex;
-		align-self: center;
-		justify-content: center;
-		font-family: netron;
-		font-weight: bold;
-		color: white;
-		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
-		font-size: 1.5rem;
-		margin-top: 1rem;
-	}
-
-	.stat-container{
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 0px 1rem;
-	}
-
-	.label_stat{
-		font-family: netron;
-		color: white;
-		font-weight: bold;
-		text-shadow: 
-		0 0 10px #18c3cf, 
-		0 0 20px #18c3cf;
-		font-size: 1.5rem;
-		font-family: netron;
-		color: white;
-		margin-bottom: 1rem;
-	}
-
-	.stat{
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-family: netron;
-		width: 5rem;
-		height: 5rem;;
-		border-radius: 50%;
-		font-size: 2.3rem;
-		font-weight: bold;
-		border: 5px solid #fffffd;
-		color: white;
-		box-shadow: 
-		0 0 10px #dd0aba,
-		0 0 30px #dd0aba;
-		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba;
-	}
 
 	
 </style>

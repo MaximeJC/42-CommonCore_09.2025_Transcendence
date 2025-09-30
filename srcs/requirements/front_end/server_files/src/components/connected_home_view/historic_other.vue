@@ -102,23 +102,7 @@ watch(()=>props.playerLogin, (newLogin)=>{
 </template>
 
 <style>
-	.title{
-		display: block;
-		font-family: netron;
-		font-weight: bold;
-		color: white;
-		text-shadow: 
-		0 0 10px #dd0aba,
-		0 0 10px #dd0aba,
-		0 0 20px #dd0aba,
-		0 0 40px #dd0aba,
-		0 0 80px #ff69b4,
-		0 0 120px #dd0aba;
-		font-size: 2rem;
-		align-self: center;
-		margin-bottom: 0.5rem;
-		text-align: center;
-	}
+
 
 	.historic-container > div:not(.title) {
 		color: white;
@@ -129,11 +113,7 @@ watch(()=>props.playerLogin, (newLogin)=>{
 		0 0 20px #dd0aba;
 	}
 
-	.list-container{
-		overflow: auto;	
-		border-bottom: 1px solid #ddd;
-		scrollbar-color: #dd0aba transparent;
-	}
+
 
 	.h-grid-row, .h-grid-header{
 		display: grid;
@@ -156,18 +136,5 @@ watch(()=>props.playerLogin, (newLogin)=>{
 		padding: 0.4rem;
 	}
 
-	.v-icon{
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	
-	.h-v-icon{
-		width: 1.5rem;
-		height: 1.5rem;
-	}
-	.h-d-icon{
-		width: 2rem;
-		height: 2rem;
-	}
+
 </style>
