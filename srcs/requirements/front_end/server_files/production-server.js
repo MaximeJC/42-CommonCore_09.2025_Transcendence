@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT_HTTP = 8080;
+const PORT_HTTP = 5173;
 const PORT_HTTPS = 5000;
 
 // Servir les fichiers statiques depuis le dossier dist
@@ -66,7 +66,8 @@ const gameProxy = createProxyMiddleware({
 	changeOrigin: true,
 	pathRewrite: { '^/game': '' },
 	ws: true,
-	agent: agent,
+	// agent: agent,
+	// secure: false, 
 	onError: (err, req, res) => {
 		console.error('Game Management Proxy error:', err);
 		if (res && !res.headersSent) {
@@ -77,7 +78,7 @@ const gameProxy = createProxyMiddleware({
 
 // Appliquer le proxy pour Express
 app.use('/api', apiProxy);
-app.use('/game', gameProxy); 
+app.use('/game', gameProxy);
 // Fallback pour les routes SPA - renvoie toujours index.html 
 app.use((req, res, next) => {
 	if (req.url.includes('.')) {
@@ -103,10 +104,10 @@ try {
 	httpsServer.on('upgrade', (req, socket, head) => {
 		// On verifie l'URL et on transmet la requete au bon proxy.
 		if (req.url.startsWith('/game')) {
-			gameProxy.upgrade(req, socket, head);
+	   		gameProxy.upgrade(req, socket, head);
 		} else if (req.url.startsWith('/api/ws')) {
-        console.log('Redirection de la WebSocket vers le proxy de l\'API...');
-        apiProxy.upgrade(req, socket, head);
+		console.log('Redirection de la WebSocket vers le proxy de l\'API...');
+			apiProxy.upgrade(req, socket, head);
 		} else {
 			// Si l'URL ne correspond pas, on ferme la connexion proprement.
 			socket.destroy();
@@ -119,7 +120,7 @@ try {
 		console.log(`AI Server proxy target: ${AI_SERVER_TARGET}`);
 		console.log(`Game Management proxy target: ${GAME_MANAGEMENT_TARGET}`);
 		console.log(`WebSocket proxy enabled for /api/ws and /game/ws`);
-});
+	});
 
 	const httpServer = http.createServer((req, res) => {
 		const hostname = req.headers.host.split(':')[0];

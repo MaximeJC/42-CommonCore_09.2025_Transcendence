@@ -1,258 +1,257 @@
-// pong-server/server.js
 import fastify from 'fastify';
-import websocket from '@fastify/websocket';
-import fastifyStatic from '@fastify/static'
+import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { GameInstance } from './GameInstance.js';
 import fs from 'fs';
-
-// import fastifyCors from '@fastify/cors';
+import cors from '@fastify/cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-let app;
+const app = fastify({ logger: true });
 
-if (process.env.NODE_ENV === 'production') {
-	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
-	app = fastify({
-	  logger: true,
-	  https: {
-		key: fs.readFileSync('/app/certs/hgp_https.key'),
-		cert: fs.readFileSync('/app/certs/hgp_https.crt')
-	  }
-	});
-  } else {
-	console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
-	app = fastify({
-	  logger: true
-	});
-  }
-
-// app.register(fastifyCors, {
-//   origin: "http://localhost:5173",
-//   credentials: true,
-// });
 const PORT = 3003;
+
+await app.register(cors, {
+	origin: (origin, cb) => {
+		if (!origin) {
+			return cb(null, true);
+		}
+		const allowedOrigins = [
+			'http://10.', 'http://192.', 'http://172.',
+			'https://10.', 'https://192.', 'https://172.',
+			'http://127.', 'http://localhost',
+			'https://127.', 'https://localhost'
+		];
+		if (allowedOrigins.some(pattern => origin.startsWith(pattern))) {
+			return cb(null, true);
+		}
+		cb(new Error(`Origine non autorisee par CORS: ${origin}`));
+	},
+	credentials: true
+});
 
 app.register(fastifyStatic, {
 	root: path.join(__dirname, '..', 'public'),
-	prefix: '/', // Servir depuis la racine (ex: /index.html)
+	prefix: '/',
 });
 
-app.register(websocket);
-
-let matchmaking_1v1 = [];
-let matchmaking_4p = [];
-// structure pour partie privee
-const privateWaitingRooms = new Map();
-const games = new Map();
 const clients = new Map();
+const games = new Map();
+const matchmaking_1v1 = [];
+const matchmaking_4p = [];
+const privateWaitingRooms = new Map();
 
-app.register(async function (fastify) {
-	fastify.get('/', { websocket: true }, (connection) => {
-		const socket = connection;
-		socket.id = uuidv4();
-		clients.set(socket.id, {
-			socket: socket,
-			gameId: null,
-			pseudo: 'Anonymous',
-			language: 'en',
-			avatarUrl: '' });
-		console.log(`[Serveur] Client connecte: ${socket.id}`);
+const PLAYER_TIMEOUT_MS = 60000;
 
-		const welcomeMessage = {
-			type: 'connection_established',
-			data: {
-				clientId: socket.id
-			}
-		};
-		socket.send(JSON.stringify(welcomeMessage));
-
-		socket.on('message', (message) => {
-			try {
-				const parsed = JSON.parse(message.toString());
-				const clientInfo = clients.get(socket.id);
-
-				// On met a jour les infos du client si le message est 'client_hello'
-				switch(parsed.type) {
-					case 'client_hello':
-						if (clientInfo) {
-							clientInfo.pseudo = parsed.data.pseudo;
-							clientInfo.language = parsed.data.language;
-							clientInfo.avatarUrl = parsed.data.avatarUrl;
-							console.log(`[Serveur] Client ${socket.id} identifie: ${JSON.stringify({ pseudo: clientInfo.pseudo, lang: clientInfo.language, avatar: clientInfo.avatarUrl })}`);
-						}
-						break;
-					case 'find_match':
-						handleMatchmaking(clientInfo, parsed.data.mode, parsed.data.opponentPseudo);
-						break;
-					// Pour partie privee
-					case 'create_private_match':
-						handlePrivateMatchmaking(clientInfo, parsed.data.opponent_pseudo, parsed.data.mode);
-						break;
-					case 'player_input':
-						if (clientInfo?.gameId) {
-							games.get(clientInfo.gameId)?.handlePlayerInput(socket.id, parsed.data.movement);
-						}
-						break;
-					case 'local_players_input':// Message special pour le 2P_LOCAL
-						if (clientInfo?.gameId) {
-							games.get(clientInfo.gameId)?.handleLocalPlayersInput(socket.id, parsed.data.movements);
-						}
-						break;
-					// Ajout du cas client_ready pour la synchronisation
-					case 'client_ready':
-						if (clientInfo?.gameId) {
-							games.get(clientInfo.gameId)?.handlePlayerReady(socket.id);
-						}
-						break;
-				}
-			} catch (e) { console.error('Erreur', e); }
-		});
-
-		socket.on('close', () => {
-			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
-			const clientInfo = clients.get(socket.id);
-
-			if (clientInfo && clientInfo.gameId) {
-				const game = games.get(clientInfo.gameId);
-				if (game && game.gameState.isGameStarted) {
-					clearInterval(game.gameLoop);
-					game.gameState.isGameStarted = false;
-
-					const remainingPlayer = game.gameState.activePlayers.find(p => p.controlType.includes('HUMAN') && p.id !== socket.id);
-
-					let endMessage;
-					// Construire le message.
-					if (remainingPlayer && remainingPlayer.pseudo) {
-						const lang = remainingPlayer.language || 'en';
-						const winnerPseudo = remainingPlayer.pseudo;
-						let opponentLeftText;
-						let winText;
-						if (lang === 'fr') {
-							winText = `${winnerPseudo} gagne !`;
-						} else if (lang === 'es') {
-							winText = `¡${winnerPseudo} gana!`;
-						} else {
-							winText = `${winnerPseudo} Wins!`;
-						}
-						if (lang === 'fr') {
-							opponentLeftText = "L'adversaire a quitte.\n";
-						} else if (lang === 'es') {
-							opponentLeftText = "El oponente se ha ido.\n";
-						} else {
-							opponentLeftText = "Opponent has left.\n";
-						}
-						endMessage = opponentLeftText + winText;
-					} else {
-						endMessage = "Opponent has left the game.";
-					}
-
-					game.broadcast('game_over', { end_message: endMessage });
-
-					console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
-					games.delete(clientInfo.gameId);
-				}
-			}
-
-			clients.delete(socket.id);
-			matchmaking_1v1 = matchmaking_1v1.filter(info => info.socket.id !== socket.id);
-			matchmaking_4p = matchmaking_4p.filter(info => info.socket.id !== socket.id);
-		});
+app.post('/connect', (request, reply) => {
+	const { pseudo, language, avatarUrl } = request.body;
+	const clientId = uuidv4();
+	clients.set(clientId, {
+		id: clientId,
+		pseudo: pseudo || 'Anonymous',
+		language: language || 'en',
+		avatarUrl: avatarUrl || '',
+		gameId: null,
+		lastSeen: Date.now()
 	});
+	console.log(`[Serveur] Nouveau client enregistre: ${pseudo} (ID: ${clientId})`);
+	reply.send({ clientId });
 });
 
-function handleMatchmaking(playerInfo, gameMode, opponentPseudo = null)
-{
-	const isInQueue = matchmaking_1v1.some(p => p.socket.id === playerInfo.socket.id) || matchmaking_4p.some(p => p.socket.id === playerInfo.socket.id);
-	if (isInQueue) {
-		console.log(`[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.`);
-		return;
-	}
+app.post('/matchmaking/join', (request, reply) => {
+	const { clientId, mode, opponentPseudo } = request.body;
+	const clientInfo = clients.get(clientId);
 
-	let game;
-	const modesInstants = ['1P_VS_AI', 'AI_VS_AI', '2AI_VS_2AI', '2P_LOCAL'];
-	if (modesInstants.includes(gameMode)) {
-		game = new GameInstance([playerInfo], gameMode, opponentPseudo);
-	} else if (['1V1_ONLINE', '2P_ONLINE'].includes(gameMode)) {
-		matchmaking_1v1.push(playerInfo);
-		if (matchmaking_1v1.length >= 2) {
-			game = new GameInstance(matchmaking_1v1.splice(0, 2), '1V1_ONLINE');
-		}
-	} else if (gameMode === '4P_ONLINE') {
-		matchmaking_4p.push(playerInfo);
-		if (matchmaking_4p.length >= 4)
-		{
-			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
-		}
-	} else {
-		console.log(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
-		return;
+	if (!clientInfo) {
+		return reply.status(404).send({ error: 'Client not found' });
 	}
+	clientInfo.lastSeen = Date.now();
+
+	if (['1P_VS_AI', 'AI_VS_AI', '2AI_VS_2AI', '2P_LOCAL'].includes(mode)) {
+		const game = createGame([clientInfo], mode);
+		reply.send({ status: 'found', gameId: game.gameId });
+	}
+	else if (['1V1_ONLINE', '2P_ONLINE'].includes(mode)) {
+		handlePublicMatchmaking(clientInfo, matchmaking_1v1, 2, '1V1_ONLINE');
+		reply.send({ status: 'in_queue' });
+	}
+	else if (mode === '4P_ONLINE') {
+		handlePublicMatchmaking(clientInfo, matchmaking_4p, 4, '4P_ONLINE');
+		reply.send({ status: 'in_queue' });
+	}
+	else if (mode === 'PRIVATE' && opponentPseudo) {
+		handlePrivateMatchmaking(clientInfo, opponentPseudo, '1V1_ONLINE');
+		reply.send({ status: 'in_queue_private' });
+	} else {
+		return reply.status(400).send({ error: `Game mode '${mode}' not recognized.` });
+	}
+});
+
+app.get('/matchmaking/status/:clientId', (request, reply) => {
+	const { clientId } = request.params;
+	const clientInfo = clients.get(clientId);
+
+	if (!clientInfo) {
+		return reply.status(404).send({ error: 'Client not found' });
+	}
+	clientInfo.lastSeen = Date.now();
+
+	if (clientInfo.gameId) {
+		reply.send({ status: 'found', gameId: clientInfo.gameId });
+	} else if ([...privateWaitingRooms.values()].some(room => room.player1.id === clientId)) {
+		reply.send({ status: 'waiting_for_opponent' });
+	} else {
+		reply.send({ status: 'in_queue' });
+	}
+});
+
+app.post('/:gameId/ready', (request, reply) => {
+	const { gameId } = request.params;
+	const { clientId } = request.body;
+	const game = games.get(gameId);
 
 	if (game) {
-		games.set(game.gameId, game);
+		game.handlePlayerReady(clientId);
+		const client = clients.get(clientId);
+		if (client) {
+			client.lastSeen = Date.now();
+		}
+		reply.status(204).send();
+	} else {
+		reply.status(404).send({ error: 'Game not found' });
+	}
+});
 
-		game.clientInfos.forEach(info => {
-			const client = clients.get(info.socket.id);
-			if (client) {
-				client.gameId = game.gameId;
-			}
-		});
+app.post('/:gameId/input', (request, reply) => {
+	const { gameId } = request.params;
+	const { clientId, movement, movements } = request.body;
+	const game = games.get(gameId);
+	const clientInfo = clients.get(clientId);
+
+	if (!game) return reply.status(404).send({ error: 'Game not found' });
+	if (!clientInfo) return reply.status(404).send({ error: 'Client not found' });
+	clientInfo.lastSeen = Date.now();
+
+	if (movement !== undefined) {
+		game.handlePlayerInput(clientId, movement);
+	}
+	if (movements) {
+		game.handleLocalPlayersInput(clientId, movements);
+	}
+	reply.status(204).send();
+});
+
+
+app.get('/:gameId/state', (request, reply) => {
+	const { gameId } = request.params;
+	const { clientId } = request.query;
+	const game = games.get(gameId);
+
+	if (!game) {
+		return reply.status(404).send({ error: 'Game not found' });
+	}
+
+	if (clientId) {
+		const client = clients.get(clientId);
+		if (client) {
+			client.lastSeen = Date.now();
+		}
+	}
+
+	const gameState = game.getSerializableState();
+	reply.send(gameState);
+});
+
+function createGame(players, mode) {
+	const game = new GameInstance(players, mode);
+	games.set(game.gameId, game);
+	players.forEach(p => {
+		const client = clients.get(p.id);
+		if (client) {
+			client.gameId = game.gameId;
+		}
+	});
+	console.log(`[Serveur] Partie ${game.gameId} creee en mode ${mode} avec ${players.length} joueurs.`);
+	return game;
+}
+
+function handlePublicMatchmaking(playerInfo, queue, requiredPlayers, gameMode) {
+	const isInQueue = queue.some(p => p.id === playerInfo.id);
+	if (isInQueue) {
+		console.log(`[Matchmaking] Le joueur ${playerInfo.pseudo} est deja en file d'attente.`);
+		return;
+	}
+	queue.push(playerInfo);
+	if (queue.length >= requiredPlayers) {
+		createGame(queue.splice(0, requiredPlayers), gameMode);
 	}
 }
 
-/**
- * Pour gerer le matchmaking prive.
- */
 function handlePrivateMatchmaking(playerInfo, opponentPseudo, gameMode) {
-	// La cle de la salle est basee sur les pseudos tries.
 	const roomKey = [playerInfo.pseudo, opponentPseudo].sort().join('_vs_');
 
 	if (privateWaitingRooms.has(roomKey)) {
 		const room = privateWaitingRooms.get(roomKey);
-
-		// Verifier que le joueur qui rejoint est bien celui qui etait attendu.
 		if (playerInfo.pseudo === room.opponent_pseudo) {
-			console.log(`[Partie Privee] ${playerInfo.pseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.`);
-			const player1 = room.player1;
-			const player2 = playerInfo;
-
-			// Determiner le mode de jeu (par exemple, 1v1 par defaut pour les matchs prives)
-			const finalGameMode = room.gameMode || '1V1_ONLINE';
-
-			const game = new GameInstance([player1, player2], finalGameMode);
-			if (game) {
-				games.set(game.gameId, game);
-				game.clientInfos.forEach(info => {
-					const client = clients.get(info.socket.id);
-					if (client) client.gameId = game.gameId;
-				});
-			}
+			console.log(`[Partie Privee] ${playerInfo.pseudo} a rejoint ${room.player1.pseudo}. Lancement.`);
+			createGame([room.player1, playerInfo], gameMode);
 			privateWaitingRooms.delete(roomKey);
 		} else {
-			// Un intrus essaie de rejoindre la partie.
-			console.warn(`[Partie Privee] Tentative de connexion non autorisee a la salle ${roomKey} par ${playerInfo.pseudo}`);
+			console.warn(`[Partie Privee] Tentative non autorisee sur la salle ${roomKey} par ${playerInfo.pseudo}`);
 		}
 	} else {
-		// La salle n'existe pas, on la cree.
-		console.log(`[Partie Privee] ${playerInfo.pseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
+		console.log(`[Partie Privee] ${playerInfo.pseudo} cree une salle pour ${opponentPseudo}.`);
 		privateWaitingRooms.set(roomKey, {
 			player1: playerInfo,
 			opponent_pseudo: opponentPseudo,
 			gameMode: gameMode
 		});
-		const waitingMessage = { type: 'waiting_for_opponent', data: { opponent: opponentPseudo } };
-		playerInfo.socket.send(JSON.stringify(waitingMessage));
 	}
 }
 
-app.listen(
-	{
-	port: PORT,
-	host: '0.0.0.0'
+setInterval(() => {
+	const now = Date.now();
+	for (const [gameId, game] of games.entries()) {
+		let disconnectedPlayer = null;
+
+		for (const player of game.gameState.activePlayers) {
+			if (player.controlType.includes('HUMAN')) {
+				const clientInfo = clients.get(player.id);
+				if (clientInfo && (now - clientInfo.lastSeen) > PLAYER_TIMEOUT_MS) {
+					disconnectedPlayer = player;
+					break;
+				}
+			}
+		}
+
+		if (disconnectedPlayer) {
+			console.log(`[Timeout] Le joueur ${disconnectedPlayer.pseudo} (ID: ${disconnectedPlayer.id}) a ete deconnecte pour inactivite.`);
+			clearInterval(game.gameLoop);
+			game.gameState.isGameStarted = false;
+
+			const remainingPlayer = game.gameState.activePlayers.find(p => p.controlType.includes('HUMAN') && p.id !== disconnectedPlayer.id);
+			let endMessage = "Opponent has left the game.";
+			if (remainingPlayer) {
+				endMessage = `${remainingPlayer.pseudo} Wins! (Opponent disconnected)`;
+			}
+
+			game.endGame({ endMessage: endMessage, winner: remainingPlayer?.pseudo, loser: disconnectedPlayer.pseudo });
+			game.clientInfos.forEach(p => {
+				if (clients.has(p.id)) clients.get(p.id).gameId = null;
+			});
+
+			setTimeout(() => games.delete(gameId), 10000);
+		}
 	}
-);
+}, 2000);
+
+app.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+	if (err) {
+		app.log.error(err);
+		process.exit(1);
+	}
+	console.log(`Serveur de jeu (HTTP API) ecoutant sur ${address}`);
+});

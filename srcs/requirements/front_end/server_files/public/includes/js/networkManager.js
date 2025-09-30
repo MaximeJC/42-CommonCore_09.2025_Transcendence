@@ -1,205 +1,248 @@
-// js/networkManager.js
-
 import { gameState } from './gameState.js';
 import { endGame, resetBall, startCountdown } from './gameLogic.js';
 import { returnToLobby } from './app.js'
 
-// On determine le protocole WebSocket. Si la page est en HTTPS, on utilise 'wss:', sinon 'ws:'.
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const API_URL = '/game';
 
-// On recupere l'hote (domaine + port) de la page actuelle.
-// 
-const host = window.location.host;
+console.log(`Connexion API a l'adresse: ${API_URL}`);
 
-// On assemble l'URL complete du WebSocket.
-// const WS_URL = `${protocol}//localhost:3003`;
-const hostname = window.location.hostname;
-const WS_URL = `${protocol}//${hostname}:3003`;
-
-// console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
-
-// On cree une variable "boite" pour stocker la fonction initializeApp.
 let mainAppInitializer = null;
 
-/**
- * Permet a app.js de "donner" sa fonction initializeApp au networkManager.
- * @param {function} initializer - La fonction a appeler quand le jeu doit demarrer.
- */
 export function setAppInitializer(initializer) {
 	mainAppInitializer = initializer;
 }
 
 class NetworkManager {
 	constructor() {
-		this.socket = null;
+		this.clientId = null;
+		this.gameId = null;
+		this.matchmakingPollInterval = null;
+		this.gameStatePollInterval = null;
+		this.inputPollInterval = null;
+		this.lastKnownStateStatus = null;
+		this.localMovement = { movement: 0 };
 	}
 
-	connect(jwtToken) // Le token si necessaire pour l'authentification
-	{
-		return new Promise((resolve, reject) => {
-			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-				console.log("Deja connecte.");
-				gameState.isConnected = true;
-				resolve();
-				return;
-			}
-
-			console.log("Tentative de connexion au serveur de jeu...");
-			// const netConfig = window.networkConfig;
-			// const WS_URL = netConfig.pongServerBaseUrl;
-
-			// if (!WS_URL) {
-			// 	const error = new Error("La configuration réseau (window.networkConfig.pongServerBaseUrl) est introuvable !");
-			// 	console.error(error);
-			// 	return reject(error);
-			// }
-
-			// console.log(`URL WebSocket absolue construite: ${WS_URL}`);
-			this.socket = new WebSocket(WS_URL);
-
-			this.socket.onopen = () => {
-				console.log("Connecte au serveur de jeu !");
-				this.sendMessage('client_hello', {
+	async connect() {
+		if (this.clientId) {
+			console.log("Deja enregistre avec le clientId:", this.clientId);
+			gameState.isConnected = true;
+			return;
+		}
+		console.log("Tentative d'enregistrement aupres du serveur de jeu...");
+		try {
+			const response = await fetch(`${API_URL}/connect`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
 					pseudo: gameState.pseudo,
 					language: gameState.language,
 					avatarUrl: gameState.avatarUrl
-					});
-				gameState.isConnected = true;
-				resolve();
-			};
-
-			this.socket.onclose = (event) => {
-				console.log("Deconnecte du serveur de jeu.", event.reason);
-				gameState.isConnected = false;
-				// Gerer la reconnexion ou afficher un message a l'utilisateur
-			};
-
-			this.socket.onerror = (error) => {
-				console.error("Erreur WebSocket:", error);
-				gameState.isConnected = false;
-				reject(error);
-			};
-
-			this.socket.onmessage = (event) => {
-				this.handleServerMessage(event.data);
-			};
-		});
+				})
+			});
+			if (!response.ok) throw new Error(`Erreur serveur: ${response.statusText}`);
+			const data = await response.json();
+			this.clientId = data.clientId;
+			gameState.myClientId = this.clientId;
+			gameState.isConnected = true;
+			console.log("Enregistre avec succes ! ClientId:", this.clientId);
+		} catch (error) {
+			console.error("Erreur lors de la connexion initiale:", error);
+			gameState.isConnected = false;
+			throw error;
+		}
 	}
 
-	handleServerMessage(data) {
-		try {
-			const message = JSON.parse(data);
-			// console.log("Message recu:", message); // Decommenter pour un debug intensif
+	handleServerMessage(state) {
 
-			// C'est le message qui declenche la creation de la scene de jeu.
-			if (message.type === 'game_start') {
-				console.log("Le serveur a lance la partie ! Mon role est:", message.data.your_player_name);
-				
-				// On sauvegarde qui nous sommes dans le gameState.
-				gameState.myPlayerName = message.data.your_player_name;
+		if (gameState.ball) {
+			gameState.ball.position.z = state.ball_z;
+			gameState.ball.position.y = state.ball_y;
+		}
 
-				// On stocke les informations de tous les joueurs (y compris les pseudos).
-				if (message.data.all_players) {
-					gameState.allPlayersInfo = message.data.all_players;
-				}
-				
-				// On appelle la fonction principale de l'application.
-				if (mainAppInitializer) {
-					mainAppInitializer();
-				} else {
-					console.error("Erreur critique: l'initialiseur de l'application (initializeApp) n'a pas ete fourni au networkManager.");
-				}
-				return;
+		if (gameState.ui && gameState.ui.scoreLeft && gameState.ui.scoreRight) {
+			gameState.ui.scoreLeft.textBlock.text = state.score_left.toString();
+			gameState.ui.scoreRight.textBlock.text = state.score_right.toString();
+		}
+
+		for (const playerName in state.players) {
+			const serverPlayerData = state.players[playerName];
+			const clientPlayerObject = gameState.activePlayers.find(p => p.config.name === playerName);
+
+			if (clientPlayerObject) {
+				clientPlayerObject.mesh.position.y = serverPlayerData.y;
 			}
-
-			if (message.type === 'game_state_update') {
-				const state = message.data;
-				
-				if (gameState.ball) {
-					gameState.ball.position.z = state.ball_z;
-					gameState.ball.position.y = state.ball_y;
-				}
-
-				// Appliquer les scores.
-				if (gameState.ui.scoreLeft && gameState.ui.scoreRight) {
-					gameState.ui.scoreLeft.textBlock.text = state.score_left.toString();
-					gameState.ui.scoreRight.textBlock.text = state.score_right.toString();
-				}
-				
-				// Appliquer la position de TOUS les joueurs geres par le serveur.
-				for (const playerName in state.players) {
-					const serverPlayerData = state.players[playerName];
-					const clientPlayerObject = gameState.activePlayers.find(p => p.config.name === playerName);
-
-					if (clientPlayerObject) {
-						clientPlayerObject.mesh.position.y = serverPlayerData.y;
-						// On met a jour le pseudo si le serveur nous en envoie un nouveau (pourrait etre utile plus tard)
-						if (serverPlayerData.pseudo) {
-							clientPlayerObject.config.pseudo = serverPlayerData.pseudo;
-						}
-					}
-				}
-				return;
-			}
-
-			// Pour les messages moins frequents qui gerent les evenements du jeu.
-			switch (message.type) {
-				case 'connection_established':
-					console.log("Connexion etablie avec le serveur.");
-					// On stocke la langue dans notre etat de jeu global.
-					gameState.myClientId = message.data.clientId;
-					break;
-				case 'start_countdown':
-					console.log("Ordre du serveur: demarrer le decompte !");
-					startCountdown(gameState);
-					break;
-
-				case 'goal_scored':
-					console.log("Un but a ete marque !");
-					resetBall(gameState);
-					break;
-
-				case 'game_over':
-					console.log("La partie est terminee.");
-					if (gameState.ball) {
-						gameState.ball.isVisible = false;
-					}
-					const endData = message.data;
-					const finalMessage = message.data.end_message;
-					if (!endData.winner)
-						returnToLobby(false);
-					// On peut maintenant afficher ou utiliser les autres donnees
-					console.log("Partie terminee. Stats :");
-					console.log("- Vainqueur:", endData.winner);
-					console.log("- Perdant:", endData.loser);
-					console.log("- Duree:", endData.duration, "secondes");
-					console.log("gameMode:", endData.gameMode);
-					console.log("game_id:", endData.gameId);
-					endGame(gameState, finalMessage);
-
-					//test partage donnees sur front
-					const gameResultEvent = new CustomEvent('gameresult', {
-					detail: message.data
-						});
-					window.dispatchEvent(gameResultEvent);
+		}
+		
+		const currentStateStatus = state.status;
+		if (this.lastKnownStateStatus !== currentStateStatus) {
+			console.log(`Changement d'etat: ${this.lastKnownStateStatus || 'null'} -> ${currentStateStatus}`);
+			switch (currentStateStatus) {
+				case 'countdown': startCountdown(gameState); break;
+				case 'playing': break;
+				case 'finished':
+					this.stopPolling();
+					if (gameState.ball) gameState.ball.isVisible = false;
+					endGame(gameState, state.end_message);
+					const finalMessage = state.end_message || `${state.winner} Wins!`;
+						endGame(gameState, finalMessage);
+					window.dispatchEvent(new CustomEvent('gameresult', { detail: { ...state } }));
 					returnToLobby(true);
 					break;
-				
-				case 'error':
-					console.error("Erreur renvoyee par le serveur:", message.data.message);
-					break;
 			}
-		} catch (e) {
-			console.error("Erreur de traitement du message serveur:", e);
+			this.lastKnownStateStatus = currentStateStatus;
 		}
 	}
 
 	sendMessage(type, data = {}) {
-		if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-			this.socket.send(JSON.stringify({ type, data }));
+		if (type === 'find_match' || type === 'create_private_match') {
+			this.findMatch(data.mode, data.opponent_pseudo);
+		} else if (type === 'player_input' || type === 'local_players_input') {
+			const payload = data.movement !== undefined ? { movement: data.movement } : { movements: data.movements };
+			this.localMovement = payload;
+		} else if (type === 'client_ready') {
+			this.sendClientReady();
 		} else {
-			console.error("Impossible d'envoyer le message : WebSocket non connecte.");
+			console.warn(`sendMessage non implemente pour le type: ${type}`);
 		}
+	}
+
+	updatePlayerInput(data) {
+		this.localMovement = data.movement !== undefined ? { movement: data.movement } : { movements: data.movements };
+	}
+
+	async findMatch(mode, opponentPseudo = null) {
+		if (!this.clientId) return;
+		try {
+			const response = await fetch(`${API_URL}/matchmaking/join`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ clientId: this.clientId, mode, opponentPseudo })
+			});
+			if (!response.ok) throw new Error("Erreur lors de la demande de matchmaking");
+			
+			const data = await response.json();
+			if (data.status === 'found' && data.gameId) {
+				this.gameId = data.gameId;
+				this.prepareGameScene();
+			} else {
+				this.startMatchmakingPolling();
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	startMatchmakingPolling() {
+		this.stopPolling();
+		console.log("En attente d'autres joueurs... Debut du polling de matchmaking...");
+		this.matchmakingPollInterval = setInterval(async () => {
+			try {
+				const response = await fetch(`${API_URL}/matchmaking/status/${this.clientId}`);
+				if (!response.ok) throw new Error("Erreur de polling matchmaking.");
+				const data = await response.json();
+				if (data.status === 'found') {
+					this.stopPolling();
+					this.gameId = data.gameId;
+					this.prepareGameScene();
+				}
+			} catch (error) {
+				console.error(error);
+				this.stopPolling();
+			}
+		}, 2000);
+	}
+
+	async prepareGameScene() {
+		if (!this.gameId || !this.clientId) return;
+		console.log("Partie trouvee ! ID:", this.gameId, ". Preparation de la scene.");
+		try {
+			const initialResponse = await fetch(`${API_URL}/${this.gameId}/state?clientId=${this.clientId}`);
+			if (!initialResponse.ok) {
+				throw new Error(`Impossible de recuperer l'etat initial du jeu. Statut: ${initialResponse.status}`);
+			}
+			const initialState = await initialResponse.json();
+			gameState.myPlayerName = this.findMyPlayerName(initialState.players);
+			gameState.allPlayersInfo = initialState.all_players;
+			
+			if (mainAppInitializer) mainAppInitializer();
+			else console.error("Erreur critique: Initialiseur de l'application non fourni.");
+		} catch (error) {
+			console.error(error);
+			returnToLobby(false);
+		}
+	}
+	
+	async sendClientReady() {
+		if (!this.gameId || !this.clientId) return;
+		console.log("Client pret, notification au serveur pour demarrer la partie...");
+		try {
+			await fetch(`${API_URL}/${this.gameId}/ready`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ clientId: this.clientId })
+			});
+			this.startPollingLoops();
+		} catch (error) {
+			console.error("Erreur lors de l'envoi du statut 'ready':", error);
+		}
+	}
+
+	startPollingLoops() {
+		this.stopPolling();
+
+		this.gameStatePollInterval = setInterval(async () => {
+			if (!this.gameId) return this.stopPolling();
+			try {
+				const response = await fetch(`${API_URL}/${this.gameId}/state?clientId=${this.clientId}`);
+				if (response.status === 404) {
+					console.log("Partie terminee (le serveur a renvoye 404).");
+					this.stopPolling();
+					returnToLobby(false);
+					return;
+				}
+				if (!response.ok) return;
+				const state = await response.json();
+				this.handleServerMessage(state);
+			} catch (error) {}
+		}, 1000 / 30);
+
+		this.inputPollInterval = setInterval(() => {
+			if (!this.gameId) return this.stopPolling();
+			this.sendPlayerInput(this.localMovement);
+		}, 1000 / 20);
+	}
+
+	async sendPlayerInput(movementData) {
+		if (!this.gameId || !this.clientId) return;
+		try {
+			await fetch(`${API_URL}/${this.gameId}/input`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ clientId: this.clientId, ...movementData })
+			});
+		} catch (error) {
+			if (error instanceof TypeError && error.message.includes("Failed to fetch")) return;
+			console.error("Erreur lors de l'envoi de l'input:", error);
+		}
+	}
+
+	findMyPlayerName(players) {
+		if (gameState.gameMode === '2P_LOCAL') return 'both';
+		if (['AI_VS_AI', '2AI_VS_2AI'].includes(gameState.gameMode)) return 'spectator';
+		for (const name in players) {
+			if (players[name].id === this.clientId) return name;
+		}
+		return 'spectator';
+	}
+
+	stopPolling() {
+		clearInterval(this.matchmakingPollInterval);
+		clearInterval(this.gameStatePollInterval);
+		clearInterval(this.inputPollInterval);
+		this.matchmakingPollInterval = null;
+		this.gameStatePollInterval = null;
+		this.inputPollInterval = null;
 	}
 }
 

@@ -1,6 +1,4 @@
-// js/gameLogic.js
 
-// Les imports sont reduits au strict minimum pour le client.
 import { inputMap } from './inputManager.js';
 import { debugFps } from './config.js';
 import { networkManager } from './networkManager.js';
@@ -186,7 +184,8 @@ function updateAndSendInputs(gameState) {
 			}
 
 			if (movement !== player.lastSentMovement) {
-				networkManager.sendMessage('player_input', { movement: movement });
+				// networkManager.sendMessage('player_input', { movement: movement });
+				networkManager.updatePlayerInput({ movement: movement });
 				player.lastSentMovement = movement;
 			}
 		});

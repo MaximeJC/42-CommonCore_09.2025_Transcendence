@@ -9,7 +9,7 @@ CERT_FILE = srcs/certs/hgp_https.crt
 
 all: up
 
-# Développement - arrete la prod si necessaire et lance la dev
+# Developpement - arrete la prod si necessaire et lance la dev
 dev: mkdir 
 	@echo "Switching to DEVELOPMENT mode..."
 	@echo "Stopping production containers..."
