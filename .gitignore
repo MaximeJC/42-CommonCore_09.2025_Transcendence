@@ -3,3 +3,5 @@
 *node_modules*
 .vscode
 certs
+prod.env
+srcs/requirements/front_end/server_files/.env

@@ -1,0 +1,22 @@
+localhost.com {
+	redir https://{host}{uri} permanent
+
+	handle / {
+		reverse_proxy hgp_front_end:5173
+	}
+
+	handle /api/* {
+		reverse_proxy hgp_user_management:3000
+	}
+
+	handle /game/* {
+		reverse_proxy hgp_game_management:3003 {
+			transport http {
+			websocket
+		}
+	}
+
+	handle /ai/* {
+		reverse_proxy hgp_ai_server:3001
+	}
+}

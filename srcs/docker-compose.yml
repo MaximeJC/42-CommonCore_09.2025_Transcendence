@@ -27,9 +27,9 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
-      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
+      - VITE_API_BASE_URL=https://localhost.com/api
+      - VITE_PONG_SERVER_BASE_URL=wss://localhost.com/game
+      - VITE_AI_SERVER_BASE_URL=https://localhost.com/ai
     networks:
       - hgp_network
     restart: unless-stopped
@@ -72,6 +72,25 @@ services:
       - hgp_network
     restart: unless-stopped
 
+  caddy:
+    container_name: hgp_caddy
+    image: caddy:2-alpine
+    ports:
+      - "8080:8080"   # HTTP, redirige vers HTTPS automatiquement
+      - "8443:443" # HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - front_end
+      - user_management
+      - game_management
+      - ai_server
+
 volumes:
   user_management_db:
     driver_opts:
@@ -83,6 +102,8 @@ volumes:
       type: none
       device: ${HOME}/hgp_data/avatars
       o: bind
+  caddy_data:
+  caddy_config:
 
 networks:
   hgp_network:
