@@ -1,4 +1,6 @@
-// js/gameObjects.js
+import * as BABYLON from '@babylonjs/core';
+import '@babylonjs/loaders';
+import * as GUI from '@babylonjs/gui';
 
 import { debug, debugVisuals } from './config.js';
 
@@ -90,11 +92,11 @@ export function create3DButton(name, initialText, scene)
 	buttonMesh.material = mat;
 
 	// CREER UNE TEXTURE GUI SPECIFIQUEMENT POUR CE MESH
-	const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(buttonMesh, 1024, 300);
+	const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(buttonMesh, 1024, 300);
 
 		// CREER LES ELEMENTS GUI 2D SUR CETTE TEXTURE
 	// Un conteneur (Rectangle) pour le style visuel du bouton (fond, bordure...)
-	const buttonContainer = new BABYLON.GUI.Rectangle(name + "_container");
+	const buttonContainer = new GUI.Rectangle(name + "_container");
 	buttonContainer.background = "rgba(156, 50, 133, 1)"; // violet transparent
 	buttonContainer.color = "#e251ca"; // bordure rose
 	buttonContainer.thickness = 8; // border: 2px
@@ -111,7 +113,7 @@ export function create3DButton(name, initialText, scene)
 		}
 	};
 
-	const textBlock = new BABYLON.GUI.TextBlock(name + "_text", initialText);
+	const textBlock = new GUI.TextBlock(name + "_text", initialText);
 	textBlock.fontFamily = "netron";
 	textBlock.color = "#aaaaaaff";
 	textBlock.fontSize = 200;
@@ -196,21 +198,21 @@ export function createTextBox(name, initialText, options, scene) {
 	}, scene);
 	displayMesh.isPickable = false;
 
-	const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(
+	const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
 		displayMesh, 
 		finalOptions.textureWidth, 
 		finalOptions.textureHeight
 	);
 		
-	const textBlock = new BABYLON.GUI.TextBlock(name + "_text", initialText);
+	const textBlock = new GUI.TextBlock(name + "_text", initialText);
 	textBlock.width = "100%";
 	textBlock.height = "100%";
 	textBlock.color = finalOptions.color;
 	textBlock.background = finalOptions.background;
 	textBlock.fontSize = finalOptions.fontSize;
 
-	textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-	textBlock.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+	textBlock.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+	textBlock.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 
 	advancedTexture.addControl(textBlock);
 

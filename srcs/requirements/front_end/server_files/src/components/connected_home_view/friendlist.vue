@@ -291,7 +291,7 @@ watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	}
 
 	.input-add-friends > button:hover{
-		background-image:  url("..//images/add_button_alt.png");
+		background-image:  url("/images/add_button_alt.png");
 
 		border: 1px solid #dd0aba;
 		box-shadow: 
