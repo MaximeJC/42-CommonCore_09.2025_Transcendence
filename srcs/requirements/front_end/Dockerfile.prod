@@ -1,29 +1,25 @@
 # Dockerfile de production
 FROM node:22.19.0-trixie-slim AS builder
 
-# On definit le repertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de configuration
 COPY ./server_files/package*.json ./
 RUN npm ci
 
-# On copie TOUT le reste du code source de l'application
 COPY ./server_files/ .
 
-# LA COMMANDE LA PLUS IMPORTANTE : On construit l'application pour la production.
-# Cela va creer un dossier /app/dist contenant le bon index.html et le dossier /assets.
+# Construction de l'app en mode prod: creer un dossier /app/dist avec
+# le bon index.html et le dossier /assets.
 RUN npm run build
 
-# Stage de production
+# Mise en production du build ci-dessus
 FROM node:22.19.0-trixie-slim AS production
 
 WORKDIR /app
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y npm openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y npm && rm -rf /var/lib/apt/lists/*
 
-# Copier les dépendances de production
 COPY ./server_files/package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
@@ -35,10 +31,6 @@ COPY --from=builder /app/public/uploads ./public/uploads
 COPY .env* ./
 
 RUN mkdir -p certs
-# RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-# 	-keyout certs/hgp_https.key \
-# 	-out certs/hgp_https.crt \
-# 	-subj "/CN=hgp.local"
 
 # On expose seulement le port 8080 (Caddy gère le 5000)
 EXPOSE 8080
