@@ -20,6 +20,22 @@ export default async function gameRoutes(fastify, options) {
 			const winner_id = winner.id;
 			const loser_id = loser.id;
 
+			const exists = await new Promise((resolve, reject)=>{
+				db.all(
+					`SELECT 1 FROM games WHERE game_id = ?`,
+					[game_id],
+					(err, rows)=>{
+						if (err) reject(err);
+						else resolve(rows.length > 0);
+					}
+				)
+			});
+			// console.log("exists = ", exists);
+			if (exists) {
+				console.log("La partie a ete enregistre par l'autre joueur.");
+				return reply.status(201).send({ message: "Partie deja enregistree." });
+			}
+
 			// Inserer la partie avec les IDs
 			await new Promise((resolve, reject) => {
 				db.run(
@@ -31,7 +47,7 @@ export default async function gameRoutes(fastify, options) {
 					}
 				);
 			});
-			
+
 			// Mettre a jour le classement
 			await updateUserRanks(db);
 
