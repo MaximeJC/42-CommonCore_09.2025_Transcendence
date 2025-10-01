@@ -36,13 +36,13 @@ class NetworkManager {
 	{
 		return new Promise((resolve, reject) => {
 			if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-				console.log("Deja connecte.");
+				// console.log("Deja connecte.");
 				gameState.isConnected = true;
 				resolve();
 				return;
 			}
 
-			console.log("Tentative de connexion au serveur de jeu...");
+			// console.log("Tentative de connexion au serveur de jeu...");
 			// const netConfig = window.networkConfig;
 			// const WS_URL = netConfig.pongServerBaseUrl;
 
@@ -56,7 +56,7 @@ class NetworkManager {
 			this.socket = new WebSocket(WS_URL);
 
 			this.socket.onopen = () => {
-				console.log("Connecte au serveur de jeu !");
+				// console.log("Connecte au serveur de jeu !");
 				this.sendMessage('client_hello', {
 					pseudo: gameState.pseudo,
 					language: gameState.language,
@@ -67,7 +67,7 @@ class NetworkManager {
 			};
 
 			this.socket.onclose = (event) => {
-				console.log("Deconnecte du serveur de jeu.", event.reason);
+				// console.log("Deconnecte du serveur de jeu.", event.reason);
 				gameState.isConnected = false;
 				// Gerer la reconnexion ou afficher un message a l'utilisateur
 			};
@@ -91,7 +91,7 @@ class NetworkManager {
 
 			// C'est le message qui declenche la creation de la scene de jeu.
 			if (message.type === 'game_start') {
-				console.log("Le serveur a lance la partie ! Mon role est:", message.data.your_player_name);
+				// console.log("Le serveur a lance la partie ! Mon role est:", message.data.your_player_name);
 				
 				// On sauvegarde qui nous sommes dans le gameState.
 				gameState.myPlayerName = message.data.your_player_name;
@@ -143,22 +143,22 @@ class NetworkManager {
 			// Pour les messages moins frequents qui gerent les evenements du jeu.
 			switch (message.type) {
 				case 'connection_established':
-					console.log("Connexion etablie avec le serveur.");
+					// console.log("Connexion etablie avec le serveur.");
 					// On stocke la langue dans notre etat de jeu global.
 					gameState.myClientId = message.data.clientId;
 					break;
 				case 'start_countdown':
-					console.log("Ordre du serveur: demarrer le decompte !");
+					// console.log("Ordre du serveur: demarrer le decompte !");
 					startCountdown(gameState);
 					break;
 
 				case 'goal_scored':
-					console.log("Un but a ete marque !");
+					// console.log("Un but a ete marque !");
 					resetBall(gameState);
 					break;
 
 				case 'game_over':
-					console.log("La partie est terminee.");
+					// console.log("La partie est terminee.");
 					if (gameState.ball) {
 						gameState.ball.isVisible = false;
 					}
@@ -167,12 +167,12 @@ class NetworkManager {
 					if (!endData.winner)
 						returnToLobby(false);
 					// On peut maintenant afficher ou utiliser les autres donnees
-					console.log("Partie terminee. Stats :");
-					console.log("- Vainqueur:", endData.winner);
-					console.log("- Perdant:", endData.loser);
-					console.log("- Duree:", endData.duration, "secondes");
-					console.log("gameMode:", endData.gameMode);
-					console.log("game_id:", endData.gameId);
+					// console.log("Partie terminee. Stats :");
+					// console.log("- Vainqueur:", endData.winner);
+					// console.log("- Perdant:", endData.loser);
+					// console.log("- Duree:", endData.duration, "secondes");
+					// console.log("gameMode:", endData.gameMode);
+					// console.log("game_id:", endData.gameId);
 					endGame(gameState, finalMessage);
 
 					//test partage donnees sur front

@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 let app;
 
 if (process.env.NODE_ENV === 'production' && !process.env.CADDY_PROXY) {
-	console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
+	// console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
 	app = fastify({
 	  logger: true,
 	  https: {
@@ -26,9 +26,9 @@ if (process.env.NODE_ENV === 'production' && !process.env.CADDY_PROXY) {
 	});
   } else {
 	if (process.env.CADDY_PROXY) {
-		console.log("Demarrage en mode PRODUCTION avec Caddy Proxy (HTTP/WS)");
+		// console.log("Demarrage en mode PRODUCTION avec Caddy Proxy (HTTP/WS)");
 	} else {
-		console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
+		// console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
 	}
 	app = fastify({
 	  logger: true
@@ -65,7 +65,7 @@ app.register(async function (fastify) {
 			pseudo: 'Anonymous',
 			language: 'en',
 			avatarUrl: '' });
-		console.log(`[Serveur] Client connecte: ${socket.id}`);
+		// console.log(`[Serveur] Client connecte: ${socket.id}`);
 
 		const welcomeMessage = {
 			type: 'connection_established',
@@ -87,7 +87,7 @@ app.register(async function (fastify) {
 							clientInfo.pseudo = parsed.data.pseudo;
 							clientInfo.language = parsed.data.language;
 							clientInfo.avatarUrl = parsed.data.avatarUrl;
-							console.log(`[Serveur] Client ${socket.id} identifie: ${JSON.stringify({ pseudo: clientInfo.pseudo, lang: clientInfo.language, avatar: clientInfo.avatarUrl })}`);
+							// console.log(`[Serveur] Client ${socket.id} identifie: ${JSON.stringify({ pseudo: clientInfo.pseudo, lang: clientInfo.language, avatar: clientInfo.avatarUrl })}`);
 						}
 						break;
 					case 'find_match':
@@ -118,7 +118,7 @@ app.register(async function (fastify) {
 		});
 
 		socket.on('close', () => {
-			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
+			// console.log(`[Serveur] Client deconnecte: ${socket.id}`);
 			const clientInfo = clients.get(socket.id);
 
 			if (clientInfo && clientInfo.gameId) {
@@ -157,7 +157,7 @@ app.register(async function (fastify) {
 
 					game.broadcast('game_over', { end_message: endMessage });
 
-					console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
+					// console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
 					games.delete(clientInfo.gameId);
 				}
 			}
@@ -173,7 +173,7 @@ function handleMatchmaking(playerInfo, gameMode, opponentPseudo = null)
 {
 	const isInQueue = matchmaking_1v1.some(p => p.socket.id === playerInfo.socket.id) || matchmaking_4p.some(p => p.socket.id === playerInfo.socket.id);
 	if (isInQueue) {
-		console.log(`[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.`);
+		// console.log(`[Matchmaking] Le joueur ${playerInfo.socket.id} est deja en file d'attente.`);
 		return;
 	}
 
@@ -193,7 +193,7 @@ function handleMatchmaking(playerInfo, gameMode, opponentPseudo = null)
 			game = new GameInstance(matchmaking_4p.splice(0, 4), '4P_ONLINE');
 		}
 	} else {
-		console.log(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
+		// console.log(`[Matchmaking] Mode de jeu '${gameMode}' non reconnu.`);
 		return;
 	}
 
@@ -221,7 +221,7 @@ function handlePrivateMatchmaking(playerInfo, opponentPseudo, gameMode) {
 
 		// Verifier que le joueur qui rejoint est bien celui qui etait attendu.
 		if (playerInfo.pseudo === room.opponent_pseudo) {
-			console.log(`[Partie Privee] ${playerInfo.pseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.`);
+			// console.log(`[Partie Privee] ${playerInfo.pseudo} a rejoint ${room.player1.pseudo}. Lancement de la partie.`);
 			const player1 = room.player1;
 			const player2 = playerInfo;
 
@@ -243,7 +243,7 @@ function handlePrivateMatchmaking(playerInfo, opponentPseudo, gameMode) {
 		}
 	} else {
 		// La salle n'existe pas, on la cree.
-		console.log(`[Partie Privee] ${playerInfo.pseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
+		// console.log(`[Partie Privee] ${playerInfo.pseudo} a cree une salle pour jouer contre ${opponentPseudo}.`);
 		privateWaitingRooms.set(roomKey, {
 			player1: playerInfo,
 			opponent_pseudo: opponentPseudo,
