@@ -11,7 +11,7 @@ const props = defineProps<{
 		opponentLogin: string | null;
 	}>();
 
-const emit = defineEmits(['show_play', 'isPlayActive']);
+const emit = defineEmits(['show_play', 'isPlayActive', 'clear-opponent']);
 const activePlay = ref('');
 const isPlayActive = ref(false);
 const isonline = ref(false)
@@ -24,12 +24,22 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
+const handleClearOpponent = () => {
+	console.log('[play_page.vue] Nettoyage de l\'opponent demandé');
+	emit('clear-opponent');
+};
+
 watch(() => props.activePlay, (newVal) => {
 	if (newVal && newVal !== '') {
 		console.log(`[play_page.vue] Recu le mode de jeu '${newVal}', lancement direct du jeu.`);
+		
+		// Si on lance un mode différent de 1V1_ONLINE, nettoyer l'opponent
+		if (newVal !== '1V1_ONLINE') {
+			handleClearOpponent();
+		}
+		
 		isPlayActive.value = true;
 		activePlay.value = newVal;
-		
 	}
 }, { immediate: true });
 
@@ -49,6 +59,7 @@ watch(() => props.activePlay, (newVal) => {
 		:activePlay="activePlay"
 		:opponentLogin="props.opponentLogin"
 		:set-language="props.setLanguage"
+		@clear-opponent="handleClearOpponent"
 		></play>
 	</div>
 	<div v-if="isPlayActive && activePlay === 'tournament'">

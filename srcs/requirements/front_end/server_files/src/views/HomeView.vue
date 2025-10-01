@@ -20,7 +20,7 @@ const props = defineProps<{
 	opponentForOnlineGame?: string | null;
 }>();
 
-const emit = defineEmits(['game-started']);
+const emit = defineEmits(['game-started','nullOpponent','clear-opponent']);
 
 // State
 const isConnect = ref(false);
@@ -90,6 +90,7 @@ function applyHashToFlags() {
 		isConnect.value = true;
 		issetting.value = false;
 		show_play.value = false;
+		emit('nullOpponent');
 	} else if (view === 'settings') {
 		isConnect.value = true;
 		issetting.value = true;
@@ -206,6 +207,12 @@ const handleStartOnlineGame = (opponentLogin: string) => {
 	emit('game-started');
 };
 
+const handleClearOpponent = () => {
+	console.log('[HomeView.vue] Nettoyage de l\'opponent demandé');
+	currentOpponent.value = null;
+	emit('clear-opponent');
+};
+
 // Watchers & Lifecycle
 const anyOpen = computed(() => issetting.value);
 watch(anyOpen, (newValue) => {
@@ -276,7 +283,8 @@ watch(() => props.opponentForOnlineGame, (newOpponent) => {
 						:show_play="show_play"
 						@show_play="toggleshow_play"
 						:activePlay="currentOpponent ? '1V1_ONLINE' : ''"
-						:opponentLogin="currentOpponent"></play_page>
+						:opponentLogin="currentOpponent"
+						@clear-opponent="handleClearOpponent"></play_page>
 				</div>
 			</div>
 		</div>

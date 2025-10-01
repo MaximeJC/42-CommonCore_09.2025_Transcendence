@@ -14,6 +14,10 @@ const props = defineProps<{
 	opponentLogin?: string | null;
 }>();
 
+const emit = defineEmits<{
+	(e: 'clear-opponent'): void;
+}>();
+
 onMounted(async () => {
 	await nextTick()
 	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
@@ -21,7 +25,7 @@ onMounted(async () => {
 
 
 const { currentUser } = user();
-
+let gameConfig: GameConfig | undefined;
 const showResultScreen = ref(false);
 const gameResult = ref({
 	winner: '',
@@ -91,19 +95,21 @@ async function handleGameResult(event: CustomEvent) {
 const handleReturnToLobby = () => {
 	console.log("retour au lobby recu!");
 	showResultScreen.value = false;
+	gameConfig = undefined;
+	emit('clear-opponent'); // Nettoie l'opponent quand on retourne au lobby
 	const target = 'profil';
 	window.location.hash = target.startsWith('/') ? target : '/' + target;
 }
 
 function handleStartGame() {
 	showResultScreen.value = false;
-	const gameConfig: GameConfig = {
+	gameConfig = {
 		pseudo: currentUser.value?.login ?? "",
 		opponentPseudo: props.opponentLogin || "", // Laisser vide pour un match public
 		avatarUrl: currentUser.value?.avatar_url ?? "",
 		gameMode: props.activePlay, //1V1_ONLINE, 1P_VS_AI, 2P_LOCAL, AI_VS_AI, 4P_ONLINE
 		language: currentLang //en, fr, es
-	};
+	} as GameConfig;
 
 	if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {
 		gameConfig.opponentPseudo = props.opponentLogin;

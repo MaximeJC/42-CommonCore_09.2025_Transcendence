@@ -168,7 +168,7 @@ export default async function friendRoutes(fastify, options) {
 			});
 
 			if (relationExists == false)
-				return reply.status(400).send({message: "Friendship doesn't exist."});
+				return reply.send({message: "Friendship doesn't exist."});
 			if (DEBUG_MODE)
 				console.log("La relation existe bien.\n");
 

@@ -130,6 +130,17 @@ function onGameStarted() {
   opponentLoginToStart.value = null;
 }
 
+function onClearOpponent() {
+	console.log('[App.vue] Nettoyage de opponentLoginToStart');
+	opponentLoginToStart.value = null;
+}
+
+function testopponent(){
+	console.log("inviteLogin = ", inviteLogin)
+	console.log("opponentLoginToStart = ", opponentLoginToStart)
+}
+
+
 watch(socket, (newSocket, oldSocket) => {
 	if (oldSocket) {
 		oldSocket.removeEventListener('message', handleServerMessage);
@@ -153,10 +164,12 @@ watch(socket, (newSocket, oldSocket) => {
 	<div class="inviteLogin">{{ inviteLogin}}</div>
 	<div class="home-container">
 		<HomeView
+			@nullOpponent="testopponent"
 			:setLanguage="setLanguage"
 			@invite="handleInvite"
 			:opponent-for-online-game="opponentLoginToStart"
-			@game-started="onGameStarted"></HomeView>
+			@game-started="onGameStarted"
+			@clear-opponent="onClearOpponent"></HomeView>
 	</div>
 
 </template>

@@ -144,11 +144,11 @@ async function checkFriend() {
 			})
 		});
 		if (!result.ok)
-			throw new Error(`${result.status}`);
+			return console.log(friendLogin, ", n'est pas dans la liste d'amis");
 		console.log("Ami checked avec succes.");
 		itsFriend.value = true;
 	} catch (err) {
-		console.error("Erreur de check d'amitie:", err);
+		//console.error("Erreur de check d'amitie:", err);
 		itsFriend.value = false;
 	}
 }
@@ -221,7 +221,7 @@ watch(() => props.selectedPlayerLogin ?? "", (newLoginFriend) => {
 		</button>
 		<div class="i-button-container">
 			<button v-if="!itsFriend" @click="addFriend" class="i-add-friends"></button>
-			<button v-else @click="deleteFriend" class="delete-friends"></button>
+			<button v-if="itsFriend" @click="deleteFriend" class="delete-friends"></button>
 			<button @click="emit('showOtherPlayer')" tittle="return-button" class="return-button">
 				<div data-i18n="home_player_button.return"></div>
 			</button>
