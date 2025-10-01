@@ -1,5 +1,5 @@
 COMPOSE_PROJECT_NAME = transcendence
-COMPOSE_FILE = srcs/docker-compose.yml
+COMPOSE_FILE = srcs/docker-compose.dev.yml
 COMPOSE_PROD_FILE = srcs/docker-compose.prod.yml
 
 #! RULES

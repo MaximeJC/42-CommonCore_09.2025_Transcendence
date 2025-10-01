@@ -1,21 +1,47 @@
 services:
+  caddy:
+    container_name: hgp_caddy
+    build:
+      context: ./requirements/caddy
+      dockerfile: Dockerfile
+    image: hgp_caddy_img
+    ports:
+      - "5000:5000"
+    networks:
+      - hgp_network
+    restart: unless-stopped
+    depends_on:
+      - front_end
+      - user_management
+      - game_management
+      - ai_server
+
+  ai_server:
+    container_name: hgp_ai_server
+    build:
+      context: ./requirements/ai_server
+      dockerfile: Dockerfile
+    image: hgp_ai_server_img
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
   front_end:
-    container_name: hgp_front_end_dev
+    container_name: hgp_front_end
     build:
       context: ./requirements/front_end
       dockerfile: Dockerfile
     image: hgp_front_end_img
+    # env_file: ./.env
     volumes:
-      - user_avatars:/app/public/uploads
-      - ./certs:/app/certs:ro 
-      - ./requirements/front_end/server_files:/app  # Mount en développement pour hot-reload
-    ports:
-      - "5173:5173"  # Port de développement
+      - user_avatars:/app/uploads
+      - ./certs:/app/certs:ro
+      - ./requirements/front_end/server_files/src:/app/src
+      - ./requirements/front_end/server_files/public:/app/public
     environment:
-      - NODE_ENV=development
       - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=ws://localhost:5173
-      - VITE_AI_SERVER_BASE_URL=http://localhost:5173
+      - VITE_PONG_SERVER_BASE_URL=/game
+      - VITE_AI_SERVER_BASE_URL=/ai
     networks:
       - hgp_network
     restart: unless-stopped
@@ -23,61 +49,36 @@ services:
       - user_management
       - game_management
 
-  user_management:
-    container_name: hgp_user_management_dev
-    build:
-      context: ./requirements/user_management
-      dockerfile: Dockerfile
-    image: hgp_user_management_dev_img
-    env_file: 
-      - ./dev.env
-    volumes:
-      - user_management_db:/app/db
-      - user_avatars:/app/uploads
-      - ./certs:/app/certs:ro 
-    environment:  
-      - NODE_ENV=development
-      - POSTGRES_HOST=localhost
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=transcendence
-      - DATABASE_URL=postgresql://postgres:root@localhost:5432/transcendence
-    networks:
-      - hgp_network
-    restart: unless-stopped
-
   game_management:
-    container_name: hgp_game_management_dev
+    container_name: hgp_game_management
     build:
       context: ./requirements/game_management
       dockerfile: Dockerfile
-    image: hgp_game_management_dev_img
+    image: hgp_game_management_img
     volumes:
-      - ./certs:/app/certs:ro 
+      - ./certs:/app/certs:ro
+    # env_file: ./.env
     environment:
-      - NODE_ENV=development
-      - AI_SERVER_URL=http://hgp_ai_server_dev:3001
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-    depends_on:
-      - ai_server
+      - AI_SERVER_URL=http://hgp_ai_server:3001
     networks:
       - hgp_network
     restart: unless-stopped
 
-  ai_server:
-    container_name: hgp_ai_server_dev
+  user_management:
+    container_name: hgp_user_management
     build:
-      context: ./requirements/ai_server
+      context: ./requirements/user_management
       dockerfile: Dockerfile
-    image: hgp_ai_server_dev_img
+    image: hgp_user_management_img
+    env_file:
+      - ./dev.env
+    volumes:
+      - ./certs:/app/certs:ro
+      - user_management_db:/app/db
+      - user_avatars:/app/uploads
     networks:
       - hgp_network
     restart: unless-stopped
-
-networks:
-  hgp_network:
-    driver: bridge
 
 volumes:
   user_management_db:
@@ -90,3 +91,7 @@ volumes:
       type: none
       device: ${HOME}/hgp_data/avatars
       o: bind
+
+networks:
+  hgp_network:
+    driver: bridge
