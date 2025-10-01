@@ -13,16 +13,16 @@ dev: mkdir
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services with Caddy..."
+	@cp ./srcs/.dev.env ./srcs/requirements/front_end/server_files/.env
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
-# 	@echo "Access your application at: https://localhost:5000"
 
 prod: mkdir
 	@echo "Switching to PRODUCTION mode with Caddy reverse proxy..."
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services with Caddy..."
+	@cp ./srcs/.prod.env ./srcs/requirements/front_end/server_files/.env
 	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
-# 	@echo "Access your application at: https://localhost:5000"
 
 down:
 	@echo "Stopping $(COMPOSE_PROJECT_NAME) services..."
