@@ -31,10 +31,10 @@ export default async function friendRoutes(fastify, options) {
 
 			// Verifier si les utilisateurs existent
 			if (!user_1) {
-				return reply.status(404).send({ error: `L'utilisateur ${login1} n'a pas ete trouve.` });
+				return reply.send({ error: `L'utilisateur ${login1} n'a pas ete trouve.` });
 			}
 			if (!user_2) {
-				return reply.status(404).send({ error: `L'utilisateur ${cleanLogin2} n'a pas ete trouve.` });
+				return reply.send({ error: `L'utilisateur ${cleanLogin2} n'a pas ete trouve.` });
 			}
 
 			const id_1 = user_1.id;
@@ -53,7 +53,7 @@ export default async function friendRoutes(fastify, options) {
 			});
 
 			if (relationExists) {
-				return reply.status(409).send({ error: "Cette relation d'amitie existe deja." });
+				return console.log("Cette relation d'amitie existe deja.");
 			}
 
 			// Inserer la relation d'amitie dans les deux sens

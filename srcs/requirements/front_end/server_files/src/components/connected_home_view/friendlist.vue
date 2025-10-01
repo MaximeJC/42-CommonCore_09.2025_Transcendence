@@ -80,7 +80,10 @@ async function addFriend() {
 		console.log("addFriend: ajouteur =", ajouteur, ", ajoute =", ajoute);
 
 		if (ajouteur === ajoute)
-			throw new Error(`Erreur: on ne peut pas etre ami avec soi-meme`);
+			return console.log(`Erreur: on ne peut pas etre ami avec soi-meme`);
+
+		if (!ajoute)
+			return console.log('Erreur: Le champs d\'ajout d\'amis est vide');
 
 		const result = await fetch(`${USER_MANAGEMENT_URL}/friends`, {
 			method: 'POST',
@@ -92,10 +95,14 @@ async function addFriend() {
 				login2: ajoute
 			})
 		});
-		if (!result.ok)
-			throw new Error(`${result.status}`);
+		console.log(result);
+		if (!result.ok || !result.statusText) {
+			search_friends.value = "";
+			return console.log(`Erreur d'ajout d'amis`);
+		}
 		console.log("Ami ajoute avec succes.");
 		fetchFriends(ajouteur);
+		search_friends.value = "";
 	} catch (err) {
 		console.error("Erreur de creation d'amitie:", err);
 	}
