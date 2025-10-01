@@ -4,7 +4,7 @@ import { returnToLobby } from './app.js'
 
 const API_URL = '/game';
 
-console.log(`Connexion API a l'adresse: ${API_URL}`);
+// console.log(`Connexion API a l'adresse: ${API_URL}`);
 
 let mainAppInitializer = null;
 
@@ -25,11 +25,11 @@ class NetworkManager {
 
 	async connect() {
 		if (this.clientId) {
-			console.log("Deja enregistre avec le clientId:", this.clientId);
+			// console.log("Deja enregistre avec le clientId:", this.clientId);
 			gameState.isConnected = true;
 			return;
 		}
-		console.log("Tentative d'enregistrement aupres du serveur de jeu...");
+		// console.log("Tentative d'enregistrement aupres du serveur de jeu...");
 		try {
 			const response = await fetch(`${API_URL}/connect`, {
 				method: 'POST',
@@ -45,7 +45,7 @@ class NetworkManager {
 			this.clientId = data.clientId;
 			gameState.myClientId = this.clientId;
 			gameState.isConnected = true;
-			console.log("Enregistre avec succes ! ClientId:", this.clientId);
+			// console.log("Enregistre avec succes ! ClientId:", this.clientId);
 		} catch (error) {
 			console.error("Erreur lors de la connexion initiale:", error);
 			gameState.isConnected = false;
@@ -76,7 +76,7 @@ class NetworkManager {
 		
 		const currentStateStatus = state.status;
 		if (this.lastKnownStateStatus !== currentStateStatus) {
-			console.log(`Changement d'etat: ${this.lastKnownStateStatus || 'null'} -> ${currentStateStatus}`);
+			// console.log(`Changement d'etat: ${this.lastKnownStateStatus || 'null'} -> ${currentStateStatus}`);
 			switch (currentStateStatus) {
 				case 'countdown': startCountdown(gameState); break;
 				case 'playing': break;
@@ -135,7 +135,7 @@ class NetworkManager {
 
 	startMatchmakingPolling() {
 		this.stopPolling();
-		console.log("En attente d'autres joueurs... Debut du polling de matchmaking...");
+		// console.log("En attente d'autres joueurs... Debut du polling de matchmaking...");
 		this.matchmakingPollInterval = setInterval(async () => {
 			try {
 				const response = await fetch(`${API_URL}/matchmaking/status/${this.clientId}`);
@@ -155,7 +155,7 @@ class NetworkManager {
 
 	async prepareGameScene() {
 		if (!this.gameId || !this.clientId) return;
-		console.log("Partie trouvee ! ID:", this.gameId, ". Preparation de la scene.");
+		// console.log("Partie trouvee ! ID:", this.gameId, ". Preparation de la scene.");
 		try {
 			const initialResponse = await fetch(`${API_URL}/${this.gameId}/state?clientId=${this.clientId}`);
 			if (!initialResponse.ok) {
@@ -175,7 +175,7 @@ class NetworkManager {
 	
 	async sendClientReady() {
 		if (!this.gameId || !this.clientId) return;
-		console.log("Client pret, notification au serveur pour demarrer la partie...");
+		// console.log("Client pret, notification au serveur pour demarrer la partie...");
 		try {
 			await fetch(`${API_URL}/${this.gameId}/ready`, {
 				method: 'POST',
@@ -196,7 +196,7 @@ class NetworkManager {
 			try {
 				const response = await fetch(`${API_URL}/${this.gameId}/state?clientId=${this.clientId}`);
 				if (response.status === 404) {
-					console.log("Partie terminee (le serveur a renvoye 404).");
+					// console.log("Partie terminee (le serveur a renvoye 404).");
 					this.stopPolling();
 					returnToLobby(false);
 					return;

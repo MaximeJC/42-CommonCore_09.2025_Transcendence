@@ -75,7 +75,7 @@
 	});
 
 	onUnmounted(() => {
-	document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
+		document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true });
 	})
 
 	const typeplay = (connection: boolean, type: string ) => {

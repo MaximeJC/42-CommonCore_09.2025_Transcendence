@@ -197,11 +197,15 @@ const handlePointerDownOutside = (e: PointerEvent) => {
 };
 
 const handleStartOnlineGame = (opponentLogin: string) => {
-	console.log(`Lancement de la partie 1V1_ONLINE contre ${opponentLogin}`);
+	// console.log(`Lancement de la partie 1V1_ONLINE contre ${opponentLogin}`);
 	currentOpponent.value = opponentLogin;
 	navigateTo('playinvite');
 	emit('game-started');
 };
+
+const handleGameEnded = () => {
+	currentOpponent.value = null;
+}
 
 // Watchers & Lifecycle
 const anyOpen = computed(() => issetting.value);
@@ -222,13 +226,8 @@ watch(() => props.opponentForOnlineGame, (newOpponent) => {
 });
 
 onMounted(() => {
-	// 1) Applique la vue au montage (si pas de hash, on laisse la logique de checksession decider)
 	applyHashToFlags();
-
-	// 2) ecoute des retours/avances navigateur (hashchange)
 	window.addEventListener('hashchange', applyHashToFlags);
-
-	// 3) Verifie la session (ajuste aussi l’URL si besoin)
 	checksession();
 });
 
@@ -237,11 +236,6 @@ onUnmounted(() => {
 	window.removeEventListener('hashchange', applyHashToFlags);
 });
 
-watch(() => props.opponentForOnlineGame, (newOpponent) => {
-	if (newOpponent) {
-		handleStartOnlineGame(newOpponent);
-	}
-});
 </script>
 
 
@@ -272,6 +266,7 @@ watch(() => props.opponentForOnlineGame, (newOpponent) => {
 						@isPlayActive="toggleisPlayActive"
 						:show_play="show_play"
 						@show_play="toggleshow_play"
+						@game-over="handleGameEnded"
 						:activePlay="currentOpponent ? '1V1_ONLINE' : ''"
 						:opponentLogin="currentOpponent"></play_page>
 				</div>
@@ -295,4 +290,4 @@ watch(() => props.opponentForOnlineGame, (newOpponent) => {
 		display: flex;
 		justify-content: center;
 	}
-</style>http://localhost:5173/#/profil
+</style>

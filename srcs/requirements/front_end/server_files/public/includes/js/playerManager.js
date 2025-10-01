@@ -120,7 +120,7 @@ export function setupPlayers(scene, gameState) {
 			break;
 
 		case '2P_LOCAL':
-			console.log("Configuration pour 2 Joueurs Local (gere par le serveur).");
+			// console.log("Configuration pour 2 Joueurs Local (gere par le serveur).");
 			playerSetups.push({
 				config: {
 					pseudo: allPlayerConfigs.left_top.pseudo,
@@ -146,7 +146,7 @@ export function setupPlayers(scene, gameState) {
 			break;
 		
 		case '1V1_ONLINE':
-			console.log("Mode 1V1_ONLINE: En attente d'un adversaire...");
+			// console.log("Mode 1V1_ONLINE: En attente d'un adversaire...");
 			playerSetups.push({
 				config: {
 					pseudo: allPlayerConfigs.left_top.pseudo,

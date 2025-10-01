@@ -26,7 +26,7 @@ let activeScene = null;
  * Nettoie la scene de jeu actuelle et retourne au lobby.
  */
 function returnToLobby(endgame) {
-	console.log("Nettoyage de la scene et retour au lobby...");
+	// console.log("Nettoyage de la scene et retour au lobby...");
 
 	// Arreter la boucle de rendu pour eviter les erreurs
 	if (engine) {
@@ -72,7 +72,7 @@ function returnToLobby(endgame) {
  * Affiche une scene d'attente simple pendant la recherche de partie.
  */
 function showWaitingScreen() {
-	console.log("Affichage de l'ecran d'attente...");
+	// console.log("Affichage de l'ecran d'attente...");
 
 	const waitingScene = new BABYLON.Scene(engine);
 	const camera = new BABYLON.FreeCamera("waitingCam", new BABYLON.Vector3(0, 0, -10), waitingScene);
@@ -124,7 +124,7 @@ function showWaitingScreen() {
 	});
 
 	cancelButton.onPointerUpObservable.add(() => {
-		console.log("Le bouton 'Quitter' a ete clique.");
+		// console.log("Le bouton 'Quitter' a ete clique.");
 		returnToLobby();
 	});
 
@@ -139,7 +139,7 @@ function showWaitingScreen() {
  * Anime la camera de la scene de jeu sur une trajectoire predefinie.
  */
 async function playCinematic(scene, camera) {
-	console.log("La cinematique demarre...");
+	// console.log("La cinematique demarre...");
 
 	const frameRate = 60;
 	const durationInSeconds = 6; // Duree de la cinematique
@@ -262,14 +262,14 @@ async function playCinematic(scene, camera) {
 	// On reactive les controles manuels a la fin.
 	camera.attachControl(canvas, true);
 
-	console.log("Cinematique terminee.");
+	// console.log("Cinematique terminee.");
 }
 
 /**
  * La fonction principale qui initialise la scene de JEU.
  */
 async function initializeApp() {
-	console.log("Initialisation de la scene de jeu...");
+	// console.log("Initialisation de la scene de jeu...");
 
 	// createScene retourne maintenant un objet { scene, camera }
 	const { scene: gameScene, camera } = createScene(engine);
@@ -290,7 +290,7 @@ async function initializeApp() {
 
 	// Affichage d'un ecran de chargement
 	engine.displayLoadingUI();
-	console.time("Temps de chargement total des modeles");
+	// console.time("Temps de chargement total des modeles");
 
 
 	// On cree une liste de toutes les "promesses" de chargement.
@@ -322,7 +322,7 @@ async function initializeApp() {
 		 pacMan
 		] = await Promise.all(loadingPromises);
 
-	console.timeEnd("Temps de chargement total des modeles");
+	// console.timeEnd("Temps de chargement total des modeles");
 
 	// cache l'ecran de chargement
 	engine.hideLoadingUI();
@@ -440,7 +440,7 @@ async function startMatchmaking(config) {
 		
 		if (config.opponentPseudo && config.gameMode === "1V1_ONLINE") {
 			// Si un adversaire est specifie, on cree une partie privee
-			console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
+			// console.log(`Demande de partie privee contre ${config.opponentPseudo}`);
 			networkManager.sendMessage('create_private_match', {
 				my_pseudo: gameState.pseudo,
 				opponent_pseudo: config.opponentPseudo,
@@ -450,7 +450,7 @@ async function startMatchmaking(config) {
 			});
 		} else {
 			// Sinon, on rejoint le matchmaking public
-			console.log("Demande de partie publique.");
+			// console.log("Demande de partie publique.");
 			networkManager.sendMessage('find_match', {
 				mode: gameState.gameMode,
 				pseudo: gameState.pseudo,

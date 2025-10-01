@@ -105,6 +105,7 @@ export class GameInstance {
 			gameId: this.gameId,
 			status: this.gameState.status,
 			mode: this.gameState.gameMode,
+			gameMode: this.gameState.gameMode,
 			ball_z: this.gameState.ball.position.z,
 			ball_y: this.gameState.ball.position.y,
 			players: playersState,
@@ -113,7 +114,8 @@ export class GameInstance {
 			score_right: this.gameState.scoreRight,
 			countdownEndTime: this.gameState.countdownEndTime || null,
 			duration: this.gameDurationInSeconds,
-
+			playerLeftTop: this.gameState.activePlayers.find(p => p.name === 'player_left_top').pseudo,
+			playerRightTop: this.gameState.activePlayers.find(p => p.name === 'player_right_top').pseudo,
 			end_message: this.gameState.endMessage || null,
 			winner: this.gameState.winnerPseudo || null,
 			loser: this.gameState.loserPseudo || null,
@@ -206,5 +208,7 @@ export class GameInstance {
 		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${this.gameState.winnerPseudo}`);
 		console.log(`[Jeu ${this.gameId}] Score final: ${this.gameState.scoreLeft} - ${this.gameState.scoreRight}`);
 		console.log(`[Jeu ${this.gameId}] Duree: ${this.gameDurationInSeconds} secondes.`);
+
+		return this.getSerializableState();
 	}
 }

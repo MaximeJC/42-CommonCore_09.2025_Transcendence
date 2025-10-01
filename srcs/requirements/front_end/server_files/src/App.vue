@@ -24,7 +24,7 @@ const emit = defineEmits(['start-online-game']);
 
 onMounted(async () => {
 	await nextTick()
-	updateText()	 // <-- c’est ça qu’il faut appeler au premier rendu
+	updateText()
 })
 
 function handleServerMessage(event: MessageEvent) {
@@ -32,23 +32,23 @@ function handleServerMessage(event: MessageEvent) {
 		const data = JSON.parse(event.data);
 
 		if (data.event === 'friend_invite') {
-			console.log("invite jeu recue via WebSocket !", data.payload);
+			// console.log("invite jeu recue via WebSocket !", data.payload);
 			inviteurLogin.value = data.payload.loginInviteur;
-			console.log("invite jeu de :", inviteurLogin.value);
+			// console.log("invite jeu de :", inviteurLogin.value);
 		}
 		if (data.event === 'friend_invite_cancel') {
-			console.log("invite jeu annule via WebSocket !", data.payload);
+			// console.log("invite jeu annule via WebSocket !", data.payload);
 			inviteurLogin.value = "";
-			console.log("invite jeu annule :", inviteurLogin.value);
+			// console.log("invite jeu annule :", inviteurLogin.value);
 		}
 		if (data.event === 'friend_invite_decline') {
-			console.log("invite jeu refuse via WebSocket !", data.payload);
+			// console.log("invite jeu refuse via WebSocket !", data.payload);
 			inviteLogin.value = "";
-			console.log("invite jeu refuse :", inviteurLogin.value);
+			// console.log("invite jeu refuse :", inviteurLogin.value);
 		}
 		if (data.event === 'friend_invite_accepted') {
-			console.log("invite jeu accepte via WebSocket !", data.payload);
-			console.log("invite jeu accepte :", inviteLogin.value);
+			// console.log("invite jeu accepte via WebSocket !", data.payload);
+			// console.log("invite jeu accepte :", inviteLogin.value);
 			
 			//rediriger vers playable_page
 			opponentLoginToStart.value = inviteLogin.value
@@ -60,7 +60,7 @@ function handleServerMessage(event: MessageEvent) {
 }
 
 async function onInvitationAccepted() {
-	console.log(`Invitation de ${inviteurLogin.value} acceptee !`);
+	// console.log(`Invitation de ${inviteurLogin.value} acceptee !`);
 
 	const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite_accept`, {
 		method: 'POST',
@@ -74,16 +74,17 @@ async function onInvitationAccepted() {
 	});
 	if (!result.ok)
 		throw new Error(`${result.status}`);
-	console.log("Ami invite accepte avec succes.", inviteLogin.value);
+	// console.log("Ami invite accepte avec succes.", inviteLogin.value);
 
 	//rediriger vers playable_page
 	opponentLoginToStart.value = inviteurLogin.value;
 
 	inviteurLogin.value = null;
+	inviteLogin.value = null;
 }
 
 async function onInvitationRefused() {
-	console.log(`Invitation de ${inviteurLogin.value} refusee.`);
+	// console.log(`Invitation de ${inviteurLogin.value} refusee.`);
 
 	const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite_decline`, {
 		method: 'POST',
@@ -97,13 +98,13 @@ async function onInvitationRefused() {
 	});
 	if (!result.ok)
 		throw new Error(`${result.status}`);
-	console.log("Ami invite refuse avec succes.", inviteLogin.value);
+	// console.log("Ami invite refuse avec succes.", inviteLogin.value);
 
 	inviteurLogin.value = null;
 }
 
 async function onInvitationCancel() {
-	console.log(`Invitation pour ${inviteLogin.value} annule.`);
+	// console.log(`Invitation pour ${inviteLogin.value} annule.`);
 
 	const result = await fetch(`${USER_MANAGEMENT_URL}/friends/invite_cancel`, {
 		method: 'POST',
@@ -117,17 +118,20 @@ async function onInvitationCancel() {
 	});
 	if (!result.ok)
 		throw new Error(`${result.status}`);
-	console.log("Ami invite annule avec succes.", inviteLogin.value);
+	// console.log("Ami invite annule avec succes.", inviteLogin.value);
 	inviteLogin.value = null;
 }
 
 function handleInvite(friendLogin: string) {
-	console.log(`Event 'invite' recu pour le joueur : ${friendLogin}`);
+	// console.log(`Event 'invite' recu pour le joueur : ${friendLogin}`);
 	inviteLogin.value = friendLogin;
 }
 
 function onGameStarted() {
-  opponentLoginToStart.value = null;
+	opponentLoginToStart.value = '';
+	inviteLogin.value = '';
+	inviteurLogin.value = '';
+	// console.log(`onGameStarted appele`);
 }
 
 watch(socket, (newSocket, oldSocket) => {

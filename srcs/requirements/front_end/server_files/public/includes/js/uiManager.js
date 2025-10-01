@@ -295,7 +295,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	
 	// Action du bouton: appeler la fonction de retour au lobby
 	exitButton.onPointerUpObservable.add(() => {
-		console.log("Le bouton 'Quitter' a ete clique.");
+		// console.log("Le bouton 'Quitter' a ete clique.");
 		returnToLobby(false);
 	});
 
@@ -312,7 +312,7 @@ export function createGUI(gameState, engine, scene, JwtToken) {
 	returnButton.mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 		BABYLON.ActionManager.OnPickTrigger,
 		function () {
-			console.log("Retour au menu principal...");
+			// console.log("Retour au menu principal...");
 			returnToLobby(false);
 		}
 	));

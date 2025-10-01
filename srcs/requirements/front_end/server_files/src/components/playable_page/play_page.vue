@@ -20,12 +20,12 @@ const handletypeplay = (isActive: boolean, type: string) => {
 	activePlay.value = type;
 	isPlayActive.value = !isPlayActive.value
 	emit('isPlayActive');
-	console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
+	// console.log('isPlayActive:', isPlayActive.value, 'activePlay:', activePlay.value);
 };
 
 watch(() => props.activePlay, (newVal) => {
 	if (newVal && newVal !== '') {
-		console.log(`[play_page.vue] Recu le mode de jeu '${newVal}', lancement direct du jeu.`);
+		// console.log(`[play_page.vue] Recu le mode de jeu '${newVal}', lancement direct du jeu.`);
 		isPlayActive.value = true;
 		activePlay.value = newVal;
 		

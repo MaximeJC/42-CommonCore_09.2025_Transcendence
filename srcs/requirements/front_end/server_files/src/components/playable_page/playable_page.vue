@@ -6,6 +6,8 @@ import { user } from '../../user';
 import tournament from "./tournament_page.vue";
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
+
+const emit = defineEmits(['game-over']);
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
 	activePlay: string;
@@ -50,7 +52,7 @@ async function addGameToDataBase(newGame: any) {
 	
 	// Ne sauvegarder que les parties 1V1 en ligne (entre vrais joueurs)
 	if (newGame.gameMode !== "1V1_ONLINE") {
-		console.log(`Partie en mode ${newGame.gameMode} - pas de sauvegarde dans la BDD`);
+		// console.log(`Partie en mode ${newGame.gameMode} - pas de sauvegarde dans la BDD`);
 		return;
 	}
 	
@@ -70,7 +72,7 @@ async function addGameToDataBase(newGame: any) {
 		);
 		if (!response.ok)
 			throw new Error(`Erreur http: ${response.status}`);
-		console.log("Partie enregistree dans la base de donnees avec succes.");
+		// console.log("Partie enregistree dans la base de donnees avec succes.");
 	} catch (err) {
 		console.error("Erreur d'ajout de partie a la base de donnees:", err);
 	}
@@ -78,19 +80,21 @@ async function addGameToDataBase(newGame: any) {
 
 // GESTION DE L'EVENEMENT DE FIN DE PARTIE
 async function handleGameResult(event: CustomEvent) {
-	console.log("Evenement 'gameresult' capture par Vue!", event.detail);
+	// console.log("Evenement 'gameresult' capture par Vue!", event.detail);
 	gameResult.value = event.detail; // Met a jour nos donnees
 	showResultScreen.value = true;
 	await nextTick();  
 	updateText()
 	addGameToDataBase(gameResult.value);
+	emit('game-over');
 }
 
 const handleReturnToLobby = () => {
-	console.log("retour au lobby recu!");
+	// console.log("retour au lobby recu!");
 	showResultScreen.value = false;
 	const target = 'profil';
 	window.location.hash = target.startsWith('/') ? target : '/' + target;
+	emit('game-over');
 }
 
 function handleStartGame() {
@@ -109,7 +113,7 @@ function handleStartGame() {
 	} else if (props.activePlay === "1V1_ONLINE" && props.opponentLogin) {
 		gameConfig.opponentPseudo = props.opponentLogin;
 	}
-	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
+	// console.log("Configuration de jeu envoyee a app.js:", gameConfig);
 
 	startMatchmaking(gameConfig);
 }
@@ -124,7 +128,7 @@ onMounted(() => {
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
 	window.removeEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+	window.removeEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 });
 
 watch(() => props.activePlay, (newVal) => {

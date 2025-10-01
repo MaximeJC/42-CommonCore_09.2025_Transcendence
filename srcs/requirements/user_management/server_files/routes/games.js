@@ -6,42 +6,56 @@ export default async function gameRoutes(fastify, options) {
 	// Ajouter une partie
 	fastify.post('/games', async (request, reply) => {
 		const { login_winner, login_loser, score_winner, score_loser, game_id } = request.body;
-
+	
 		try {
-			// Recuperer les utilisateurs complets pour obtenir leurs IDs
 			const winner = await getUserByLogin(login_winner);
 			const loser = await getUserByLogin(login_loser);
-
-			// Verifier si les utilisateurs existent
+	
 			if (!winner || !loser) {
-				return reply.status(404).send({ error: "Un des logins est introuvable dans la base de donnees." });
+				return reply.send({ error: "Un des logins est introuvable dans la base de donnees." });
 			}
-
+	
 			const winner_id = winner.id;
 			const loser_id = loser.id;
-
-			// Inserer la partie avec les IDs
-			await new Promise((resolve, reject) => {
-				db.run(
-					`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
-					[winner_id, loser_id, score_winner, score_loser, game_id],
-					function (err) {
+	
+			const exists = await new Promise((resolve, reject) => {
+				db.all(
+					`SELECT 1 FROM games WHERE game_id = ?`,
+					[game_id],
+					(err, rows) => {
 						if (err) reject(err);
-						else resolve(this);
+						else resolve(rows.length > 0);
 					}
 				);
 			});
-			
-			// Mettre a jour le classement
-			await updateUserRanks(db);
-
-			reply.status(201).send({ message: "Partie enregistree avec succes." });
-
-		} catch (err) {
-			if (DEBUG_MODE) {
-				console.log("Erreur lors de l'ajout de la partie:", err);
+	
+			if (exists) {
+				return reply.send({ message: "Partie deja enregistree." });
 			}
-			reply.status(500).send({ error: "Erreur serveur lors de l'ajout de la partie." });
+			else{
+				// Inserer la partie
+				await new Promise((resolve, reject) => {
+					db.run(
+						`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
+						[winner_id, loser_id, score_winner, score_loser, game_id],
+						function (err) {
+							if (err) reject(err);
+							else resolve(this);
+						}
+					);
+				});
+
+				await updateUserRanks(db);
+
+				reply.send({ message: "Partie enregistree avec succes." });
+			}
+	
+			
+	
+		} catch (err) {
+			if (DEBUG_MODE)
+				console.log("Erreur lors de l'ajout de la partie:", err);
+			reply.send({ error: "Erreur serveur lors de l'ajout de la partie." });
 		}
 	});
 

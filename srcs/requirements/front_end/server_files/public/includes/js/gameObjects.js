@@ -9,7 +9,7 @@ import { debug, debugVisuals } from './config.js';
 
 
 export function createDebugArrow(scene) {
-	console.log("Creation de la fleche de debogage.");
+	// console.log("Creation de la fleche de debogage.");
 	const arrowPoints = [
 		new BABYLON.Vector3(0, 0, 0), // Point de depart
 		new BABYLON.Vector3(0, 0, 5)  // Point d'arrivee (longueur 5)
@@ -62,7 +62,7 @@ export async function createBall(scene) {
 			axes.zAxis.parent = ball;
 			ball.isVisible = false;
 		}
-		console.log("Balle creee avec succes !");
+		// console.log("Balle creee avec succes !");
 	} catch (error) {
 		console.error("Erreur lors de la creation de la balle :", error);
 	}
@@ -254,7 +254,7 @@ export async function loadArcade(scene) {
 			axesArcade.yAxis.parent = pong_arcade;
 			axesArcade.zAxis.parent = pong_arcade;
 		}
-		console.log("Arcade importee avec succes !");
+		// console.log("Arcade importee avec succes !");
 		const table = createTable(scene);
 		
 		return pong_arcade;
@@ -267,7 +267,7 @@ export async function loadArcade(scene) {
 
 export async function loadArcadeMachines(scene) {
 	try {
-		console.time("Temps de chargement ArcadeMachines");
+		// console.time("Temps de chargement ArcadeMachines");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "ArcadeMachines.glb", scene);
 		const ArcadeMachines = result.meshes[0];
 		ArcadeMachines.position = new BABYLON.Vector3(50, -75, 300);
@@ -278,14 +278,14 @@ export async function loadArcadeMachines(scene) {
 			axesArcadeMachines.yAxis.parent = ArcadeMachines;
 			axesArcadeMachines.zAxis.parent = ArcadeMachines;
 		}
-		console.log("Machine d'arcade importee avec succes !");
-		console.timeEnd("Temps de chargement ArcadeMachines");
+		// console.log("Machine d'arcade importee avec succes !");
+		// console.timeEnd("Temps de chargement ArcadeMachines");
 
 		return ArcadeMachines;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele machine d'arcade :", error);
-		console.timeEnd("Temps de chargement ArcadeMachines");
+		// console.timeEnd("Temps de chargement ArcadeMachines");
 
 		return null;
 	}
@@ -293,7 +293,7 @@ export async function loadArcadeMachines(scene) {
 
 export async function loadDDM(scene) {
 	try {
-		console.time("Temps de chargement DDM");
+		// console.time("Temps de chargement DDM");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "DDM.glb", scene);
 		const DDM = result.meshes[0];
 		DDM.position = new BABYLON.Vector3(200, -45, -650);
@@ -304,14 +304,14 @@ export async function loadDDM(scene) {
 			axesDDM.yAxis.parent = DDM;
 			axesDDM.zAxis.parent = DDM;
 		}
-		console.log("DDM importee avec succes !");
-		console.timeEnd("Temps de chargement DDM");
+		// console.log("DDM importee avec succes !");
+		// console.timeEnd("Temps de chargement DDM");
 
 		return DDM;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele DDM :", error);
-		console.timeEnd("Temps de chargement DDM");
+		// console.timeEnd("Temps de chargement DDM");
 
 		return null;
 	}
@@ -319,7 +319,7 @@ export async function loadDDM(scene) {
 
 export async function loadSugarRush(scene) {
 	try {
-		console.time("Temps de chargement sugar_rush");
+		// console.time("Temps de chargement sugar_rush");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "sugar_rush.glb", scene);
 		const SugarRush = result.meshes[0];
 		SugarRush.position = new BABYLON.Vector3(830, -10, -790);
@@ -330,21 +330,21 @@ export async function loadSugarRush(scene) {
 			axesSugarRush.yAxis.parent = SugarRush;
 			axesSugarRush.zAxis.parent = SugarRush;
 		}
-		console.log("SugarRush importee avec succes !");
-		console.timeEnd("Temps de chargement sugar_rush");
+		// console.log("SugarRush importee avec succes !");
+		// console.timeEnd("Temps de chargement sugar_rush");
 
 		return SugarRush;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Sugar Rush :", error);
-		console.timeEnd("Temps de chargement sugar_rush");
+		// console.timeEnd("Temps de chargement sugar_rush");
 		return null;
 	}
 }
 
 export async function loadHockey(scene) {
 	try {
-		console.time("Temps de chargement Hockey");
+		// console.time("Temps de chargement Hockey");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Hockey.glb", scene);
 		const Hockey = result.meshes[0];
 		Hockey.position = new BABYLON.Vector3(800, -166, -200);
@@ -355,21 +355,21 @@ export async function loadHockey(scene) {
 			axesHockey.yAxis.parent = Hockey;
 			axesHockey.zAxis.parent = Hockey;
 		}
-		console.log("Hockey importee avec succes !");
-		console.timeEnd("Temps de chargement Hockey");
+		// console.log("Hockey importee avec succes !");
+		// console.timeEnd("Temps de chargement Hockey");
 
 		return Hockey;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Hockey :", error);
-		console.timeEnd("Temps de chargement Hockey");
+		// console.timeEnd("Temps de chargement Hockey");
 		return null;
 	}
 }
 
 export async function loadWhackAMole(scene) {
 	try {
-		console.time("Temps de chargement Whack_a_mole");
+		// console.time("Temps de chargement Whack_a_mole");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Whack_a_mole.glb", scene);
 		const WhackAMole = result.meshes[0];
 		WhackAMole.position = new BABYLON.Vector3(1300, -100, -875);
@@ -380,21 +380,21 @@ export async function loadWhackAMole(scene) {
 			axesWhackAMole.yAxis.parent = WhackAMole;
 			axesWhackAMole.zAxis.parent = WhackAMole;
 		}
-		console.log("WhackAMole importee avec succes !");
-		console.timeEnd("Temps de chargement Whack_a_mole");
+		// console.log("WhackAMole importee avec succes !");
+		// console.timeEnd("Temps de chargement Whack_a_mole");
 
 		return WhackAMole;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele WhackAMole :", error);
-		console.timeEnd("Temps de chargement Whack_a_mole");
+		// console.timeEnd("Temps de chargement Whack_a_mole");
 		return null;
 	}
 }
 
 export async function loadBubblegum(scene) {
 	try {
-		console.time("Temps de chargement Bubblegum");
+		// console.time("Temps de chargement Bubblegum");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "Bubblegum.glb", scene);
 		const Bubblegum = result.meshes[0];
 		Bubblegum.position = new BABYLON.Vector3(1300, -190, 400);
@@ -405,21 +405,21 @@ export async function loadBubblegum(scene) {
 			axesBubblegum.yAxis.parent = Bubblegum;
 			axesBubblegum.zAxis.parent = Bubblegum;
 		}
-		console.log("Bubblegum importee avec succes !");
-		console.timeEnd("Temps de chargement Bubblegum");
+		// console.log("Bubblegum importee avec succes !");
+		// console.timeEnd("Temps de chargement Bubblegum");
 
 		return Bubblegum;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Bubblegum :", error);
-		console.timeEnd("Temps de chargement Bubblegum");
+		// console.timeEnd("Temps de chargement Bubblegum");
 		return null;
 	}
 }
 
 export async function loadTronArcade(scene) {
 	try {
-		console.time("Temps de chargement TronArcade");
+		// console.time("Temps de chargement TronArcade");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "TronArcade.glb", scene);
 		const TronArcade = result.meshes[0];
 		TronArcade.position = new BABYLON.Vector3(-125, -300, -200);
@@ -431,21 +431,21 @@ export async function loadTronArcade(scene) {
 			axesTronArcade.yAxis.parent = TronArcade;
 			axesTronArcade.zAxis.parent = TronArcade;
 		}
-		console.log("TronArcade importee avec succes !");
-		console.timeEnd("Temps de chargement TronArcade");
+		// console.log("TronArcade importee avec succes !");
+		// console.timeEnd("Temps de chargement TronArcade");
 
 		return TronArcade;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele TronArcade :", error);
-		console.timeEnd("Temps de chargement TronArcade");
+		// console.timeEnd("Temps de chargement TronArcade");
 		return null;
 	}
 }
 
 export async function loadPacman(scene) {
 	try {
-		console.time("Temps de chargement pacman");
+		// console.time("Temps de chargement pacman");
 		const result = await BABYLON.SceneLoader.ImportMeshAsync("", "./includes/assets/", "pacman.glb", scene);
 		const Pacman = result.meshes[0];
 		Pacman.position = new BABYLON.Vector3(-24, -300, 820);
@@ -457,14 +457,14 @@ export async function loadPacman(scene) {
 			axesPacman.yAxis.parent = Pacman;
 			axesPacman.zAxis.parent = Pacman;
 		}
-		console.log("Pacman importee avec succes !");
-		console.timeEnd("Temps de chargement pacman");
+		// console.log("Pacman importee avec succes !");
+		// console.timeEnd("Temps de chargement pacman");
 
 		return Pacman;
 	} 
 	catch (error) {
 		console.error("Erreur lors de l'importation du modele Pacman :", error);
-		console.timeEnd("Temps de chargement pacman");
+		// console.timeEnd("Temps de chargement pacman");
 		return null;
 	}
 }
@@ -511,7 +511,7 @@ function createGround(scene) {
 	ground.material = groundMaterial;
 	ground.position = new BABYLON.Vector3(870, -300, 0);
 	ground.rotation = new BABYLON.Vector3(0, -Math.PI, 0);
-	console.log("ground importee avec succes !");
+	// console.log("ground importee avec succes !");
 
 	return ground;
 }
@@ -539,7 +539,7 @@ function createCeiling(scene) {
 	ceilingMesh.position = new BABYLON.Vector3(870, 500, 0);
 	ceilingMesh.rotation.x = Math.PI;
 	ceilingMesh.rotation.y = Math.PI / 2;
-	console.log("Plafond cree avec succes !");
+	// console.log("Plafond cree avec succes !");
 
 	return ceilingMesh;
 }
