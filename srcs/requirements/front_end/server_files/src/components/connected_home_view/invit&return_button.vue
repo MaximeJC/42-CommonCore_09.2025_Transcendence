@@ -146,10 +146,12 @@ async function checkFriend() {
 		// console.log("resultat de POST /friends/check =", result);
 		if (result.ok) {
 			const data = await result.json();
-			if (data.message === "Friendship successfully checked.")
+			if (data.isFriend)
 				itsFriend.value = true;
-			else
-				return console.log(friendLogin, ", n'est pas dans la liste d'amis");	
+			else {
+				itsFriend.value = false;
+				console.log(friendLogin, ", n'est pas dans la liste d'amis");	
+			}
 		}
 		console.log("Ami checked avec succes.");
 	} catch (err) {

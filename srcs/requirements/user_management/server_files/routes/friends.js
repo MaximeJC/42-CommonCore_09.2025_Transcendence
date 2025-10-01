@@ -166,17 +166,24 @@ export default async function friendRoutes(fastify, options) {
 					}
 				);
 			});
-
-			if (relationExists == false)
-				return reply.send({message: "Friendship doesn't exist."});
 			if (DEBUG_MODE)
 				console.log("La relation existe bien.\n");
 
-			notifyUser(login2, 'friend_check', {
-				message: `Vous etes ami : ${user1.login}`
+			if (relationExists == false)
+				return reply.send({message: "Friendship doesn't exist."});
+
+			if (relationExists === true) {
+				notifyUser(login2, 'friend_check', {
+					message: `Vous etes ami : ${user1.login}`
+				});
+			}
+
+			reply.send({
+				message: "Friendship successfully checked.",
+				isFriend: relationExists
 			});
 
-			reply.send({message: "Friendship successfully checked."});
+			// reply.send({message: "Friendship successfully checked."});
 		} catch (err) {
 			if (DEBUG_MODE)
 				console.log(`Erreur de check d'ami! : ${err.message}\n`);
