@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(e: 'showOtherPlayer'): void
+	(e: 'friend-list-changed'): void
 }>()
 
 import { user } from '../../user';
@@ -91,7 +92,8 @@ async function addFriend() {
 			throw new Error(`${result.status}`);
 		console.log("Ami ajoute avec succes.");
 		itsFriend.value = true;
-		fetchFriends(ajouteur);
+		emit('friend-list-changed');
+		// fetchFriends(ajouteur);
 	} catch (err) {
 		console.error("Erreur de creation d'amitie:", err);
 	}
@@ -130,30 +132,33 @@ async function checkFriend() {
 	try {
 		const checkeur = currentUser.value?.login ?? "";
 		const friendLogin = props.selectedPlayerLogin ?? "";
+		if (checkeur && friendLogin)
+		{
+			console.log("checkFriend: checkeur =", checkeur, ", checked =", friendLogin);
 
-		console.log("checkFriend: checkeur =", checkeur, ", checked =", friendLogin);
-
-		const result = await fetch(`${USER_MANAGEMENT_URL}/friends/check`, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				login1: checkeur,
-				login2: friendLogin
-			})
-		});
-		// console.log("resultat de POST /friends/check =", result);
-		if (result.ok) {
-			const data = await result.json();
-			if (data.isFriend)
-				itsFriend.value = true;
-			else {
-				itsFriend.value = false;
-				console.log(friendLogin, ", n'est pas dans la liste d'amis");	
+			const result = await fetch(`${USER_MANAGEMENT_URL}/friends/check`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					login1: checkeur,
+					login2: friendLogin
+				})
+			});
+			// console.log("resultat de POST /friends/check =", result);
+			if (result.ok) {
+				const data = await result.json();
+				if (data.isFriend)
+					itsFriend.value = true;
+				else {
+					itsFriend.value = false;
+					console.log(friendLogin, ", n'est pas dans la liste d'amis");	
+				}
 			}
+			console.log("Ami checked avec succes.");
+
 		}
-		console.log("Ami checked avec succes.");
 	} catch (err) {
 		//console.error("Erreur de check d'amitie:", err);
 		itsFriend.value = false;
@@ -181,7 +186,8 @@ async function deleteFriend() {
 			throw new Error(`${result.status}`);
 		console.log("Ami supprime avec succes.");
 		itsFriend.value = false;
-		fetchFriends(supprimeur);
+		 emit('friend-list-changed');
+		// fetchFriends(supprimeur);
 	} catch (err) {
 		console.error("Erreur de suppression d'amitie:", err);
 	}
@@ -194,6 +200,12 @@ function handleServerMessage(event: MessageEvent) {
 			console.log("Check d'amis recue via WebSocket !", data.payload);
 			if (currentUser.value?.login) {
 				itsFriend.value = true;
+			}
+		}
+		if (data.event === 'friend_update') {
+			console.log("Maj liste d'amis recue via WebSocket !", data.payload);
+			if (currentUser.value?.login) {
+				 checkFriend();
 			}
 		}
 	} catch (error) {

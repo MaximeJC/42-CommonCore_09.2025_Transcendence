@@ -56,7 +56,10 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			if (result.ok) { 
 				message.value = `Welcome ${data.user?.login}!`
 			if (data.user)
+			{
 				setUser(data.user);
+				// console.log(`setUser in connection_form`);
+			}
 			emit('isconnected'); // emission de l'evenement de connexion reussie
 		} else {
 			message.value = data.message || "Connexion error";
