@@ -11,7 +11,6 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 	-out /app/certs/hgp_https.crt \
 	-subj "/CN=hgp.local"
 
-# Exposer le port 5000
 EXPOSE 5000
 
 # Caddy démarre automatiquement avec la configuration
