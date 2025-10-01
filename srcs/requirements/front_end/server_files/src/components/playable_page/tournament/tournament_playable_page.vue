@@ -93,29 +93,29 @@ function handleStartGame() {
 }
 
 onMounted(() => {
-	console.log("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+	//console.log("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
-	const babylonScript = document.createElement("script")
-	babylonScript.src = "/includes/js/BabylonJS/babylon.js"
-	document.body.appendChild(babylonScript)
+	//const babylonScript = document.createElement("script")
+	//babylonScript.src = "/includes/js/BabylonJS/babylon.js"
+	//document.body.appendChild(babylonScript)
 
-	babylonScript.onload = () => {
-		const guiScript = document.createElement("script")
-		guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
-		document.body.appendChild(guiScript)
+	//babylonScript.onload = () => {
+	//	const guiScript = document.createElement("script")
+	//	guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
+	//	document.body.appendChild(guiScript)
 		
-		guiScript.onload = () => {
-			// Attendre que Babylon.js soit complètement initialisé
-			setTimeout(() => {
-				console.log("Babylon.js chargé, lancement du jeu...");
-				window.addEventListener('babylon-returned-to-lobby', handleReturnTournament);
-				window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
-				nextTick().then(() => {
-					handleStartGame();
+	//	guiScript.onload = () => {
+	//		// Attendre que Babylon.js soit complètement initialisé
+	setTimeout(() => {
+	console.log("Babylon.js chargé, lancement du jeu...");
+	window.addEventListener('babylon-returned-to-lobby', handleReturnTournament);
+	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+	nextTick().then(() => {
+		handleStartGame();
 				});
 			}, 500); // Délai de 500ms pour s'assurer que tout est prêt
-		}
-	}
+	//	}
+	//}
 })
 
 onUnmounted(() => {
