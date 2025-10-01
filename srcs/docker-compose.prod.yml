@@ -8,7 +8,6 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      # - ./requirements/caddy/Caddyfile:/etc/caddy/Caddyfile
       - certs_https:/app/certs
     networks:
       - hgp_network
@@ -37,9 +36,9 @@ services:
     image: hgp_front_end_prod_img
     volumes:
       - user_avatars:/app/uploads
-      - certs_https:/app/certs:ro 
+      - certs_https:/app/certs:ro
     environment:
-      - NODE_ENV=production 
+      - NODE_ENV=production
       - API_TARGET=http://hgp_user_management:3000
       - GAME_MANAGEMENT_TARGET=http://hgp_game_management:3003
     networks:
@@ -56,7 +55,7 @@ services:
       dockerfile: Dockerfile
     image: hgp_game_management_img
     volumes:
-      - certs_https:/app/certs:ro 
+      - certs_https:/app/certs:ro
     environment:
       - NODE_ENV=production
       - AI_SERVER_URL=http://hgp_ai_server:3001
@@ -74,14 +73,13 @@ services:
       context: ./requirements/user_management
       dockerfile: Dockerfile
     image: hgp_user_management_img
-    env_file: 
+    env_file:
       - ./prod.env
     volumes:
       - user_management_db:/app/db
       - user_avatars:/app/uploads
-      - certs_https:/app/certs:ro 
-    environment:  
-
+      - certs_https:/app/certs:ro
+    environment:
       - CADDY_PROXY=true
     networks:
       - hgp_network
