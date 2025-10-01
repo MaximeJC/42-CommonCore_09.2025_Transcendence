@@ -13,7 +13,7 @@ import { notifyAllsocket } from '../websocket/handlers.js';
 
 import 'dotenv/config';
 import axios from 'axios';
-import qs from 'qs'; 
+import qs from 'qs';
 
 export default async function userRoutes(fastify, options) {
 	const { db, getUserByEmail, getUserByLogin, userSocketMap, DEBUG_MODE } = options.deps;
@@ -35,7 +35,7 @@ export default async function userRoutes(fastify, options) {
 	// Fonction pour creer un utilisateur a partir des donnees de l'API 42
 	async function createUserFrom42(userData) {
 		const { login, email, avatar_url } = userData;
-		
+
 		// Un mot de passe aleatoire est genere car l'utilisateur ne se connectera pas avec.
 		const randomPassword = Math.random().toString(36).slice(-8);
 		const hashedPassword = await bcrypt.hash(randomPassword, 10);
@@ -69,10 +69,10 @@ export default async function userRoutes(fastify, options) {
 			// echanger le code contre un access_token
 		const requestData = {
 			grant_type: 'authorization_code',
-			client_id: process.env.FORTYTWO_CLIENT_ID,
+			client_id: process.env.VITE_42_CLIENT_ID,
 			client_secret: process.env.FORTYTWO_CLIENT_SECRET,
 			code: code,
-			redirect_uri: process.env.FORTYTWO_REDIRECT_URI,
+			redirect_uri: process.env.VITE_42_REDIRECT_URI,
 		};
 
 		try {
@@ -113,7 +113,7 @@ export default async function userRoutes(fastify, options) {
 						});
 					});
 				}
-				
+
 				// Creer l'utilisateur s'il n'existe pas
 				user = await createUserFrom42({
 					login: login42,
@@ -253,7 +253,7 @@ export default async function userRoutes(fastify, options) {
 		if (!user || !user.id) {
 			return reply.status(401).send({ error: 'Utilisateur non connecte' });
 		}
-		
+
 		const data = await request.file();
 		if (!data) {
 			return reply.status(400).send({ error: 'Aucun fichier envoye' });
@@ -270,11 +270,11 @@ export default async function userRoutes(fastify, options) {
 					fs.unlinkSync(path.join(__dirname, '..', 'uploads', file));
 				}
 			}
-			
+
 			// Sauvegarder le nouveau
 			await pipeline(data.file, fs.createWriteStream(saveTo));
 			const relativePath = `/uploads/${filename}`;
-			
+
 			// Mettre a jour la base de donnees
 			await new Promise((resolve, reject) => {
 				db.run(`UPDATE users SET avatar_url = ? WHERE id = ?`, [relativePath, user.id], (err) => {
@@ -282,7 +282,7 @@ export default async function userRoutes(fastify, options) {
 					else resolve();
 				});
 			});
-			
+
 			reply.send({ message: 'Avatar mis a jour', avatar_url: relativePath });
 
 		} catch (error) {
@@ -290,7 +290,7 @@ export default async function userRoutes(fastify, options) {
 			reply.status(500).send({ message: 'Erreur interne du serveur' });
 		}
 	});
-	
+
 	// Informations sur un utilisateur specifique via son login
 	fastify.get('/users/specificlogin', async (request, reply) => {
 		const { login } = request.query;
@@ -315,19 +315,19 @@ export default async function userRoutes(fastify, options) {
 			reply.status(500).send({ error: err.message });
 		}
 	});
-	
+
 	// Changer l'email de l'utilisateur connecte
 	fastify.post('/users/change-email', async (request, reply) => {
 		const user = request.session.get('user');
 		if (!user) {
 			return reply.status(401).send({ success: false, message: "Non connecte" });
 		}
-		
+
 		const { email } = request.body;
 		if (!email) {
 			return reply.status(400).send({ success: false, message: "Email manquant" });
 		}
-		
+
 		const cleanEmail = validator.escape(validator.trim(email));
 
 		try {
@@ -357,9 +357,9 @@ export default async function userRoutes(fastify, options) {
 		if (!login) {
 			return reply.status(400).send({ success: false, message: "Login manquant" });
 		}
-		
+
 		const cleanLogin = validator.escape(validator.trim(login));
-		
+
 		try {
 			await new Promise((resolve, reject) => {
 				db.run(`UPDATE users SET login = ? WHERE id = ?`, [cleanLogin, user.id], function (err) {
@@ -393,14 +393,14 @@ export default async function userRoutes(fastify, options) {
 		if (!user) {
 			return reply.status(401).send({ success: false, message: "Non connecte" });
 		}
-		
+
 		const { old_password, password } = request.body;
 		console.log("*****************");
 		console.log("old_password: ", old_password);
 		console.log("user.password: ", user.password);
 		console.log("password: ", password);
 		console.log("*****************");
-		
+
 		if (!old_password || !password) {
 			return reply.send({ success: false, message: "Mot de passe manquant" });
 		}
