@@ -32,16 +32,10 @@ services:
       context: ./requirements/front_end
       dockerfile: Dockerfile
     image: hgp_front_end_img
-    # env_file: ./.env
+    env_file: ./.dev.env
     volumes:
       - user_avatars:/app/uploads
       - ./certs:/app/certs:ro
-      - ./requirements/front_end/server_files/src:/app/src
-      - ./requirements/front_end/server_files/public:/app/public
-    environment:
-      - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=/game
-      - VITE_AI_SERVER_BASE_URL=/ai
     networks:
       - hgp_network
     restart: unless-stopped
@@ -57,9 +51,7 @@ services:
     image: hgp_game_management_img
     volumes:
       - ./certs:/app/certs:ro
-    # env_file: ./.env
-    environment:
-      - AI_SERVER_URL=http://hgp_ai_server:3001
+    env_file: ./.dev.env
     networks:
       - hgp_network
     restart: unless-stopped
