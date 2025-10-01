@@ -58,7 +58,7 @@ const playerData = ref({
 
 	.connected_player_frame{
 		display: flex;
-		justify-content: space-between;
+		justify-content: space-around;
 		align-items: center;
 		width: 51rem;
 		background-color: rgba(156, 50, 133, 0.5);
@@ -102,8 +102,19 @@ const playerData = ref({
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
+		text-overflow: ".";
+		word-wrap:break-word;
+
 		font-size: 1.5rem;
 		margin-top: 1rem;
+	}
+
+	.login > div{
+		display: inline-block;   /* nécessaire pour gérer la largeur */
+		width: 7ch;              /* largeur équivalente à ~6 caractères */
+		overflow: hidden;        /* coupe ce qui dépasse */
+		white-space: nowrap;     /* empêche le retour à la ligne */
+		text-overflow: ellipsis; /* ajoute "…" à la fin si coupé */
 	}
 
 	.stat-container{
@@ -120,10 +131,11 @@ const playerData = ref({
 		text-shadow: 
 		0 0 10px #18c3cf, 
 		0 0 20px #18c3cf;
-		font-size: 1.5rem;
+		font-size: 1.2rem;
 		font-family: netron;
 		color: white;
 		margin-bottom: 1rem;
+		
 	}
 
 	.stat{

@@ -8,13 +8,11 @@ import { returnToLobby } from './app.js'
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
 // On recupere l'hote (domaine + port) de la page actuelle.
-// 
 const host = window.location.host;
 
-// On assemble l'URL complete du WebSocket.
-// const WS_URL = `${protocol}//localhost:3003`;
-const hostname = window.location.hostname;
-const WS_URL = `${protocol}//${hostname}:3003`;
+// On assemble l'URL complete du WebSocket via le proxy Caddy.
+// Au lieu de se connecter directement au port 3003, on passe par le proxy /game
+const WS_URL = `${protocol}//${host}/game`;
 
 // console.log(`Connexion WebSocket a l'adresse: ${WS_URL}`);
 
