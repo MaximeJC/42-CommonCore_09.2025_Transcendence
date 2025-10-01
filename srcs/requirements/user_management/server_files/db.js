@@ -13,6 +13,8 @@ console.log(`Chemin de la DB : ${dbPath}`);
 
 let db = new sqlite3.Database(dbPath);
 
+db.configure('busyTimeout', 3000);
+
 // creer table d'utilisateurs, table de parties et table d'amities
 db.serialize(()=>{
 	db.run(`CREATE TABLE IF NOT EXISTS users (

@@ -1,6 +1,7 @@
-// js/sceneSetup.js
-
 import { debug } from './config.js';
+import * as BABYLON from '@babylonjs/core';
+import { GridMaterial } from '@babylonjs/materials';
+import * as GUI from '@babylonjs/gui';
 
 /**
  * Initialise le canvas et le moteur de rendu Babylon.js.
@@ -106,7 +107,7 @@ export function createScene(engine) {
  */
 function createDebugHelpers(scene) {
 	const groundDebug = BABYLON.MeshBuilder.CreateGround("groundDebug", {width: 1920, height: 1920}, scene);
-	const gridMaterial = new BABYLON.GridMaterial("grid", scene);
+	const gridMaterial = new GridMaterial("grid", scene);
 	gridMaterial.gridRatio = 10;
 	gridMaterial.majorUnitFrequency = 5; 
 	groundDebug.material = gridMaterial;

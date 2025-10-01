@@ -5,8 +5,8 @@ import { setLanguage, updateText, currentLang } from '../../service/translators'
 import { user } from '../../user';
 import { startMatchmaking } from "../../../public/includes/js/app.js";
 
-const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
-const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
+// const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
+// const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
 
 const props = defineProps<{
 	setLanguage: (lang: string) => void;
@@ -20,7 +20,7 @@ const emit = defineEmits<{
 
 onMounted(async () => {
 	await nextTick()
-	updateText()   // <-- c’est ça qu’il faut appeler au premier rendu
+	updateText()
 })
 
 
@@ -76,7 +76,7 @@ async function addGameToDataBase(newGame: any) {
 		);
 		if (!response.ok)
 			throw new Error(`Erreur http: ${response.status}`);
-		console.log("Partie enregistree dans la base de donnees avec succes.");
+		// console.log("Partie enregistree dans la base de donnees avec succes.");
 	} catch (err) {
 		console.error("Erreur d'ajout de partie a la base de donnees:", err);
 	}
@@ -115,23 +115,23 @@ function handleStartGame() {
 		gameConfig.opponentPseudo = props.opponentLogin;
 	}
 	console.log("Configuration de jeu envoyee a app.js:", gameConfig);
-	(window as any).networkConfig = {
-		pongServerBaseUrl: pongServerPath,
-		aiServerBaseUrl: aiServerPath
-	};
+	// (window as any).networkConfig = {
+	// 	pongServerBaseUrl: pongServerPath,
+	// 	aiServerBaseUrl: aiServerPath
+	// };
 	startMatchmaking(gameConfig);
 }
 
 onMounted(() => {
-	const babylonScript = document.createElement("script")
-	babylonScript.src = "/includes/js/BabylonJS/babylon.js"
-	document.body.appendChild(babylonScript)
+	// const babylonScript = document.createElement("script")
+	// babylonScript.src = "/includes/js/BabylonJS/babylon.js"
+	// document.body.appendChild(babylonScript)
 
-	babylonScript.onload = () => {
-		const guiScript = document.createElement("script")
-		guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
-		document.body.appendChild(guiScript)
-	}
+	// babylonScript.onload = () => {
+	// 	const guiScript = document.createElement("script")
+	// 	guiScript.src = "/includes/js/BabylonJS/gui/babylon.gui.min.js"
+	// 	document.body.appendChild(guiScript)
+	// }
 
 	window.addEventListener('babylon-returned-to-lobby', handleReturnToLobby);
 	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
@@ -140,7 +140,7 @@ onMounted(() => {
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
 	window.removeEventListener('babylon-returned-to-lobby', handleReturnToLobby);
-	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+	window.removeEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
 });
 
 watch(() => props.activePlay, (newVal) => {
