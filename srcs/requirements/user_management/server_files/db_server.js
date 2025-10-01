@@ -32,7 +32,7 @@ async function configure() {
 	// Enregistrement des plugins (middlewares)
 	await fastify.register(fastifyCookie);
 	await fastify.register(fastifySecureSession, {
-		key: crypto.randomBytes(32),
+		key: process.env.SESSION_KEY,
 		cookie: {
 			path: '/',
 			httpOnly: true,
