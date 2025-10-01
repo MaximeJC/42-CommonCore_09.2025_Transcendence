@@ -107,7 +107,7 @@ export default async function userRoutes(fastify, options) {
 				const existingEmail = await getUserByEmail(email);
 				if(existingLogin && existingEmail) {
 					await new Promise((resolve, reject) => {
-						db.run(`UPDATE users SET login42 = ? WHERE login = ?`, [login42, login42], (err) => {
+						db.run(`UPDATE users SET login_42 = ? WHERE login = ?`, [login42, login42], (err) => {
 							if (err) reject(err);
 							else resolve();
 						});
