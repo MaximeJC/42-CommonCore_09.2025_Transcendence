@@ -8,8 +8,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./requirements/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - certs_https:/app/certs:ro
+      # - ./requirements/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - certs_https:/app/certs
     networks:
       - hgp_network
     restart: unless-stopped
@@ -81,12 +81,7 @@ services:
       - user_avatars:/app/uploads
       - certs_https:/app/certs:ro 
     environment:  
-      - POSTGRES_HOST=localhost
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=transcendence
-      - DATABASE_URL=postgresql://postgres:root@localhost:5432/transcendence
+
       - CADDY_PROXY=true
     networks:
       - hgp_network

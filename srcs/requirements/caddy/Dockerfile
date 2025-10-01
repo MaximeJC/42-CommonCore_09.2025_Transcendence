@@ -1,6 +1,15 @@
 FROM caddy:2.7-alpine
 
-# Le Caddyfile sera monté via volume - pas de COPY
+RUN apk update && apk upgrade
+RUN apk add --no-cache openssl
+
+COPY Caddyfile /etc/caddy/Caddyfile
+
+RUN mkdir -p /app/certs
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+	-keyout /app/certs/hgp_https.key \
+	-out /app/certs/hgp_https.crt \
+	-subj "/CN=hgp.local"
 
 # Exposer le port 5000
 EXPOSE 5000
