@@ -1,66 +1,37 @@
 COMPOSE_PROJECT_NAME = transcendence
 COMPOSE_FILE = srcs/docker-compose.yml
 COMPOSE_PROD_FILE = srcs/docker-compose.prod.yml
-CERT_FILE = srcs/certs/hgp_https.crt
 
 #! RULES
 
-.PHONY: all up build start down stop restart clean re logs fclean mkdir dev prod caddy-dev caddy-prod certs
+.PHONY: all dev prod down restart restart-dev clean fclean re logs ps mkdir clean-data
 
-all: up
+all: prod
 
-# Développement - arrete la prod si necessaire et lance la dev
-dev: mkdir 
-	@echo "Switching to DEVELOPMENT mode..."
-	@echo "Stopping production containers..."
-	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
-	@echo "Starting development services..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
-#2>&1 | tee dev.log
-
-# Production - arrete la dev si necessaire et lance la prod
-prod: mkdir
-	@echo "Switching to PRODUCTION mode..."
-	@echo "Stopping development containers..."
-	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
-	@echo "Starting production services..."
-	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
-#2>&1 | tee prod.log
-
-# Développement avec Caddy - nouvelle architecture avec reverse proxy
-caddy-dev: mkdir 
+dev: mkdir
 	@echo "Switching to DEVELOPMENT mode with Caddy reverse proxy..."
 	@echo "Stopping production containers..."
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services with Caddy..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
-	@echo "🚀 Access your application at: https://localhost:5000"
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
+# 	@echo "Access your application at: https://localhost:5000"
 
-# Production avec Caddy - nouvelle architecture avec reverse proxy
-caddy-prod: mkdir
+prod: mkdir
 	@echo "Switching to PRODUCTION mode with Caddy reverse proxy..."
 	@echo "Stopping development containers..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services with Caddy..."
-	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans 
-	@echo "🚀 Access your application at: https://localhost:5000"
-
-up: mkdir 
-	@echo "Starting $(COMPOSE_PROJECT_NAME) services..."
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
-
-build: up
-
-start: up
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
+# 	@echo "Access your application at: https://localhost:5000"
 
 down:
 	@echo "Stopping $(COMPOSE_PROJECT_NAME) services..."
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 
-stop: down
+restart: down prod
 
-restart: down up
+restart-dev: down dev
 
 # Stops the containers and removes volumes
 clean:
@@ -68,7 +39,6 @@ clean:
 	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down -v 2>/dev/null || true
 	@echo "Removing certificates..."
-# 	@rm -rf srcs/certs
 
 # Full cleanup: containers, volumes, networks, and images
 fclean: clean
@@ -89,6 +59,8 @@ mkdir:
 	cd ${HOME} && mkdir -p hgp_data
 	cd ${HOME}/hgp_data && mkdir -p database avatars certs
 
-# a utilise avec precaution
-space:
-	@docker system prune -a --volumes
+clean-data:
+	@echo "Cleaning up data directories..."
+	@rm -rf ${HOME}/hgp_data/database/* ${HOME}/hgp_data/avatars/* ${HOME}/hgp_data/certs/*
+	@rm -rf ${HOME}/hgp_data
+	@echo "Data directories deleted!"
