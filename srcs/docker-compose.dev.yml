@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: hgp_front_end_img
     volumes:
-      - prod_front_avatars:/app/public/uploads
+      - user_avatars:/app/public/uploads
       - ./certs:/app/certs:ro 
       - ./requirements/front_end/server_files:/app  # Mount en développement pour hot-reload
     ports:
@@ -14,8 +14,8 @@ services:
     environment:
       - NODE_ENV=development
       - VITE_API_BASE_URL=/api
-      - VITE_PONG_SERVER_BASE_URL=http://localhost:3003
-      - VITE_AI_SERVER_BASE_URL=http://localhost:3001
+      - VITE_PONG_SERVER_BASE_URL=ws://localhost:5173
+      - VITE_AI_SERVER_BASE_URL=http://localhost:5173
     networks:
       - hgp_network
     restart: unless-stopped
@@ -23,10 +23,70 @@ services:
       - user_management
       - game_management
 
+  user_management:
+    container_name: hgp_user_management_dev
+    build:
+      context: ./requirements/user_management
+      dockerfile: Dockerfile
+    image: hgp_user_management_dev_img
+    env_file: 
+      - ./dev.env
+    volumes:
+      - user_management_db:/app/db
+      - user_avatars:/app/uploads
+      - ./certs:/app/certs:ro 
+    environment:  
+      - NODE_ENV=development
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=transcendence
+      - DATABASE_URL=postgresql://postgres:root@localhost:5432/transcendence
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
+  game_management:
+    container_name: hgp_game_management_dev
+    build:
+      context: ./requirements/game_management
+      dockerfile: Dockerfile
+    image: hgp_game_management_dev_img
+    volumes:
+      - ./certs:/app/certs:ro 
+    environment:
+      - NODE_ENV=development
+      - AI_SERVER_URL=http://hgp_ai_server_dev:3001
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    depends_on:
+      - ai_server
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
+  ai_server:
+    container_name: hgp_ai_server_dev
+    build:
+      context: ./requirements/ai_server
+      dockerfile: Dockerfile
+    image: hgp_ai_server_dev_img
+    networks:
+      - hgp_network
+    restart: unless-stopped
+
 networks:
   hgp_network:
     driver: bridge
 
 volumes:
-  front_avatars:
-    driver: local
+  user_management_db:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/database
+      o: bind
+  user_avatars:
+    driver_opts:
+      type: none
+      device: ${HOME}/hgp_data/avatars
+      o: bind

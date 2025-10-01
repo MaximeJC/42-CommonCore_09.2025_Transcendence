@@ -90,5 +90,5 @@ mkdir:
 	cd ${HOME}/hgp_data && mkdir -p database avatars certs
 
 # a utilise avec precaution
-space:
+space: clean
 	@docker system prune -a --volumes

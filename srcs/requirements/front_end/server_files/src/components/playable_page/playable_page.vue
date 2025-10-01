@@ -154,8 +154,7 @@ watch(() => props.activePlay, (newVal) => {
 		display: grid;
 		grid-template-rows: 0.5fr 0.5fr 0.5fr;
 		grid-template-columns: 1fr;
-		width: 30rem;
-		align-content: flex-start;
+		width: max-content;
 		height: 15rem;
 		background-color: rgba(156, 50, 133, 0.5);
 		border: 2px solid #e251ca;
@@ -197,6 +196,7 @@ watch(() => props.activePlay, (newVal) => {
 		0 0 40px #27cf18;
 		font-size: 3.5rem;
 		margin-bottom: 0.5rem;
+	
 	}
 
 .grid-row{

@@ -35,10 +35,10 @@ COPY --from=builder /app/public/uploads ./public/uploads
 COPY .env* ./
 
 RUN mkdir -p certs
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-	-keyout certs/hgp_https.key \
-	-out certs/hgp_https.crt \
-	-subj "/CN=hgp.local"
+# RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+# 	-keyout certs/hgp_https.key \
+# 	-out certs/hgp_https.crt \
+# 	-subj "/CN=hgp.local"
 
 # On expose seulement le port 8080 (Caddy gère le 5000)
 EXPOSE 8080

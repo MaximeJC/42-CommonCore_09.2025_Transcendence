@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://hgp_user_management:3000',
+        target: 'http://hgp_user_management_dev:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         ws: true,
