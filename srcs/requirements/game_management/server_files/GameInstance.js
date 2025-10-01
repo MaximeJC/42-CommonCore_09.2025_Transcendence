@@ -29,7 +29,7 @@ export class GameInstance {
 		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
 		this.readyPlayers = new Set();
 
-		console.log("[Jeu " + this.gameId + " Creation d'une partie en mode " + gameMode + ".");
+		// console.log("[Jeu " + this.gameId + " Creation d'une partie en mode " + gameMode + ".");
 		this.setupPlayers(clientInfos, gameMode, opponentPseudo);
 
 		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
@@ -175,14 +175,14 @@ export class GameInstance {
 	 * appelee par le serveur quand un client envoie 'client_ready'.
 	 */
 	handlePlayerReady(playerId) {
-		console.log(`[Jeu ${this.gameId}] Le joueur ${playerId} est pret.`);
+		// console.log(`[Jeu ${this.gameId}] Le joueur ${playerId} est pret.`);
 		this.readyPlayers.add(playerId);
 
 		const totalClientCount = this.clientInfos.length;
 
 		// On verifie si TOUS les clients connectes a cette partie (joueurs ou spectateurs) sont prets.
 		if (this.readyPlayers.size === totalClientCount) {
-			console.log(`[Jeu ${this.gameId}] Tous les joueurs/spectateurs sont prets. Lancement du jeu !`);
+			// console.log(`[Jeu ${this.gameId}] Tous les joueurs/spectateurs sont prets. Lancement du jeu !`);
 			this.beginGame();
 		}
 	}
@@ -248,7 +248,7 @@ export class GameInstance {
 
 		// // Position des joueurs
 		// this.gameState.activePlayers.forEach((player, index) => {
-		// 	console.log(`Joueur ${index + 1} (${player.pseudo}): { y: ${player.y.toFixed(2)}, movement: ${player.movement} }`);
+			// console.log(`Joueur ${index + 1} (${player.pseudo}): { y: ${player.y.toFixed(2)}, movement: ${player.movement} }`);
 		// });
 
 		this.broadcastState();
@@ -352,10 +352,10 @@ export class GameInstance {
 			}
 		});
 
-		console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
-		console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);
-		console.log(`[Jeu ${this.gameId}] Score final: ${score_left} - ${score_right}`);
-		console.log(`[Jeu ${this.gameId}] Duree: ${this.gameDurationInSeconds} secondes.`);
+		// console.log(`[Jeu ${this.gameId}] Partie terminee. Vainqueur: ${winnerPseudo}`);
+		// console.log(`[Jeu ${this.gameId}] Partie terminee. Perdant: ${loserPseudo}`);
+		// console.log(`[Jeu ${this.gameId}] Score final: ${score_left} - ${score_right}`);
+		// console.log(`[Jeu ${this.gameId}] Duree: ${this.gameDurationInSeconds} secondes.`);
 	}
 
 	broadcast(type, data) {
