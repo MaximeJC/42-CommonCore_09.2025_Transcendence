@@ -181,11 +181,7 @@ onMounted(()=>{ fetchMyGames() });
 
 	.h-grid-row > div{
 		padding: 0.4rem;
-		display: inline-block;   /* nécessaire pour gérer la largeur */
-		width: 7ch;              /* largeur équivalente à ~6 caractères */
-		overflow: hidden;        /* coupe ce qui dépasse */
-		white-space: nowrap;     /* empêche le retour à la ligne */
-		text-overflow: ellipsis; /* ajoute "…" à la fin si coupé */
+		
 	}
 
 	.v-icon{
