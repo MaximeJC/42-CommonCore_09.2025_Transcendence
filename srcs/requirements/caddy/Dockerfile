@@ -3,7 +3,7 @@ FROM caddy:2.7-alpine
 RUN apk update && apk upgrade
 RUN apk add --no-cache openssl
 
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY ./server_files/Caddyfile /etc/caddy/Caddyfile
 
 RUN mkdir -p /app/certs
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
