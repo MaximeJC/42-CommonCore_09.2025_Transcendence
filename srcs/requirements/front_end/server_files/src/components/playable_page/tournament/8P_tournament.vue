@@ -45,35 +45,35 @@ const playBox = ref<HTMLElement | null>(null);
 				
 				<div title="player1" class="player_title">
 					<div data-i18n="tournament.player 1"></div>
-					<input title="player1"></input>
+					<input title="player1" maxlength="13"></input>
 				</div>
 				<div title="player2" class="player_title">
 					<div data-i18n="tournament.player 2"></div>
-					<input title="player2"></input>
+					<input title="player2" maxlength="13"></input>
 				</div>
 				<div title="player3" class="player_title">
 					<div data-i18n="tournament.player 3"></div>
-					<input title="player3"></input>
+					<input title="player3" maxlength="13"></input>
 				</div>
 				<div title="player4" class="player_title">
 					<div data-i18n="tournament.player 4"></div>
-					<input title="player4"></input>
+					<input title="player4" maxlength="13"></input>
 				</div>
 				<div title="player5" class="player_title">
 					<div data-i18n="tournament.player 5"></div>
-					<input title="player5"></input>
+					<input title="player5" maxlength="13"></input>
 				</div>
 				<div title="player6" class="player_title">
 					<div data-i18n="tournament.player 6"></div>
-					<input title="player6"></input>
+					<input title="player6" maxlength="13"></input>
 				</div>
 				<div title="player7" class="player_title">
 					<div data-i18n="tournament.player 7"></div>
-					<input title="player7"></input>
+					<input title="player7" maxlength="13"></input>
 				</div>
 				<div title="player8" class="player_title">
 					<div data-i18n="tournament.player 8"></div>
-					<input title="player8"></input>
+					<input title="player8" maxlength="13"></input>
 				</div>
 			</div>
 			<button @click="handleSubmit" type="button" title="Submit-button" class=" t_Submit-button">

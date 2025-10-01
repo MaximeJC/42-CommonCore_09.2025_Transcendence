@@ -46,19 +46,19 @@ const showDemiFinal = ref(false);
 			
 			<div title="player1" class="player_title">
 				<div data-i18n="tournament.player 1"></div>
-				<input title="player1"></input>
+				<input title="player1" maxlength="13"></input>
 			</div>
 			<div title="player2" class="player_title">
 				<div data-i18n="tournament.player 2"></div>
-				<input title="player2"></input>
+				<input title="player2" maxlength="13"></input>
 			</div>
 			<div title="player3" class="player_title">
 				<div data-i18n="tournament.player 3"></div>
-				<input title="player3"></input>
+				<input title="player3" maxlength="13"></input>
 			</div>
 			<div title="player4" class="player_title">
 				<div data-i18n="tournament.player 4"></div>
-				<input title="player4"></input>
+				<input title="player4" maxlength="13"></input>
 			</div>
 		</div>
 		<button @click="handleSubmit" type="button" title="Submit-button" class=" t_Submit-button">

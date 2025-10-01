@@ -75,6 +75,7 @@ const playerData = ref({
 	.avatar\+login{
 		display: flex;
 		flex-direction: column;
+		
 		margin-right: 1rem;
 	}
 	
@@ -110,11 +111,12 @@ const playerData = ref({
 	}
 
 	.login > div{
-		display: inline-block;   /* nécessaire pour gérer la largeur */
-		width: 7ch;              /* largeur équivalente à ~6 caractères */
+		text-align: center;
+		/*display: inline-block;   /* nécessaire pour gérer la largeur */
+		width: 7.5rem;              /* largeur équivalente à ~6 caractères */
 		overflow: hidden;        /* coupe ce qui dépasse */
 		white-space: nowrap;     /* empêche le retour à la ligne */
-		text-overflow: ellipsis; /* ajoute "…" à la fin si coupé */
+		text-overflow: '.'; /* ajoute "…" à la fin si coupé */
 	}
 
 	.stat-container{
