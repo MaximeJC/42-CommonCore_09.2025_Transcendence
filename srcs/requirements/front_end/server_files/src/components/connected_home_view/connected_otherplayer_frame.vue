@@ -8,7 +8,7 @@ import invit_return from "./invit&return_button.vue";
 import { watch } from 'vue';
 import { socket, connectSocket, disconnectSocket } from '@/service/socketService'; // Import le socket
 
-const emit = defineEmits(['showOtherPlayer']);
+const emit = defineEmits(['showOtherPlayer', 'friend-list-changed']);
 
 
 const props = defineProps<{
@@ -58,37 +58,6 @@ watch(
     { immediate: true }
 );
 
-/* async function fetchPlayerData(retries = 5, delay = 1000) {
-	try {
-		for (let i = 0; i < retries; i++) {
-			const response = await fetch(`${USER_MANAGEMENT_URL}/me`, {
-				method: 'GET',
-				credentials: 'include'
-			});
-			if (response.ok) {
-				const data = await response.json();
-				// Si user est présent, on peut sortir
-				if (data.user && data.user.login) {
-					playerData.value = {
-						login: data.user.login,
-						nb_games: data.user.nb_games,
-						nb_won_games: data.user.nb_won_games,
-						rank: data.user.rank
-					};
-					return;
-				}
-			}
-			// Attendre avant de réessayer
-			await new Promise(res => setTimeout(res, delay));
-		}
-		// console.warn("User non trouvé après plusieurs tentatives.");
-		// playerData.value = null;
-	} catch (error) {
-		console.error("Erreur dans fetchPlayerData:", error);
-		// playerData.value = null;
-	}
-}
-onMounted(async()=>{ await fetchPlayerData(); }); */
 function handleServerMessage(event: MessageEvent) {
 	try {
 		const data = JSON.parse(event.data);
@@ -137,8 +106,14 @@ watch(socket, (newSocket, oldSocket) => {
 			<div title="rank" class="label_stat" data-i18n="player_stat.rank"></div>
 			<div title="rank_stat" class="stat" >{{ playerData.rank }}</div>
 		</div>
-		<invit_return @showOtherPlayer="emit('showOtherPlayer')" :selectedPlayerLogin="selectedPlayerLogin" :connect="playerData.connect" :setLanguage="props.setLanguage" ></invit_return>
+		<invit_return
+		@showOtherPlayer="emit('showOtherPlayer')"
+		@friend-list-changed="emit('friend-list-changed')"  
+		:selectedPlayerLogin="selectedPlayerLogin"
+		:connect="playerData.connect"
+		:setLanguage="props.setLanguage" ></invit_return>
 	</div>
+
 </template>
 
 <style>

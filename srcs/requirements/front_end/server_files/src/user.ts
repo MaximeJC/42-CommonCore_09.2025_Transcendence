@@ -18,6 +18,7 @@ export function user() {
 
 	const setUser = (userData: User) => { // pour ajouter utilisateur quand connecte
 		currentUser.value = userData;
+		// console.log(`setUser in user.ts`);
 		connectSocket(userData.login); //connexion au socket
 	};
 

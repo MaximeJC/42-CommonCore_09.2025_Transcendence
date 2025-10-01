@@ -22,6 +22,8 @@ function connectSocket(userLogin: string) {
 			payload: userLogin
 		};
 		newSocket.send(JSON.stringify(registerMessage));
+		// console.log(`saddEventListener socketService.ts`);
+
 	});
 
 	newSocket.addEventListener('close', () => {

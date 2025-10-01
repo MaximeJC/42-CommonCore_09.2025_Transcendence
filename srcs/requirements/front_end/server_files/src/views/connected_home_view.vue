@@ -7,6 +7,7 @@ import leaderbord from '../components/connected_home_view/leaderbord.vue';
 import friendlist from '../components/connected_home_view/friendlist.vue';
 import histo from '@/components/connected_home_view/historic.vue';
 import histo_other from '@/components/connected_home_view/historic_other.vue'
+import { user } from '../user';
 
 const emit = defineEmits(['show_play']);
 
@@ -45,11 +46,20 @@ const togglehistoric = () => {
 	historic.value = !historic.value;
 }
 
-const toggleother_player = (login: string) => {
-	other_player.value = !other_player.value;
-	selectedPlayerLogin.value = login;
+const toggleother_player = (login?: string) => {
+	other_player.value = !!login;
+	selectedPlayerLogin.value = login || null;
 }
 
+const { currentUser } = user();
+
+const friendlistComponentRef = ref<InstanceType<typeof friendlist> | null>(null);
+
+function handleFriendListChange() {	
+	if (friendlistComponentRef.value && currentUser.value) {
+		friendlistComponentRef.value.fetchFriends(currentUser.value.login);
+	}
+}
 	
 
 </script>
@@ -59,11 +69,11 @@ const toggleother_player = (login: string) => {
 		<player_frame
 		v-show="!other_player"
 			:players="currentPlayerStats"
-		    :setLanguage="props.setLanguage"
-		    :other_player="other_player"
-		    :historic="historic"
-		    @showOtherPlayer="toggleother_player"
-		    @show-historic="togglehistoric"
+			:setLanguage="props.setLanguage"
+			:other_player="other_player"
+			:historic="historic"
+			@showOtherPlayer="toggleother_player"
+			@show-historic="togglehistoric"
 			@show_play="emit('show_play')">
 		</player_frame>
 		<otherplayer_frame
@@ -72,6 +82,7 @@ const toggleother_player = (login: string) => {
 			:other_player="other_player"
 			:selectedPlayerLogin="selectedPlayerLogin"
 			@showOtherPlayer="toggleother_player"
+			@friend-list-changed="handleFriendListChange" 
 		></otherplayer_frame>
 		<div v-if="!historic && !other_player" title="leader+friend" class="subpages">
 			<leaderbord 
@@ -81,7 +92,11 @@ const toggleother_player = (login: string) => {
 				@currentPlayerStats="handleCurrentPlayerStats"
 				:other_player="other_player">
 			</leaderbord>
-			<friendlist @showOtherPlayer="toggleother_player" :setLanguage="props.setLanguage" :other_player="other_player"></friendlist>
+			<friendlist
+			ref="friendlistComponentRef"
+			@showOtherPlayer="toggleother_player"
+			:setLanguage="props.setLanguage"
+			:other_player="other_player"></friendlist>
 		</div>
 		<div v-show="historic || other_player" title="historic" class="histo-container">
 			<histo 

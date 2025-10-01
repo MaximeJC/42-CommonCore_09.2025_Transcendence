@@ -24,7 +24,8 @@ onMounted(async () => {
 const rootElement = ref<HTMLElement | null>(null);
 
 defineExpose({
-	rootElement
+	rootElement,
+	fetchFriends 
 });
 
 const showOtherPlayer = (loginToShow: string)=>{
@@ -193,7 +194,7 @@ watch(socket, (newSocket, oldSocket) => {
 	if (newSocket) {
 		newSocket.addEventListener('message', handleServerMessage);
 	}
-});
+}, { immediate: true });
 
 watch(() => currentUser.value?.login ?? "", (newLogin) => {
 	if (newLogin !== "") { 

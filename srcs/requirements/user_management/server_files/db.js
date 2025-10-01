@@ -103,18 +103,21 @@ export async function getUserByEmail(email) {
 }
 
 export async function getUserByLogin(login) {
-	const db = await open({
-			filename: dbPath,
-			driver: sqlite3.Database,
-		});
-		console.log('Base de donnees ouverte');
-	try {
-		const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
-		console.log('login trouve en base:', user);
-		return (user);
-	} catch (err) {
-		console.error('Erreur dans getUserByLogin:', err);
-		throw err;
+	if (login)
+	{
+		const db = await open({
+				filename: dbPath,
+				driver: sqlite3.Database,
+			});
+			console.log('Base de donnees ouverte');
+		try {
+			const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
+			console.log('login trouve en base:', user);
+			return (user);
+		} catch (err) {
+			console.error('Erreur dans getUserByLogin:', err);
+			throw err;
+		}
 	}
 }
 
