@@ -19,33 +19,34 @@ export default async function gameRoutes(fastify, options) {
 	
 			const winner_id = winner.id;
 			const loser_id = loser.id;
-	
-			const exists = await new Promise((resolve, reject) => {
+
+			const exists = await new Promise((resolve, reject)=>{
 				db.all(
 					`SELECT 1 FROM games WHERE game_id = ?`,
 					[game_id],
-					(err, rows) => {
+					(err, rows)=>{
 						if (err) reject(err);
 						else resolve(rows.length > 0);
 					}
-				);
+				)
 			});
-	
-			if (exists === true) {
-				return reply.send({ message: "Partie deja enregistree." });
+			// console.log("exists = ", exists);
+			if (exists) {
+				console.log("La partie a ete enregistre par l'autre joueur.");
+				return reply.status(201).send({ message: "Partie deja enregistree." });
 			}
 
-				// Inserer la partie
-				await new Promise((resolve, reject) => {
-					db.run(
-						`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
-						[winner_id, loser_id, score_winner, score_loser, game_id],
-						function (err) {
-							if (err) reject(err);
-							else resolve(this);
-						}
-					);
-				});
+			// Inserer la partie avec les IDs
+			await new Promise((resolve, reject) => {
+				db.run(
+					`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
+					[winner_id, loser_id, score_winner, score_loser, game_id],
+					function (err) {
+						if (err) reject(err);
+						else resolve(this);
+					}
+				);
+			});
 
 			// Mettre a jour le classement
 				await updateUserRanks(db);

@@ -221,7 +221,7 @@
 				console.log(message.value);
 			}
 		} catch (err) {
-			message.value = "Cannot change email";
+			message.value = "Cannot change login";
 			console.error("Fetch error:", err); 
 		}
 	}
