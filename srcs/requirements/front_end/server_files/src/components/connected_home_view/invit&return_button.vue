@@ -143,10 +143,15 @@ async function checkFriend() {
 				login2: friendLogin
 			})
 		});
-		if (!result.ok)
-			return console.log(friendLogin, ", n'est pas dans la liste d'amis");
+		// console.log("resultat de POST /friends/check =", result);
+		if (result.ok) {
+			const data = await result.json();
+			if (data.message === "Friendship successfully checked.")
+				itsFriend.value = true;
+			else
+				return console.log(friendLogin, ", n'est pas dans la liste d'amis");	
+		}
 		console.log("Ami checked avec succes.");
-		itsFriend.value = true;
 	} catch (err) {
 		//console.error("Erreur de check d'amitie:", err);
 		itsFriend.value = false;

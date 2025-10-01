@@ -176,7 +176,7 @@ export default async function friendRoutes(fastify, options) {
 				message: `Vous etes ami : ${user1.login}`
 			});
 
-			reply.send({message: "Friendship successfully check."});
+			reply.send({message: "Friendship successfully checked."});
 		} catch (err) {
 			if (DEBUG_MODE)
 				console.log(`Erreur de check d'ami! : ${err.message}\n`);
