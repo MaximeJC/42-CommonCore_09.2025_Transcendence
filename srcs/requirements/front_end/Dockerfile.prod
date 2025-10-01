@@ -35,8 +35,5 @@ RUN mkdir -p certs
 # On expose seulement le port 8080 (Caddy gère le 5000)
 EXPOSE 8080
 
-# Variables d'environnement par défaut
-ENV NODE_ENV=production
-
 # On demarre le serveur de production
 CMD ["node", "production-server.js"]
