@@ -65,8 +65,10 @@ async function handleConnection() { // fonction asynchrone appelee lors de la te
 			message.value = data.message || "Connexion error";
 			if (data.field === 'email') { 
 				error_email.value = true;
+				error_password.value = false;
 			} else if (data.field === 'password') {
 				error_password.value = true;
+				error_email.value = false;
 			} else {
 				error_email.value = true;
 				error_password.value = true;
