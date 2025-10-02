@@ -160,7 +160,7 @@ function handleServerMessage(event: MessageEvent) {
 async function inviteFriend (friend: string, isconnected: boolean){
 	try {
 		const inviteur = currentUser.value?.login ?? "";
-
+		let hash:string = window.location.hash 
 		// const friend = search_friends.value;
 
 		if (isconnected){
