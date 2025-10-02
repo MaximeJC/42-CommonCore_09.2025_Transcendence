@@ -18,13 +18,17 @@ const WS_URL = `${protocol}//${host}/game`;
 
 // On cree une variable "boite" pour stocker la fonction initializeApp.
 let mainAppInitializer = null;
-
+let onGameOverCallback = null;
 /**
  * Permet a app.js de "donner" sa fonction initializeApp au networkManager.
  * @param {function} initializer - La fonction a appeler quand le jeu doit demarrer.
  */
 export function setAppInitializer(initializer) {
 	mainAppInitializer = initializer;
+}
+
+export function setGameOverCallback(callback) {
+    onGameOverCallback = callback;
 }
 
 class NetworkManager {
@@ -176,10 +180,13 @@ class NetworkManager {
 					endGame(gameState, finalMessage);
 
 					//test partage donnees sur front
-					const gameResultEvent = new CustomEvent('gameresult', {
-					detail: message.data
-						});
-					window.dispatchEvent(gameResultEvent);
+					// const gameResultEvent = new CustomEvent('gameresult', {
+					// detail: message.data
+					// 	});
+					// window.dispatchEvent(gameResultEvent);
+                    if (onGameOverCallback) {
+                        onGameOverCallback(message.data);
+                    }
 					returnToLobby(true);
 					break;
 				
