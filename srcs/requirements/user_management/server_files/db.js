@@ -1,4 +1,4 @@
-import path from 'path';
+import path, { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
@@ -88,13 +88,21 @@ db.serialize(()=>{
 });
 
 export async function getUserByEmail(email) {
-	const db = await open({
-			filename: dbPath,
-			driver: sqlite3.Database,
-		});	
-		console.log('Base de donnees ouverte');
+	// const db = await open({
+	// 	filename: dbPath,
+	// 	driver: sqlite3.Database,
+	// });
+	// console.log('Base de donnees ouverte');
 	try {
-		const user = await db.get("SELECT * FROM users WHERE email = ?", [email]);
+		const user = await new Promise((resolve, reject)=>{
+			db.get("SELECT * FROM users WHERE email = ?", [email], (err, row)=>{
+				if (err) {
+					reject(err);
+				} else {
+					resolve(row);
+				}
+			});
+		}); 
 		console.log('UserMail trouve en base:', user);
 		return (user);
 	} catch (err) {
@@ -104,15 +112,22 @@ export async function getUserByEmail(email) {
 }
 
 export async function getUserByLogin(login) {
-	if (login)
-	{
-		const db = await open({
-				filename: dbPath,
-				driver: sqlite3.Database,
-			});
-			console.log('Base de donnees ouverte');
+	if (login) {
+		// const db = await open({
+		// 	filename: dbPath,
+		// 	driver: sqlite3.Database,
+		// });
+		// console.log('Base de donnees ouverte');
 		try {
-			const user = await db.get("SELECT * FROM users WHERE login = ?", [login]);
+			const user = await new Promise((resolve, reject)=>{
+				db.get("SELECT * FROM users WHERE login = ?", [login], (err, row)=>{
+					if (err) {
+						reject(err);
+					} else {
+						resolve(row);
+					}
+				});
+			});
 			console.log('login trouve en base:', user);
 			return (user);
 		} catch (err) {

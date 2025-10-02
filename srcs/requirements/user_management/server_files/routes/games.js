@@ -20,26 +20,10 @@ export default async function gameRoutes(fastify, options) {
 			const winner_id = winner.id;
 			const loser_id = loser.id;
 
-			const exists = await new Promise((resolve, reject)=>{
-				db.all(
-					`SELECT 1 FROM games WHERE game_id = ?`,
-					[game_id],
-					(err, rows)=>{
-						if (err) reject(err);
-						else resolve(rows.length > 0);
-					}
-				)
-			});
-			// console.log("exists = ", exists);
-			if (exists) {
-				console.log("La partie a ete enregistre par l'autre joueur.");
-				return reply.status(201).send({ message: "Partie deja enregistree." });
-			}
-
-			// Inserer la partie avec les IDs
-			await new Promise((resolve, reject) => {
+			const result = await new Promise((resolve, reject)=>{
 				db.run(
-					`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
+					`INSERT OR IGNORE INTO games (id_winner, id_loser, score_winner, score_loser, game_id)
+					VALUES (?, ?, ?, ?, ?)`,
 					[winner_id, loser_id, score_winner, score_loser, game_id],
 					function (err) {
 						if (err) reject(err);
@@ -47,11 +31,41 @@ export default async function gameRoutes(fastify, options) {
 					}
 				);
 			});
+			if (result.changes === 0) {
+				console.log("La partie a ete enregistre par l'autre joueur.");
+				return reply.status(201).send({ message: "Partie deja enregistree." });
+			}
+				// db.all(
+				// 	`SELECT 1 FROM games WHERE game_id = ?`,
+				// 	[game_id],
+				// 	(err, rows)=>{
+				// 		if (err) reject(err);
+				// 		else resolve(rows.length > 0);
+				// 	}
+				// )
+			// });
+			// console.log("exists = ", exists);
+			// if (exists) {
+			// 	console.log("La partie a ete enregistre par l'autre joueur.");
+			// 	return reply.status(201).send({ message: "Partie deja enregistree." });
+			// }
+
+			// Inserer la partie avec les IDs
+			// await new Promise((resolve, reject) => {
+			// 	db.run(
+			// 		`INSERT INTO games (id_winner, id_loser, score_winner, score_loser, game_id) VALUES (?, ?, ?, ?, ?)`,
+			// 		[winner_id, loser_id, score_winner, score_loser, game_id],
+			// 		function (err) {
+			// 			if (err) reject(err);
+			// 			else resolve(this);
+			// 		}
+			// 	);
+			// });
 
 			// Mettre a jour le classement
-				await updateUserRanks(db);
+			await updateUserRanks(db);
 
-				reply.send({ message: "Partie enregistree avec succes." });
+			reply.send({ message: "Partie enregistree avec succes." });
 		} catch (err) {
 			if (DEBUG_MODE)
 				console.log("Erreur lors de l'ajout de la partie:", err);
