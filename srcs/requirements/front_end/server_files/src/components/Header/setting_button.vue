@@ -103,6 +103,16 @@
 		cursor: pointer;
 	}
 
+.option-page::before {
+	content: '';
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	right: 0;
+	height: 1.5rem;
+	background-color: transparent; 
+}
+
 	.option-button{
 		position: relative;
 		margin-bottom: 1rem;
