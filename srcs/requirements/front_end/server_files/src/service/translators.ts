@@ -11,7 +11,7 @@ es
 //export let act_lang: string;
 
 export let currentLang: keyof typeof translations =
-  (localStorage.getItem('lang') as keyof typeof translations) || 'fr'
+  (localStorage.getItem('lang') as keyof typeof translations) || 'es'
 
 export const updateText = (): void => {
 	const elementsToTranslate: NodeListOf<HTMLElement> = document.querySelectorAll('[data-i18n]');

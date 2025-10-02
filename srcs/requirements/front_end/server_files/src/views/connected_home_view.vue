@@ -2,7 +2,7 @@
 
 import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, nextTick, watch } from 'vue';
-import { setLanguage, updateText } from '../service/translators';
+import { currentLang, setLanguage, updateText } from '../service/translators';
 import player_frame from '../components/connected_home_view/connected_player_frame.vue'
 import otherplayer_frame from '../components/connected_home_view/connected_otherplayer_frame.vue'
 import leaderbord from '../components/connected_home_view/leaderbord.vue';
@@ -79,12 +79,17 @@ async function fetchLanguage() {
 	}
 }
 
+
+
 onMounted(async ()=>{
+	let lang: string;
 	const language = await fetchLanguage();
 	if (language)
 		setLanguage(language);
 	else
-		setLanguage('fr');
+		setLanguage(currentLang);
+	console.log("lang =", currentLang)
+
 });
 
 </script>
