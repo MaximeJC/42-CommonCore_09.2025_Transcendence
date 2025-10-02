@@ -101,5 +101,5 @@ Makefile					# Makefile du projet
 - **Optimisations**: Build minifie
 - **Performance**: Optimise
 
-_Common Core Rank 06 - Completed in September 2025_
+_Common Core Rank 06 - Completed in September 2025_  
 _Code by [ahoizai](https://github.com/axelhoizai), [lcollong](https://github.com/louisecollonge), [mdemare](https://github.com/KaliStudio), [mgouraud](https://github.com/MaximeJC) and [nicolmar](https://github.com/Nico-Mar42)_
