@@ -23,6 +23,14 @@ function shuffleArray<T>(array: T[]): T[] {
   }
   return shuffled;
 }
+const player1 = ref('');
+const player2 = ref('');
+const player3 = ref('');
+const player4 = ref('');
+const player5 = ref('');
+const player6 = ref('');
+const player7 = ref('');
+const player8 = ref('');
 
 const list_of_players = ref(["","","","","","","",""])
 const order_for_matches = ref(["","","","","","","",""])
@@ -34,6 +42,34 @@ function handleSubmit(e: Event) {
 	showQuartFinal.value = true;
 }
 
+// Array avec tous les joueurs pour faciliter la gestion
+const allPlayers = computed(() => [
+  player1.value, player2.value, player3.value, player4.value,
+  player5.value, player6.value, player7.value, player8.value
+]);
+
+// Array avec tous les statuts de duplication
+const duplicateStatuses = computed(() => {
+  return allPlayers.value.map((currentPlayer, currentIndex) => {
+    if (currentPlayer.trim() === '') return false;
+    
+    return allPlayers.value.some((otherPlayer, otherIndex) => 
+      otherIndex !== currentIndex && 
+      otherPlayer.trim() === currentPlayer.trim()
+    );
+  });
+});
+
+// Computed individuels pour chaque joueur (utilisant la fonction commune)
+const isDuplicate1 = computed(() => duplicateStatuses.value[0]);
+const isDuplicate2 = computed(() => duplicateStatuses.value[1]);
+const isDuplicate3 = computed(() => duplicateStatuses.value[2]);
+const isDuplicate4 = computed(() => duplicateStatuses.value[3]);
+const isDuplicate5 = computed(() => duplicateStatuses.value[4]);
+const isDuplicate6 = computed(() => duplicateStatuses.value[5]);
+const isDuplicate7 = computed(() => duplicateStatuses.value[6]);
+const isDuplicate8 = computed(() => duplicateStatuses.value[7]);
+
 const playBox = ref<HTMLElement | null>(null);
 
 </script>
@@ -44,36 +80,44 @@ const playBox = ref<HTMLElement | null>(null);
 			<div title="add_players_login" class="e_add_players_login">
 				
 				<div title="player1" class="player_title">
-					<div data-i18n="tournament.player 1"></div>
-					<input title="player1" maxlength="13"></input>
+					<div data-i18n="tournament.player 1" ></div>
+					<input title="player1" v-model='player1' :class="{ error: isDuplicate1 }"  maxlength="13"></input>
+					<div v-ifshow="isDuplicate1" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player2" class="player_title">
 					<div data-i18n="tournament.player 2"></div>
-					<input title="player2" maxlength="13"></input>
+					<input title="player2" v-model='player2' :class="{ error: isDuplicate2 }" maxlength="13"></input>
+					<div v-show="isDuplicate2" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player3" class="player_title">
 					<div data-i18n="tournament.player 3"></div>
-					<input title="player3" maxlength="13"></input>
+					<input title="player3" v-model='player3' :class="{ error: isDuplicate3 }" maxlength="13"></input>
+					<div v-show="isDuplicate3" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player4" class="player_title">
 					<div data-i18n="tournament.player 4"></div>
-					<input title="player4" maxlength="13"></input>
+					<input title="player4" v-model='player4' :class="{ error: isDuplicate4 }" maxlength="13"></input>
+					<div v-show="isDuplicate4" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player5" class="player_title">
 					<div data-i18n="tournament.player 5"></div>
-					<input title="player5" maxlength="13"></input>
+					<input title="player5" v-model='player5' :class="{ error: isDuplicate5 }" maxlength="13"></input>
+					<div v-show="isDuplicate5" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player6" class="player_title">
 					<div data-i18n="tournament.player 6"></div>
-					<input title="player6" maxlength="13"></input>
+					<input title="player6" v-model='player6' :class="{ error: isDuplicate6 }" maxlength="13"></input>
+					<div v-show="isDuplicate6" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player7" class="player_title">
 					<div data-i18n="tournament.player 7"></div>
-					<input title="player7" maxlength="13"></input>
+					<input title="player7" v-model='player7' :class="{ error: isDuplicate7 }" maxlength="13"></input>
+					<div v-show="isDuplicate7" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player8" class="player_title">
 					<div data-i18n="tournament.player 8"></div>
-					<input title="player8" maxlength="13"></input>
+					<input title="player8" v-model='player8' :class="{ error: isDuplicate8 }" maxlength="13"></input>
+					<div v-show="isDuplicate8" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 			</div>
 			<button @click="handleSubmit" type="button" title="Submit-button" class=" t_Submit-button">
@@ -116,6 +160,24 @@ const playBox = ref<HTMLElement | null>(null);
 	font-size: 2em;
 }
 
+.error {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.8em;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  text-shadow: none;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 
 .e_add_players_login{

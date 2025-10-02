@@ -293,7 +293,7 @@ watch(() => props.activePlay, (newVal) => {
 #renderCanvas {
 	width: 100vw;
 	height: 100vh;
-	z-index: -1;
+	z-index: 9999;
 	display: none;
 	margin: 0;
 	padding: 0;

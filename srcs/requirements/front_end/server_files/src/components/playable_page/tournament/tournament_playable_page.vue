@@ -57,8 +57,13 @@ const showSetting = (winner: string, loser: string) => {
 };
 
 const handleReturnTournament = () => {
+	const target = 'profil';
+
 	console.log("retour au tournoi recu!");
-	showSetting(gameResult.value.winner, gameResult.value.loser)
+	if (gameResult.value.winner && gameResult.value.loser)
+		showSetting(gameResult.value.winner, gameResult.value.loser)
+	else	
+		window.location.hash = target.startsWith('/') ? target : '/' + target;
 }
 
 function handleStartGame() {
@@ -154,7 +159,7 @@ onUnmounted(() => {
 		display: grid;
 		grid-template-rows: 0.5fr 0.5fr 0.5fr;
 		grid-template-columns: 1fr;
-		width: 30rem;
+		width: max-content;
 		align-content: flex-start;
 		height: 15rem;
 		background-color: rgba(156, 50, 133, 0.5);

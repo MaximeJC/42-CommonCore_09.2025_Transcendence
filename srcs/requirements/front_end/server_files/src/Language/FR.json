@@ -113,7 +113,8 @@
 		"first_match": "Match 1",
 		"seconde_match": "Match 2",
 		"third_match": "Match 3",
-		"fourth_match": "Match 4"
+		"fourth_match": "Match 4",
+		"error_pseudo": "pseudo déjà existant"
 	},
 
 	"contact":{
