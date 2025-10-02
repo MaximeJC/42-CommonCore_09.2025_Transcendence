@@ -27,15 +27,21 @@ onMounted(async () => {
 	updateText()	 // <-- c’est ça qu’il faut appeler au premier rendu
 })
 
-function handleServerMessage(event: MessageEvent) {
+async function handleServerMessage(event: MessageEvent) {
 	try {
 		const data = JSON.parse(event.data);
-
+		console.log("window.location.hash :", window.location.hash);
+		
 		if (data.event === 'friend_invite') {
 			console.log("invite jeu recue via WebSocket !", data.payload);
 			inviteurLogin.value = data.payload.loginInviteur;
-			console.log("invite jeu de :", inviteurLogin.value);
+			if (window.location.hash === "#/playinvite" || window.location.hash === "#/play") {
+				onInvitationRefused();
+				inviteurLogin.value = null;
+			}console.log("invite jeu de :", inviteurLogin.value);
+			
 		}
+
 		if (data.event === 'friend_invite_cancel') {
 			console.log("invite jeu annule via WebSocket !", data.payload);
 			inviteurLogin.value = "";
@@ -54,6 +60,7 @@ function handleServerMessage(event: MessageEvent) {
 			opponentLoginToStart.value = inviteLogin.value
 			inviteLogin.value = "";
 		}
+
 	} catch (error) {
 		console.error('Erreur de parsing du message WebSocket:', error);
 	}

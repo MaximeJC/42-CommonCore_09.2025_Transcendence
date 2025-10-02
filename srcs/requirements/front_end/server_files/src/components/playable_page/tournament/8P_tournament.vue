@@ -34,13 +34,7 @@ const player8 = ref('');
 
 const list_of_players = ref(["","","","","","","",""])
 const order_for_matches = ref(["","","","","","","",""])
-function handleSubmit(e: Event) {
-	e.preventDefault();
-	const inputs = document.querySelectorAll<HTMLInputElement>('.e_add_players_login input');
-	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
-	order_for_matches.value = shuffleArray(list_of_players.value);
-	showQuartFinal.value = true;
-}
+
 
 // Array avec tous les joueurs pour faciliter la gestion
 const allPlayers = computed(() => [
@@ -71,6 +65,18 @@ const isDuplicate7 = computed(() => duplicateStatuses.value[6]);
 const isDuplicate8 = computed(() => duplicateStatuses.value[7]);
 
 const playBox = ref<HTMLElement | null>(null);
+
+function handleSubmit(e: Event) {
+	e.preventDefault();
+	if (duplicateStatuses.value.some(isDup => isDup)) {
+		// Si un pseudo est en double, on ne valide pas
+		return;
+	}
+	const inputs = document.querySelectorAll<HTMLInputElement>('.e_add_players_login input');
+	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
+	order_for_matches.value = shuffleArray(list_of_players.value);
+	showQuartFinal.value = true;
+}
 
 </script>
 
@@ -160,15 +166,14 @@ const playBox = ref<HTMLElement | null>(null);
 	font-size: 2em;
 }
 
-.error {
-  border: 2px solid red;
-  background-color: #ffe6e6;
-}
-
 .error-message {
-  color: #dc3545;
+  color: #ffffff;
   font-size: 0.8em;
-  margin-top: 0.25rem;
+  margin-top: 0.10rem;
+  text-shadow: 
+	0 0 10px #dc3545,
+	0 0 10px #dc3545,
+	0 0 20px #dc3545;
   font-weight: 500;
   text-shadow: none;
   animation: fadeIn 0.3s ease-in;
