@@ -15,6 +15,8 @@ const opponentLoginToStart = ref<string | null>(null)
 const inviteurLogin = ref<string | null>(null);
 const inviteLogin = playerInvited;
 
+let playing = true;
+
 const props = defineProps<{
 	setinviteur: (inviteur: string) => void;
 	setinvite: (invite: string) => void;
@@ -24,7 +26,7 @@ const emit = defineEmits(['start-online-game']);
 
 onMounted(async () => {
 	await nextTick()
-	updateText()	 // <-- c’est ça qu’il faut appeler au premier rendu
+	updateText()
 })
 
 async function handleServerMessage(event: MessageEvent) {
@@ -36,9 +38,11 @@ async function handleServerMessage(event: MessageEvent) {
 			console.log("invite jeu recue via WebSocket !", data.payload);
 			inviteurLogin.value = data.payload.loginInviteur;
 			if (window.location.hash === "#/playinvite" || window.location.hash === "#/play") {
+				playing = true;
 				onInvitationRefused();
 				inviteurLogin.value = null;
 			}console.log("invite jeu de :", inviteurLogin.value);
+			playing = false;
 			
 		}
 
@@ -159,7 +163,7 @@ watch(socket, (newSocket, oldSocket) => {
 
 </script>
 <template>
-	<pop_up_invite v-if="inviteurLogin"
+	<pop_up_invite v-if="inviteurLogin && playing === false"
 	:inviteur="inviteurLogin"
 	@accept="onInvitationAccepted" 
 	@refuse="onInvitationRefused"></pop_up_invite>
