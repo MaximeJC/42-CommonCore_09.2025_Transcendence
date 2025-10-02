@@ -18,26 +18,26 @@ let app;
 if (process.env.NODE_ENV === 'production' && !process.env.CADDY_PROXY) {
 	// console.log("Demarrage en mode PRODUCTION (HTTPS/WSS)");
 	app = fastify({
-	  logger: true,
-	  https: {
+		logger: true,
+		https: {
 		key: fs.readFileSync('/app/certs/hgp_https.key'),
 		cert: fs.readFileSync('/app/certs/hgp_https.crt')
-	  }
+		}
 	});
-  } else {
+	} else {
 	if (process.env.CADDY_PROXY) {
 		// console.log("Demarrage en mode PRODUCTION avec Caddy Proxy (HTTP/WS)");
 	} else {
 		// console.log("Demarrage en mode DEVELOPPEMENT (HTTP/WS)");
 	}
 	app = fastify({
-	  logger: true
+		logger: true
 	});
-  }
+}
 
 // app.register(fastifyCors, {
-//   origin: "http://localhost:5173",
-//   credentials: true,
+//	 origin: "http://localhost:5173",
+//	 credentials: true,
 // });
 const PORT = 3003;
 
@@ -118,56 +118,30 @@ app.register(async function (fastify) {
 		});
 
 		socket.on('close', () => {
-			// console.log(`[Serveur] Client deconnecte: ${socket.id}`);
+			console.log(`[Serveur] Client deconnecte: ${socket.id}`);
 			const clientInfo = clients.get(socket.id);
 
 			if (clientInfo && clientInfo.gameId) {
 				const game = games.get(clientInfo.gameId);
-				if (game && game.gameState.isGameStarted) {
-					clearInterval(game.gameLoop);
-					game.gameState.isGameStarted = false;
+				if (game) {
 
-					const remainingPlayer = game.gameState.activePlayers.find(p => p.controlType.includes('HUMAN') && p.id !== socket.id);
-
-					let endMessage;
-					// Construire le message.
-					if (remainingPlayer && remainingPlayer.pseudo) {
-						const lang = remainingPlayer.language || 'en';
-						const winnerPseudo = remainingPlayer.pseudo;
-						let opponentLeftText;
-						let winText;
-						if (lang === 'fr') {
-							winText = `${winnerPseudo} gagne !`;
-						} else if (lang === 'es') {
-							winText = `¡${winnerPseudo} gana!`;
-						} else {
-							winText = `${winnerPseudo} Wins!`;
-						}
-						if (lang === 'fr') {
-							opponentLeftText = "L'adversaire a quitte.\n";
-						} else if (lang === 'es') {
-							opponentLeftText = "El oponente se ha ido.\n";
-						} else {
-							opponentLeftText = "Opponent has left.\n";
-						}
-						endMessage = opponentLeftText + winText;
-					} else {
-						endMessage = "Opponent has left the game.";
+					const result = game.handlePlayerDisconnect(socket.id);
+					
+					if (result && result.shouldDelete) {
+						games.delete(clientInfo.gameId);
+						console.log(`[Serveur] Instance de jeu ${clientInfo.gameId} supprimee.`);
 					}
-
-					game.broadcast('game_over', { end_message: endMessage });
-
-					// console.log(`[Jeu ${game.gameId}] Partie terminee. ${endMessage}`);
-					games.delete(clientInfo.gameId);
 				}
 			}
 
-			clients.delete(socket.id);
 			matchmaking_1v1 = matchmaking_1v1.filter(info => info.socket.id !== socket.id);
 			matchmaking_4p = matchmaking_4p.filter(info => info.socket.id !== socket.id);
+
+			clients.delete(socket.id);
 		});
 	});
 });
+
 
 function handleMatchmaking(playerInfo, gameMode, opponentPseudo = null)
 {

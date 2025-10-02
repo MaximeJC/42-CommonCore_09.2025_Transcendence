@@ -19,12 +19,12 @@ export class GameInstance {
 		this.gameState.gameMode = gameMode;
 
 		if (gameMode === '4P_ONLINE' || gameMode === '2AI_VS_2AI') {
-            this.gameState.limitUp = limitUp4v4;
-            this.gameState.limitDown = limitDown4v4;
-        } else {
-            this.gameState.limitUp = limitUp2v2;
-            this.gameState.limitDown = limitDown2v2;
-        }
+			this.gameState.limitUp = limitUp4v4;
+			this.gameState.limitDown = limitDown4v4;
+		} else {
+			this.gameState.limitUp = limitUp2v2;
+			this.gameState.limitDown = limitDown2v2;
+		}
 
 		// On utilise un Set pour stocker les IDs des joueurs qui ont confirme etre prets.
 		this.readyPlayers = new Set();
@@ -34,6 +34,71 @@ export class GameInstance {
 
 		// On ne lance pas le jeu immediatement, on notifie les clients de se preparer.
 		this.notifyClientsToPrepare();
+	}
+
+	handlePlayerDisconnect(disconnectedPlayerId) {
+		console.log(`[Jeu ${this.gameId}] Le joueur ${disconnectedPlayerId} s'est deconnecte.`);
+
+		if (this.gameLoop) {
+			clearInterval(this.gameLoop);
+		}
+		this.gameState.isGameStarted = false;
+
+		const disconnectedPlayerInfo = this.clientInfos.find(info => info.socket.id === disconnectedPlayerId);
+		const remainingPlayersInfo = this.clientInfos.filter(info => info.socket.id !== disconnectedPlayerId);
+
+		if (this.gameState.waitingForPlayers) {
+			console.log(`[Jeu ${this.gameId}]Deconnexion pendant l'attente. Annulation.`);
+			this.broadcast('match_cancelled',
+				{
+					reason: 'opponent_left'
+				});
+			return { shouldDelete: true };
+		}
+
+		const remainingHumanPlayers = remainingPlayersInfo.filter(info => {
+			const player = this.gameState.activePlayers.find(p => p.id === info.socket.id);
+			return player && player.controlType.includes('HUMAN');
+		});
+
+		let winnerPseudo = null;
+		if (remainingHumanPlayers.length === 1) {
+			winnerPseudo = remainingHumanPlayers[0].pseudo;
+		}
+
+		const lang = (remainingPlayersInfo.length > 0) ? remainingPlayersInfo[0].language : 'en';
+		let endMessage;
+
+		if (winnerPseudo) {
+			let opponentLeftText, winText;
+			if (lang === 'fr') {
+				opponentLeftText = "L'adversaire a quitté la partie.\n";
+				winText = `${winnerPseudo} gagne !`;
+			} else if (lang === 'es') {
+				opponentLeftText = "El oponente se ha ido.\n";
+				winText = `¡${winnerPseudo} gana!`;
+			} else {
+				opponentLeftText = "Opponent has left.\n";
+				winText = `${winnerPseudo} Wins!`;
+			}
+			endMessage = opponentLeftText + winText;
+		} else {
+			if (lang === 'fr') {
+				endMessage = "Un joueur a quitté la partie.";
+			} else if (lang === 'es') {
+				endMessage = "Un jugador ha abandonado la partida.";
+			} else {
+				endMessage = "A player has left the game.";
+			}
+		}
+
+		this.broadcast('game_over', { 
+			end_message: endMessage,
+			winner: winnerPseudo,
+			loser: disconnectedPlayerInfo ? disconnectedPlayerInfo.pseudo : 'Unknown',
+		});
+
+		return { shouldDelete: true };
 	}
 
 	setupPlayers(clientInfos, gameMode, opponentPseudo = null) { // Le parametre est 'clientInfos'
