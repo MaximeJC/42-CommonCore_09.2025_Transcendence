@@ -23,6 +23,7 @@ db.serialize(()=>{
 				email TEXT UNIQUE NOT NULL,
 				password TEXT NOT NULL,
 				connected INTEGER DEFAULT 0 NOT NULL,
+				language TEXT DEFAULT 'fr' NOT NULL,
 
 				nb_games INTEGER DEFAULT 0 NOT NULL,
 				nb_won_games INTEGER DEFAULT 0 NOT NULL,
