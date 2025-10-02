@@ -36,7 +36,7 @@ async function configure() {
 		cookie: {
 			path: '/',
 			httpOnly: true,
-			secure: false, // Mettre à true en production (HTTPS)
+			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'lax',
 		}
 	});
@@ -68,7 +68,8 @@ async function configure() {
 			}
 			cb(new Error(`Not allowed by CORS: ${origin}`));
 		},
-		credentials: true
+		credentials: true,
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 	});
 
 	// Gestion des fichiers (pour les avatars)
@@ -106,4 +107,4 @@ async function configure() {
 	await fastify.listen({ port: 3000, host: '0.0.0.0' });
 }
 
-configure();
+await configure();

@@ -250,6 +250,7 @@
 					old_password: old_password.value,
 					password: new_password.value,
 				}),
+				credentials: 'include',
 			});
 			
 			const data = await result.json();
@@ -303,11 +304,11 @@
 				</form>
 			</div>
 			<div title="mail_container" class="set_container" >
-				<form title="form_mail" class="set_form">
+				<form title="form_mail" class="set_form" @submit.prevent="handleEmail">
 					<label title="mail_label" class="set_subtitle" data-i18n="setting.mail" ></label>
 					<div class="set_sub_inp">
 						<input title="mail_input" class="set_input" type="email" id="new_email" autocomplete="off" v-model="new_email"></input>
-						<button @click="handleEmail" type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<button type="submit" title="mail_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div title="email-error" class="set_error"  >
 						<div v-show="error_email" data-i18n="setting.mail_error"></div>
@@ -316,11 +317,11 @@
 				</form>
 			</div>
 			<div class="set_container" title="login_container">
-				<form class="set_form" title="form_login">
+				<form class="set_form" title="form_login" @submit.prevent="handleLogin">
 					<label title="login_label" class="set_subtitle" data-i18n="setting.login" ></label>
 					<div class="set_sub_inp">
 						<input title="login_input" class="set_input" type="login" id="new_login" v-model="new_login"></input>
-						<button @click="handleLogin" type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
+						<button  type="submit" title="login_button" class="set_button" data-i18n="Signup.submit" ></button>
 					</div>
 					<div title="login-error" class="set_error"  >
 						<div v-show="error_login" data-i18n="setting.login_error"></div>
@@ -330,7 +331,7 @@
 			</div>
 			<div class="set_container" title="password_container">
 				<div class="password_inputs">
-					<form class="set_form" title="form_password">
+					<form class="set_form" title="form_password"  @submit.prevent="handlePassword">
 						<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>
 						<div class="set_sub_inp">
 							<input title="old_password_input" class="set_input" type="password" id="old_password" autocomplete="off" v-model="old_password" />
@@ -345,7 +346,7 @@
 						<label class="set_subtitle" data-i18n="Signup.conf_password"></label>
 						<div class="set_sub_inp">
 							<input title="conf_password_input" class="set_input" type="password" id="repeat_new_password" autocomplete="off" v-model="conf_new_password" />
-							<button @click="handlePassword" type="submit" class="set_button" data-i18n="Signup.submit"></button>
+							<button type="submit" class="set_button" data-i18n="Signup.submit"></button>
 						</div>
 							<div title="password-error" class="set_error"  >
 								<div v-show="error_conf_password" data-i18n="setting.conf_password_error"></div>

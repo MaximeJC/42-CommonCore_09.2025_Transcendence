@@ -3,22 +3,6 @@
     # Utiliser vos certificats existants au lieu de ceux de Caddy
     tls /app/certs/hgp_https.crt /app/certs/hgp_https.key
     
-    # Headers de sécurité et CORS
-    # header {
-    #     Access-Control-Allow-Origin *
-    #     Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    #     Access-Control-Allow-Headers "Content-Type, Authorization"
-    #     X-Content-Type-Options nosniff
-    #     X-Frame-Options DENY
-    #     X-XSS-Protection "1; mode=block"
-    # }
-    
-    # Gestion des requêtes OPTIONS pour CORS
-    # @options {
-    #     method OPTIONS
-    # }
-    # respond @options 200
-    
     # Proxy pour l'API user_management (REST + WebSocket)
     handle_path /api/* {
         reverse_proxy hgp_user_management:3000
