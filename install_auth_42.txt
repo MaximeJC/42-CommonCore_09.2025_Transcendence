@@ -1,39 +1,21 @@
-- recuperer l'ip de la machine qui heberge genre 10.2.1.8
-- aller sur le profil de l'Internal
-- aller dans settings de l'Internal
+- recuperer l'ip de la machine qui heberge genre 10.2.1.8 (commande [ifconfig | grep "inet 10."] pour avoir directement la bonne ligne)
+- aller sur le profil de l'Intra
+- aller dans settings de l'Intra
 - cliquer sur api
 - cliquer sur register a new app
 - remplir les champ obligatoires
-Dans Redirect URi ecrire : https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/callback"
+Dans Redirect URI ecrire : https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/callback
 bien evidement remplacer LIP_PUBLIC_DU_PC_QUI_HEBERGE par l'ip de la machine qui heberge genre 10.2.1.8
 - appuyer sur submit.
 
-dans l'app dans le dossier srcs creer un prod.env qui ne dois pas exister car comme on est des bon dev, on l'a ajoute dans le gitignore bien evidement.
+dans l'app dans le dossier srcs creer un .prod.env (ou .dev.env selon le cas) qui ne dois pas exister car comme on est des bon dev, on l'a ajoute dans le gitignore bien evidement.
 
-dans le prod.env :
-
-NODE_ENV=production
-FRONT_PORT=5000
+dans le .prod.env (ou .dev.env), completer les lignes suivantes :
 
 FORTYTWO_CLIENT_SECRET="SECRET_OBTENU_SUR_L_INTRA"
-FORTYTWO_CLIENT_ID="UID_OBTENU_SUR_L_INTRA"
-FORTYTWO_REDIRECT_URI="https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/callback" ## L'URL exacte dans le back-end
+VITE_42_CLIENT_ID="UID_OBTENU_SUR_L_INTRA"
+VITE_42_REDIRECT_URI="https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/callback" ## L'URL exacte dans le back-end
 
 Bien evidement remplacer par les bonnes Info !!!!
-
-dans srcs/front_end/server_files creer un .env qui ne dois pas exister car comme on est des bon dev, on l'a ajoute aussi dans le gitignore bien evidement.
-
-dans le .env :
-
-PORT=5000
-API_TARGET=http://hgp_user_management:3000
-AI_SERVER_TARGET=http://hgp_ai_server:3001
-GAME_MANAGEMENT_TARGET=http://hgp_game_management:3003
-
-
-VITE_42_REDIRECT_URI="https://LIP_PUBLIC_DU_PC_QUI_HEBERGE:5000/api/auth/42/callback" ## L'URL exacte dans le back-end 
-VITE_42_CLIENT_ID="UID_OBTENU_SUR_L_INTRA"
-
-Bien evidement remplacer par les bonnes Info et NE PAS COPIER/COLLER le prod.env !!!!
 
 make prod et prier !!!!!!!
