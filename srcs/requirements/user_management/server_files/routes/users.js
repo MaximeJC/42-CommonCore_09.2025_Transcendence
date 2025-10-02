@@ -436,4 +436,56 @@ export default async function userRoutes(fastify, options) {
 			reply.status(500).send({ success: false, message: "Erreur serveur." });
 		}
 	});
+
+	// Ajouter la langue dans la base de donnee
+	fastify.post('/users/setlanguage', async (request, reply)=>{
+		const { login } = request.body;
+		if (!login)
+			return reply.status(400).send({ success: false, message: "Login requis." });
+
+		const { language } = request.body;
+		if (!language)
+			return reply.status(400).send({ success: false, message: "Langue manquante" });
+
+		const cleanLanguage = validator.escape(validator.trim(language));
+
+		try {
+			await new Promise((resolve, reject) => {
+				db.run(
+					`UPDATE users SET language = ? WHERE login = ?`, 
+					[cleanLanguage, login], 
+					function (err) {
+						if (err) reject(err);
+						else resolve(this);
+					}
+				);
+			});
+			reply.status(200).send({ success: true, message: "Langue change avec succes" });
+		} catch (err) {
+			reply.status(500).send({ success: false, message: "Erreur serveur." });
+		}
+	});
+
+	// Recuperer la langue dans la base de donnees
+	fastify.get('/users/language', async (request, reply)=>{
+		const { login } = request.query;
+		if (!login)
+			return reply.status(400).send({ error: "Login manquant" });
+
+		try {
+			const row = await new Promise((resolve, reject) => {
+				db.get(
+					`SELECT language FROM users WHERE login = ?`, 
+					[login], (err, row) => {
+						if (err) reject(err);
+						else resolve(row);
+					}
+				);
+			});
+			reply.status(200).send({ success: true, language: row.language });
+		} catch (err) {
+			console.error(err);
+			reply.status(500).send({ success: false, message: "Erreur serveur." });
+		}
+	});
 }

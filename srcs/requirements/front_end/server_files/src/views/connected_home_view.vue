@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { setLanguage, updateText } from '../service/translators';
 import player_frame from '../components/connected_home_view/connected_player_frame.vue'
@@ -60,7 +62,30 @@ function handleFriendListChange() {
 		friendlistComponentRef.value.fetchFriends(currentUser.value.login);
 	}
 }
-	
+
+async function fetchLanguage() {
+	if (!currentUser.value)
+		return null;
+	try {
+		const response = await fetch(`${USER_MANAGEMENT_URL}/users/language?login=${encodeURIComponent(currentUser.value?.login)}`);
+		if (!response.ok)
+			throw new Error('Language fetch error');
+
+		const data = await response.json();
+		console.log(data);
+		return data.language;
+	} catch (error) {
+		console.log("Error:", error);
+	}
+}
+
+onMounted(async ()=>{
+	const language = await fetchLanguage();
+	if (language)
+		setLanguage(language);
+	else
+		setLanguage('fr');
+});
 
 </script>
 

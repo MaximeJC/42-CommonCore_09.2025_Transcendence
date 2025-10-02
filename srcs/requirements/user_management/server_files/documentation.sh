@@ -98,3 +98,10 @@ node db_server.js
 		-H "Content-Type: application/json" \
 		-d '{"login": "Louise", "email": "louise@example.com", "password": "bimo"}'
 
+	# Recuperer la langue d'un utilisateur:
+	curl http://localhost:3000/users/language?login=Yoo 
+	# Changer la langue d'un utilisateur:
+	curl -X POST http://localhost:3000/users/setlanguage \
+		-H "Content-Type: application/json" \
+		-d '{"login": "Yoo", "language": "en"}'	
+

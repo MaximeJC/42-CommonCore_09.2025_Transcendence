@@ -1,8 +1,38 @@
 <script setup lang="ts">
-	const props = defineProps<{
-		setLanguage: (lang: string) => void;
-	}>();
-	
+import { setLanguage, updateText } from '../../service/translators';
+import { user } from '../../user';
+import { USER_MANAGEMENT_URL } from '@/config/config.js';
+
+const props = defineProps<{
+	setLanguage: (lang: string) => void;
+}>();
+
+const { currentUser } = user();
+
+async function setNewLanguage(lang: string) {
+	try {
+		props.setLanguage(lang);
+		updateText();
+		if (!currentUser || !currentUser.value) {
+			console.log('Pas de currentUser -setNewLanguage');
+			return;
+		}
+		const response = await fetch(`${USER_MANAGEMENT_URL}/users/setlanguage`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ login: currentUser.value.login, language: lang }),
+		});
+		if (!response.ok) {
+			throw new Error('Failed to update language');
+		}
+		console.log(`Language updated to ${lang}`);
+	} catch (error) {
+		console.error('Error updating language:', error);
+	}
+}
+
 </script>
 
 <template>
@@ -13,13 +43,13 @@
 		</button>
 		<ul class="lang-options">
 			<li>
-				<button class="lang-button-option" @click="setLanguage('fr')">Français</button>
+				<button class="lang-button-option" @click="setNewLanguage('fr')">Français</button>
 			</li>
 			<li>
-				<button  class="lang-button-option" @click="setLanguage('en')">English</button>
+				<button  class="lang-button-option" @click="setNewLanguage('en')">English</button>
 			</li>
 			<li>
-				<button  class="lang-button-option" @click="setLanguage('es')">Español</button>
+				<button  class="lang-button-option" @click="setNewLanguage('es')">Español</button>
 			</li>
 		</ul>
 	</div>
