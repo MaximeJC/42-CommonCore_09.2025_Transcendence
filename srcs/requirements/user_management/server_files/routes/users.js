@@ -203,14 +203,20 @@ export default async function userRoutes(fastify, options) {
 		}
 
 		const cleanEmail = validator.escape(validator.trim(email));
+		const cleanPassword = validator.escape(password);
+
 		const user = await getUserByEmail(cleanEmail);
 
-		if (user && await bcrypt.compare(password, user.password)) {
+		if (user && await bcrypt.compare(cleanPassword, user.password) === true) {
 			request.session.set('user', user);
 			updateIsConnected(db, user.id);
 			return reply.send({ success: true, user: user });
+		} else if (!user) {
+			return reply.status(401).send({ success: false, message: "Email invalides.", field: 'email' });
+		} else if (await bcrypt.compare(cleanPassword, user.password) === false) {
+			return reply.status(401).send({ success: false, message: "Password invalides.", field: 'password' });
 		} else {
-			return reply.status(401).send({ success: false, message: "Identifiants invalides." });
+			return reply.status(500).send({ success: false, message: "[ft_transcendance: Erreur de connexion]"});
 		}
 	});
 
@@ -401,19 +407,22 @@ export default async function userRoutes(fastify, options) {
 		console.log("password: ", password);
 		console.log("*****************");
 
+		const cleanold_Password = validator.escape(old_password);
+		const cleanPassword = validator.escape(password);
+
 		if (!old_password || !password) {
 			return reply.send({ success: false, message: "Mot de passe manquant" });
 		}
 
 		console.log("*****************");
-		console.log("bcrypt: ", await bcrypt.compare(old_password, user.password));
+		console.log("bcrypt: ", await bcrypt.compare(cleanold_Password, user.password));
 		console.log("*****************");
 
-		if (await bcrypt.compare(old_password, user.password) === false) {
+		if (await bcrypt.compare(cleanold_Password, user.password) === false) {
 			return reply.send({ success: false, message: "Erreur de mot de passe" });
 		}
 
-		const hashedPassword = await bcrypt.hash(password, 10);
+		const hashedPassword = await bcrypt.hash(cleanPassword, 10);
 
 		try {
 			await new Promise((resolve, reject) => {

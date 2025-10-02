@@ -234,7 +234,10 @@
 	
 		if (new_password.value !== conf_new_password.value) {
 			error_conf_password.value = true;
-			// message.value = "Passwords are not the same";
+			old_password.value = "";
+			new_password.value = "";
+			conf_new_password.value = "";
+			message.value = "Passwords are not the same";
 			return;
 		}
 
@@ -262,6 +265,9 @@
 			} else {
 				message.value = data.message || "Password error";
 				error_password.value = true;
+				old_password.value = "";
+				new_password.value = "";
+				conf_new_password.value = "";
 			}
 		} catch (err) {
 			message.value = "Cannot change password";
