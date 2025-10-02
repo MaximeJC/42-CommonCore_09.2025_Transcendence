@@ -8,14 +8,6 @@ COMPOSE_PROD_FILE = srcs/docker-compose.prod.yml
 
 all: prod
 
-dev: mkdir
-	@echo "Switching to DEVELOPMENT mode with Caddy reverse proxy..."
-	@echo "Stopping production containers..."
-	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
-	@echo "Starting development services with Caddy..."
-	@cp ./srcs/.dev.env ./srcs/requirements/front_end/server_files/.env
-	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
-
 prod: mkdir
 	@echo "Switching to PRODUCTION mode with Caddy reverse proxy..."
 	@echo "Stopping development containers..."
@@ -30,8 +22,6 @@ down:
 	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 
 restart: down prod
-
-restart-dev: down dev
 
 # Stops the containers and removes volumes
 clean:
