@@ -34,7 +34,7 @@ async function fetchOtherPlayerData(otherPlayerLogin: string) {
 			throw new Error('Player data fetch error');
 
 		const data = await response.json();
-		console.log(data);
+		// console.log(data);
 		playerData.value = {
 			login: data.login,
 			avatar_url: data.avatar_url,
@@ -43,7 +43,7 @@ async function fetchOtherPlayerData(otherPlayerLogin: string) {
 			rank: data.rank,
 			connect: data.connected,
 		};
-		console.log(playerData);
+		// console.log(playerData);
 	} catch (error) {
 		console.log("Error:", error);
 	}

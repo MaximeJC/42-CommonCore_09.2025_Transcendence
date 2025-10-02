@@ -394,18 +394,12 @@ export default async function userRoutes(fastify, options) {
 
 	// Changer le mot de passe
 	fastify.post('/users/change-password', async (request, reply) => {
-		// TODO : ajouter une verification de l'ancien mot de pass par securite
 		const user = request.session.get('user');
 		if (!user) {
 			return reply.status(401).send({ success: false, message: "Non connecte" });
 		}
 
 		const { old_password, password } = request.body;
-		console.log("*****************");
-		console.log("old_password: ", old_password);
-		console.log("user.password: ", user.password);
-		console.log("password: ", password);
-		console.log("*****************");
 
 		const cleanold_Password = validator.escape(old_password);
 		const cleanPassword = validator.escape(password);
@@ -413,10 +407,6 @@ export default async function userRoutes(fastify, options) {
 		if (!old_password || !password) {
 			return reply.send({ success: false, message: "Mot de passe manquant" });
 		}
-
-		console.log("*****************");
-		console.log("bcrypt: ", await bcrypt.compare(cleanold_Password, user.password));
-		console.log("*****************");
 
 		if (await bcrypt.compare(cleanold_Password, user.password) === false) {
 			return reply.send({ success: false, message: "Erreur de mot de passe" });

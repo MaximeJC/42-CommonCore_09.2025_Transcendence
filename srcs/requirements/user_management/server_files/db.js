@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, 'db/database.db');
-console.log(`Chemin de la DB : ${dbPath}`);
+// console.log(`Chemin de la DB : ${dbPath}`);
 
 let db = new sqlite3.Database(dbPath);
 
@@ -103,7 +103,7 @@ export async function getUserByEmail(email) {
 				}
 			});
 		}); 
-		console.log('UserMail trouve en base:', user);
+		// console.log('UserMail trouve en base:', user);
 		return (user);
 	} catch (err) {
 		console.error('Erreur dans getUserByEmail:', err);
@@ -128,7 +128,7 @@ export async function getUserByLogin(login) {
 					}
 				});
 			});
-			console.log('login trouve en base:', user);
+			// console.log('login trouve en base:', user);
 			return (user);
 		} catch (err) {
 			console.error('Erreur dans getUserByLogin:', err);

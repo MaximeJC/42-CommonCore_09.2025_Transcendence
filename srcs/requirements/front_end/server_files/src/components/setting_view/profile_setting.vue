@@ -124,7 +124,7 @@
 				credentials: 'include',
 			});
 			
-			console.log (" email = " + new_email.value);
+			// console.log (" email = " + new_email.value);
 			interface ServerResponse { // interface qui definit la structure des donnees attendues par le serveur
 				success: boolean; // reussite de la requete
 				message?: string; // message optionnel
@@ -132,7 +132,7 @@
 			}
 
 			const data: ServerResponse = await result.json();
-			console.log("data Sever response: ", data);
+			// console.log("data Sever response: ", data);
 
 			// verifier si login ou email presente dans DB
 			if (!result.ok)
@@ -193,7 +193,7 @@
 			}
 
 			const data: ServerResponse = await result.json();
-			console.log("data Sever response: ", data);
+			// console.log("data Sever response: ", data);
 
 			// verifier si login ou email presente dans DB
 			if (!result.ok)
@@ -254,7 +254,7 @@
 			
 			const data = await result.json();
 
-			console.log("data: ", data);
+			// console.log("data: ", data);
 			
 			if (data.success) { // afficher un message et reinitialiser les variables
 				message.value = "Password successfully changed";

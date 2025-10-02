@@ -96,7 +96,7 @@ async function addFriend() {
 				login2: ajoute
 			})
 		});
-		console.log(result);
+		// console.log(result);
 		if (!result.ok || result.status == 304 || result.status == 204) {
 			search_friends.value = "";
 			return console.log(`Erreur d'ajout d'amis`);

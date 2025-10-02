@@ -72,7 +72,7 @@ async function fetchLanguage() {
 			throw new Error('Language fetch error');
 
 		const data = await response.json();
-		console.log(data);
+		// console.log(data);
 		return data.language;
 	} catch (error) {
 		console.log("Error:", error);
