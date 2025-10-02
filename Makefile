@@ -11,7 +11,7 @@ all: prod
 dev: mkdir
 	@echo "Switching to DEVELOPMENT mode with Caddy reverse proxy..."
 	@echo "Stopping production containers..."
-	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting development services with Caddy..."
 	@cp ./srcs/.dev.env ./srcs/requirements/front_end/server_files/.env
 	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
@@ -19,15 +19,15 @@ dev: mkdir
 prod: mkdir
 	@echo "Switching to PRODUCTION mode with Caddy reverse proxy..."
 	@echo "Stopping development containers..."
-	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 	@echo "Starting production services with Caddy..."
 	@cp ./srcs/.prod.env ./srcs/requirements/front_end/server_files/.env
 	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) up --build -d --remove-orphans
 
 down:
 	@echo "Stopping $(COMPOSE_PROJECT_NAME) services..."
-	@docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
-	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	docker compose -f $(COMPOSE_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
+	docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) down 2>/dev/null || true
 
 restart: down prod
 
@@ -56,11 +56,7 @@ ps:
 	@docker compose -f $(COMPOSE_PROD_FILE) --project-name $(COMPOSE_PROJECT_NAME) ps 2>/dev/null || true
 
 mkdir:
-	cd ${HOME} && mkdir -p hgp_data
-	cd ${HOME}/hgp_data && mkdir -p database avatars certs
+	@cd ${HOME} && mkdir -p hgp_data
+	@cd ${HOME}/hgp_data && mkdir -p database avatars certs
+	@cd srcs/requirements/front_end/server_files/public && mkdir -p uploads
 
-clean-data:
-	@echo "Cleaning up data directories..."
-	@rm -rf ${HOME}/hgp_data/database/* ${HOME}/hgp_data/avatars/* ${HOME}/hgp_data/certs/*
-	@rm -rf ${HOME}/hgp_data
-	@echo "Data directories deleted!"
