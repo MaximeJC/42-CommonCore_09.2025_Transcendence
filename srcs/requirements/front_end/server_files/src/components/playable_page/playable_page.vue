@@ -89,7 +89,8 @@ async function handleGameResult(event: CustomEvent) {
 	showResultScreen.value = true;
 	await nextTick();  
 	updateText()
-	addGameToDataBase(gameResult.value);
+	if (gameResult.value.gameMode === "1V1_ONLINE")
+		addGameToDataBase(gameResult.value);
 }
 
 const handleReturnToLobby = () => {

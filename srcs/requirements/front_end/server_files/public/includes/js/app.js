@@ -53,7 +53,7 @@ function returnToLobby(endgame) {
 	// Reinitialiser les parties importantes du gameState
 	gameState.isGameStarted = false;
 	gameState.activePlayers = [];
-	gameState.ball = null;
+	gameState.C = null;
 	// ... (reinitialiser d'autres etats si besoin)
 
 	// Reafficher le lobby HTML
