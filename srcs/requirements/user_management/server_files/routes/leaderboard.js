@@ -29,7 +29,7 @@ export default async function leaderboardRoutes(fastify, options) {
 			if (DEBUG_MODE) {
 				console.log("Erreur lors de l'affichage du classement:", err.message);
 			}
-			reply.status(500).send({ error: "Erreur serveur lors de la recuperation du classement." });
+			reply.status(304).send({ error: "Erreur serveur lors de la recuperation du classement." });
 		}
 	});
 }

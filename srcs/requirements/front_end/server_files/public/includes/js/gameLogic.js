@@ -55,12 +55,16 @@ export function endGame(gameState, message) {
 	if (gameState.countdownInterval) {
 		clearInterval(gameState.countdownInterval);
 	}
-	
-	gameState.ball.isVisible = false;
-	gameState.ui.countdownText.mesh.isVisible = false;
-	gameState.ui.winnerText.textBlock.text = message;
-	gameState.ui.winnerText.textBlock.fontSize = '35%';
-	gameState.ui.winnerText.mesh.isVisible = true;
+	if (gameState.ball)
+		gameState.ball.isVisible = false;
+	if (gameState.ui.countdownText)
+		gameState.ui.countdownText.mesh.isVisible = false;
+	if (gameState.ui.winnerText)
+	{
+		gameState.ui.winnerText.textBlock.text = message;
+		gameState.ui.winnerText.textBlock.fontSize = '35%';
+		gameState.ui.winnerText.mesh.isVisible = true;
+	}
 
 	// On verifie que le bouton a bien ete cree avant d'essayer de l'afficher.
 	if (gameState.ui.returnButton) {
