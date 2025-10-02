@@ -20,7 +20,7 @@ export default async function userRoutes(fastify, options) {
 	const __filename = fileURLToPath(import.meta.url);
 	const __dirname = dirname(__filename);
 
-// --- Pour l'auth 42 ---
+	// --- Pour l'auth 42 ---
 
 	// Fonction pour trouver un utilisateur par son login 42
 	async function getUserBy42Login(login42) {
@@ -34,7 +34,7 @@ export default async function userRoutes(fastify, options) {
 
 	// Fonction pour creer un utilisateur a partir des donnees de l'API 42
 	async function createUserFrom42(userData) {
-		const { login, email, avatar_url } = userData;
+		const { login, email, avatar_url, login42 } = userData;
 
 		// Un mot de passe aleatoire est genere car l'utilisateur ne se connectera pas avec.
 		const randomPassword = Math.random().toString(36).slice(-8);
@@ -43,7 +43,7 @@ export default async function userRoutes(fastify, options) {
 		return new Promise((resolve, reject) => {
 			db.run(
 				`INSERT INTO users (login, email, password, avatar_url, login_42) VALUES (?, ?, ?, ?, ?)`,
-				[login, email, hashedPassword, avatar_url, login],
+				[login, email, hashedPassword, avatar_url, login42],
 				function (err) {
 					if (err) reject(err);
 					else {
@@ -58,15 +58,27 @@ export default async function userRoutes(fastify, options) {
 		});
 	}
 
-	// DEBUT ROUTE D'AUTH 42---
+	// Fonction d'aide pour trouver un login disponible en ajoutant un suffixe numerique
+	async function findAvailableLogin(baseLogin) {
+		let newLogin = baseLogin;
+		let counter = 1;
+		// On boucle tant que le login qu'on essaie est deja pris
+		while (await getUserByLogin(newLogin)) {
+			newLogin = `${baseLogin}${counter}`;
+			counter++;
+		}
+		return newLogin;
+	}
+
 	fastify.get('/auth/42/callback', async (request, reply) => {
 		const { code } = request.query;
 
 		if (!code) {
-			return reply.redirect('/connexion');
+			return reply.redirect('/connexion?error=nocode');
 		}
 
-			// echanger le code contre un access_token
+		try {
+			
 		const requestData = {
 			grant_type: 'authorization_code',
 			client_id: process.env.VITE_42_CLIENT_ID,
@@ -75,8 +87,7 @@ export default async function userRoutes(fastify, options) {
 			redirect_uri: process.env.VITE_42_REDIRECT_URI,
 		};
 
-		try {
-			// Échanger le code contre un access_token
+			// echanger le code contre un access_token
 			const tokenResponse = await axios.post(
 				'https://api.intra.42.fr/oauth/token',
 				qs.stringify(requestData),
@@ -102,38 +113,80 @@ export default async function userRoutes(fastify, options) {
 			let user = await getUserBy42Login(login42);
 
 			if (!user) {
-				// Si non, on verifie si un compte avec le meme login "normal" existe
-				const existingLogin = await getUserByLogin(login42);
-				const existingEmail = await getUserByEmail(email);
-				if(existingLogin && existingEmail) {
+				// Si non, l'utilisateur existe-t-il deja avec cet email ?
+				const userByEmail = await getUserByEmail(email);
+				
+				if (userByEmail) {
+					// On a trouve un compte avec le meme email.
+					console.log(`Liaison du compte existant (email: ${email}) avec le login 42: ${login42}`);
 					await new Promise((resolve, reject) => {
-						db.run(`UPDATE users SET login_42 = ? WHERE login = ?`, [login42, login42], (err) => {
-							if (err) reject(err);
-							else resolve();
+						db.run(`UPDATE users SET login_42 = ? WHERE email = ?`, [login42, email], (err) => {
+							if (err) reject(err); else resolve();
 						});
 					});
+					user = userByEmail; // On utilise cet utilisateur pour la session
+				} else {
+					// L'utilisateur est totalement nouveau.
+					
+					// Avant de creer, on verifie si le login 42 est deja pris par un AUTRE compte.
+					let finalLogin = login42;
+					const userByLogin = await getUserByLogin(login42);
+					if (userByLogin) {
+						// On cherche un login disponible.
+						console.warn(`Conflit de login pour ${login42}. Recherche d'un login alternatif.`);
+						finalLogin = await findAvailableLogin(login42);
+						console.log(`Login alternatif trouve : ${finalLogin}`);
+					}
+					
+					// On cree le compte avec le login final.
+					console.log(`Creation d'un nouvel utilisateur avec le login: ${finalLogin}`);
+					user = await createUserFrom42({
+						login: finalLogin,
+						email: email,
+						avatar_url: avatarUrl,
+						login42: login42
+					});
+					await updateUserRanks(db);
+					notifyAllsocket('leaderboard_update', `Nouveau joueur ${finalLogin}`);
 				}
-
-				// Creer l'utilisateur s'il n'existe pas
-				user = await createUserFrom42({
-					login: login42,
-					email: email,
-					avatar_url: avatarUrl,
-				});
-				await updateUserRanks(db);
-				notifyAllsocket('leaderboard_update', `Nouveau joueur ${login42}`);
 			}
 
-			// On cree la session
-			request.session.set('user', user);
-			updateIsConnected(db, user.id);
+			// Creation de la Session et Redirection
+			if (user) {
+				request.session.set('user', user);
+				updateIsConnected(db, user.id);
+				return reply.redirect('/profile');
+			} else {
+				throw new Error("La gestion de l'utilisateur a echoue.");
+			}
 
-			return reply.redirect('/profile');
-
+		// } catch (error) {
+		// 	console.error("Erreur critique lors de l'auth 42:", error.response ? error.response.data : error.message);
+		// 	return reply.redirect('/?error=auth_failed');
+		// }
 		} catch (error) {
-			console.error("Erreur lors de l'auth 42:", error.response ? error.response.data : error.message);
-			return reply.redirect('/?error=auth_failed');
+			if (error.response && error.response.data) {
+				const errorData = error.response.data;
+				const errorType = errorData.error;
+				const errorDescription = errorData.error_description;
+		
+				console.error(`Erreur de l'API 42 [${errorType}] : ${errorDescription}`);
+				switch (errorType) {
+					case 'invalid_grant':
+						console.error("[TRANSCENDENCE] redirect_uri est incorrect.");
+						return reply.redirect('/connexion?error=invalid_grant');				
+					case 'invalid_client':
+						console.error("[TRANSCENDENCE] Identifiants de l'API 42 sont incorrects. Verifiez le fichier .env.");
+						return reply.redirect('/?error=server_config');		
+					default:
+						return reply.redirect('/?error=auth_failed');
+				}
+			} else {
+				console.error("[TRANSCENDENCE] Erreur critique non liee a l'API 42 lors de l'authentification:", error.message);
+				return reply.redirect('/?error=internal_error');
+			}
 		}
+		
 	});
 	// FIN AUTHE 42
 
