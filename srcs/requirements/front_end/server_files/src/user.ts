@@ -10,6 +10,8 @@ export interface User {
 	rank: number;
 	nb_games: number;
 	nb_won_games: number;
+	with42: number;
+	language: string;
 }
 
 const currentUser: Ref<User | null> = ref(null);

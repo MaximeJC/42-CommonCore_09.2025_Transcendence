@@ -329,7 +329,7 @@
 					</div>
 				</form>
 			</div>
-			<div class="set_container" title="password_container">
+			<div v-if="currentUser?.with42 === 0" class="set_container" title="password_container">
 				<div class="password_inputs">
 					<form class="set_form" title="form_password"  @submit.prevent="handlePassword">
 						<label title="password_label" class="set_subtitle" data-i18n="setting.old_password" ></label>

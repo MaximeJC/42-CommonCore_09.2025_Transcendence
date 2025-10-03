@@ -42,8 +42,8 @@ export default async function userRoutes(fastify, options) {
 
 		return new Promise((resolve, reject) => {
 			db.run(
-				`INSERT INTO users (login, email, password, avatar_url, login_42) VALUES (?, ?, ?, ?, ?)`,
-				[login, email, hashedPassword, avatar_url, login42],
+				`INSERT INTO users (login, email, password, avatar_url, login_42, with42) VALUES (?, ?, ?, ?, ?, ?)`,
+				[login, email, hashedPassword, avatar_url, login42, 1],
 				function (err) {
 					if (err) reject(err);
 					else {
