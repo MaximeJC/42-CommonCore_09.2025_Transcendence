@@ -72,6 +72,10 @@ function handleSubmit(e: Event) {
 		// Si un pseudo est en double, on ne valide pas
 		return;
 	}
+	if (allPlayers.value.some(player => player.trim() === "")) {
+		// Si un champ est vide, on ne valide pas
+		return;
+	}
 	const inputs = document.querySelectorAll<HTMLInputElement>('.e_add_players_login input');
 	list_of_players.value = Array.from(inputs).map(input => input.value.trim());
 	order_for_matches.value = shuffleArray(list_of_players.value);
@@ -88,7 +92,7 @@ function handleSubmit(e: Event) {
 				<div title="player1" class="player_title">
 					<div data-i18n="tournament.player 1" ></div>
 					<input title="player1" v-model='player1' :class="{ error: isDuplicate1 }"  maxlength="13"></input>
-					<div v-ifshow="isDuplicate1" class="error-message" data-i18n="tournament.error_pseudo"></div>
+					<div v-show="isDuplicate1" class="error-message" data-i18n="tournament.error_pseudo"></div>
 				</div>
 				<div title="player2" class="player_title">
 					<div data-i18n="tournament.player 2"></div>
