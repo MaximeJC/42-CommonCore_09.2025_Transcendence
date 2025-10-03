@@ -5,10 +5,10 @@
 	import setting from './setting_button.vue'
 	import { user } from '../../user';
 
-	const { currentUser } = user();
+	const { currentUser, clearUser } = user();
 
 
-	let UserCookie = ''; 
+	let UserCookie = '';
 
 	const props = defineProps<{
 		setLanguage: (lang: string) => void;
@@ -30,9 +30,11 @@
 			});
 
 			if (response.ok)
-
+			{
+				clearUser();
 				console.log("Deconnexion");
-			else 
+			}
+			else
 				console.log("Erreur de connexion");
 		} catch (err) {
 				console.error("Erreur de deconnexion:", err);
@@ -103,14 +105,14 @@
 		font-size: 2rem;
 		color: white;
 		border: 2px solid #e251ca;
-		text-shadow: 
+		text-shadow:
 		0 0 10px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
 		0 0 40px #dd0aba,
 		0 0 80px #ff69b4,
 		0 0 120px #dd0aba;
-		box-shadow: 
+		box-shadow:
 		0 0 5px #dd0aba,
 		0 0 10px #dd0aba,
 		0 0 20px #dd0aba,
@@ -127,14 +129,14 @@
 	.my-button:hover{
 		background-color: rgba(251, 255, 34, 0.5);
 		border: 2px solid #fbff22;
-		box-shadow: 
+		box-shadow:
 		0 0 5px #fbff22,
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
 		0 0 40px #fbff22,
 		0 0 80px #fbff22;
 
-		text-shadow: 
+		text-shadow:
 		0 0 10px #fbff22,
 		0 0 10px #fbff22,
 		0 0 20px #fbff22,
@@ -152,7 +154,7 @@
 		margin-left: 2.5rem;
 		font-size: 5rem;
 		font-weight: bold;
-		text-shadow: 
+		text-shadow:
 			0 0 10px #dd0aba,
 			0 0 10px #dd0aba,
 			0 0 20px #dd0aba,
@@ -183,7 +185,7 @@
 	}
 
 	.logo:hover{
-		text-shadow: 
+		text-shadow:
 			0 0 10px #fbff22,
 			0 0 10px #fbff22,
 			0 0 20px #fbff22,
@@ -233,7 +235,7 @@
     	.logo {
     	    font-size: 3rem;
     	    margin-left: 1rem;
-			
+
     	}
     	.logo::after {
     	    width: 24rem; /* Reduire la longueur de la ligne */
@@ -248,5 +250,5 @@
     	    width: 100%;
     	}
 	}
-	
+
 </style>
