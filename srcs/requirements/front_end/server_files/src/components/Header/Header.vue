@@ -5,7 +5,7 @@
 	import setting from './setting_button.vue'
 	import { user } from '../../user';
 
-	const { currentUser } = user();
+	const { currentUser, clearUser } = user();
 
 
 	let UserCookie = ''; 
@@ -30,8 +30,11 @@
 			});
 
 			if (response.ok)
-
+			{
+				clearUser();
 				console.log("Deconnexion");
+			}
+
 			else 
 				console.log("Erreur de connexion");
 		} catch (err) {

@@ -7,11 +7,13 @@ const props = defineProps<{
 	setLanguage: (lang: string) => void;
 }>();
 
-const { currentUser } = user();
+const { currentUser, updateUser } = user();
 
 async function setNewLanguage(lang: string) {
 	try {
 		props.setLanguage(lang);
+		updateUser({ language: lang });
+
 		updateText();
 		if (!currentUser || !currentUser.value) {
 			console.log('Pas de currentUser -setNewLanguage');
@@ -22,7 +24,7 @@ async function setNewLanguage(lang: string) {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ login: currentUser.value.login, language: lang }),
+			body: JSON.stringify({ login: currentUser.value.login, language: currentUser.value.language }),
 		});
 		if (!response.ok) {
 			throw new Error('Failed to update language');
