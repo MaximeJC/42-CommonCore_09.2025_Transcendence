@@ -4,6 +4,8 @@ import { onMounted, onUnmounted, ref ,nextTick , watch, } from "vue"
 import { setLanguage, updateText } from '../../../service/translators';
 import { user } from '../../../user';
 import { startMatchmaking } from "../../../../public/includes/js/app.js";
+import { setGameOverCallback } from "../../../../public/includes/js/networkManager.js";
+
 
 const pongServerPath = import.meta.env.VITE_PONG_SERVER_BASE_URL;
 const aiServerPath = import.meta.env.VITE_AI_SERVER_BASE_URL;
@@ -42,12 +44,17 @@ interface GameConfig {
 };
 
 // GESTION DE L'EVENEMENT DE FIN DE PARTIE
-async function handleGameResult(event: CustomEvent) {
-	console.log("Evenement 'gameresult' capture par Vue!", event.detail);
-	gameResult.value = event.detail; // Met a jour nos donnees
-	showResultScreen.value = true;
-	await nextTick();  
-	updateText()
+async function handleGameResult(gameData: any) {
+    console.log("Callback 'handleGameResult' appele avec les donnees:", gameData);
+
+    if (!gameData) {
+        console.error("handleGameResult a ete appele sans donnees de jeu.");
+        return;
+    }
+    gameResult.value = gameData;
+    showResultScreen.value = true;
+    await nextTick();  
+    updateText()
 }
 
 const emit = defineEmits(['match_rslt']);
@@ -57,13 +64,9 @@ const showSetting = (winner: string, loser: string) => {
 };
 
 const handleReturnTournament = () => {
-	const target = 'profil';
-
 	console.log("retour au tournoi recu!");
-	if (gameResult.value.winner && gameResult.value.loser)
 		showSetting(gameResult.value.winner, gameResult.value.loser)
-	else	
-		window.location.hash = target.startsWith('/') ? target : '/' + target;
+
 }
 
 function handleStartGame() {
@@ -114,7 +117,7 @@ onMounted(() => {
 	setTimeout(() => {
 	console.log("Babylon.js chargé, lancement du jeu...");
 	window.addEventListener('babylon-returned-to-lobby', handleReturnTournament);
-	window.addEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+    setGameOverCallback(handleGameResult);
 	nextTick().then(() => {
 		handleStartGame();
 				});
@@ -125,7 +128,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	// Nettoyer l'ecouteur pour eviter les fuites de memoire
-	window.removeEventListener('gameresult', (event) => handleGameResult(event as CustomEvent));
+    setGameOverCallback(handleGameResult);
 });
 
 //watch(() => props.act_match[1], (newVal) => {
