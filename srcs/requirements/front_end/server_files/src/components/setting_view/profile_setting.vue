@@ -30,9 +30,7 @@
 		email: string;
 		login: string;
 	}
-		
-	// const act: player = {email: "test@test.fr", login: "test" , avatar: "..//images/default_avatar.png"};
-
+  
 	const avatarFile = ref<File | null>(null);
 	const uploadedAvatar = ref("");
 	const uploadedPseudo = ref("");
@@ -77,7 +75,6 @@
 		console.log("Fichier à uploader:", avatarFile.value);
 		const formData = new FormData();
 		formData.append("file", avatarFile.value);
-
 
 		const userLogin = getUserLogin();
 
@@ -225,7 +222,6 @@
 			console.error("Fetch error:", err); 
 		}
 	}
-
 
 	async function handlePassword() {
 		error_password.value = false;
