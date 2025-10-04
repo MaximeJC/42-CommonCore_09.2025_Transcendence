@@ -22,6 +22,7 @@ const playerData = ref({
 	nb_games: 0,
 	nb_won_games: 0,
 	rank: 0,
+	with42: 0,
 });
 </script>
 

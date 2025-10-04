@@ -367,7 +367,8 @@ export default async function userRoutes(fastify, options) {
 				nb_games: user.nb_games,
 				nb_won_games: user.nb_won_games,
 				connected: user.connected,
-				rank: user.rank
+				rank: user.rank,
+				with42: user.with42,
 			};
 			reply.send(publicInfo);
 		} catch (err) {
