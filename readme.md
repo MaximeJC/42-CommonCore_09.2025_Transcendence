@@ -101,7 +101,7 @@ Makefile					# Makefile du projet
 - **Optimisations**: Build minifie
 - **Performance**: Optimise
 
-Quelque capture d'écran pour illustrer.
+### Quelque capture d'écran pour illustrer.
 
 ![Texte alternatif](./screen/ft_transcendance_connexion_page.png) ![Texte alternatif](./screen/ft_transcendance_connected_page.png)
 
