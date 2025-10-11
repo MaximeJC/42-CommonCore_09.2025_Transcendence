@@ -103,12 +103,11 @@ Makefile					# Makefile du projet
 
 Quelque capture d'écran pour illustrer.
 
+![Texte alternatif](https://i.ibb.co/Vc0nxnG5/ft-transcendance-connexion-page.png) ![Texte alternatif](https://i.ibb.co/c0Z7vhL/ft-transcendance-connected-page.png)
 
-![Texte alternatif](https://i.ibb.co/0jhrSMXR/image1.png) ![Texte alternatif](https://i.ibb.co/hRY7r0zC/image2.png)
+![Texte alternatif](https://i.ibb.co/LDRfB79V/ft-transcendance-connected-page-eng.png) ![Texte alternatif](https://i.ibb.co/Lzn1WtPX/ft-transcendance-choice-game.png)
 
-![Texte alternatif](https://i.ibb.co/kjwWy21/image3.png) ![Texte alternatif](https://i.ibb.co/BH3RvMT0/image4.png)
-
-![Texte alternatif](https://i.ibb.co/zTW9F9gD/image5.png) ![Texte alternatif](https://i.ibb.co/4Rt7XXJb/image6.png)
+![Texte alternatif](https://i.ibb.co/3yRrVKZk/ft-transcendance-cinematic.png) ![Texte alternatif](https://i.ibb.co/whgRPPYn/ft-transcendance-game.png)
 
 _Common Core Rank 06 - Completed in September 2025_  
 _Code by [ahoizai](https://github.com/axelhoizai), [lcollong](https://github.com/louisecollonge), [mdemare](https://github.com/KaliStudio), [mgouraud](https://github.com/MaximeJC) and [nicolmar](https://github.com/Nico-Mar42)_
